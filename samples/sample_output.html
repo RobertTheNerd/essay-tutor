@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ISEE Essay - Score 5 Example</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&family=Source+Serif+Pro:wght@400;600&display=swap");
+
+      :root {
+        --primary-blue: #2563eb;
+        --primary-gray: #374151;
+        --light-gray: #f8fafc;
+        --border-light: #e2e8f0;
+        --border-medium: #cbd5e1;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --gradient-header: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --essay-bg: #fefefe;
+        --essay-shadow: inset 0 0 0 1px #e2e8f0,
+          0 2px 4px -1px rgb(0 0 0 / 0.05);
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        color: var(--text-primary);
+        font-size: 14px;
+        min-height: 100vh;
+      }
+
+      .header {
+        background: var(--gradient-header);
+        color: white;
+        text-align: center;
+        border-radius: 12px;
+        padding: 2rem 1.5rem 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+        font-family: "Source Serif Pro", serif;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .prompt {
+        margin-top: 1rem;
+        font-size: 1rem;
+        font-style: italic;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+        font-weight: 400;
+      }
+
+      .student-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
+      }
+
+      .student-info > div {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .student-info strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      .legend {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      .legend-color {
+        width: 12px;
+        height: 8px;
+        border-radius: 2px;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .essay-container {
+        width: 100%;
+        max-width: 8in;
+        margin: 0 auto;
+        background: var(--essay-bg);
+        border-radius: 12px;
+        box-shadow: var(--essay-shadow);
+        padding: 2rem;
+        position: relative;
+      }
+
+      .essay-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        font-family: "Source Serif Pro", serif;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--border-light);
+      }
+
+      .essay-text {
+        font-family: "Space Mono", "Courier New", "Monaco", monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #2d3748;
+        text-align: left;
+        font-weight: 400;
+        letter-spacing: 0.01em;
+      }
+
+      .text-block {
+        margin-bottom: 2.5rem;
+        position: relative;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+        border-radius: 8px;
+        border-left: 4px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      .text-block:nth-child(odd) {
+        border-left-color: #3b82f6;
+      }
+
+      .text-block:nth-child(even) {
+        border-left-color: #10b981;
+      }
+
+      .text-line {
+        margin-bottom: 0.75rem;
+        padding: 0.25rem 0;
+      }
+
+      .marked-text {
+        position: relative;
+        display: inline;
+        border-radius: 2px;
+        padding: 1px 2px;
+        transition: all 0.2s ease;
+      }
+
+      .grammar-mark {
+        background: linear-gradient(
+          120deg,
+          rgba(239, 68, 68, 0.25) 0%,
+          rgba(239, 68, 68, 0.15) 100%
+        );
+      }
+
+      .word-mark {
+        background: linear-gradient(
+          120deg,
+          rgba(59, 130, 246, 0.25) 0%,
+          rgba(59, 130, 246, 0.15) 100%
+        );
+      }
+
+      .structure-mark {
+        background: linear-gradient(
+          120deg,
+          rgba(34, 197, 94, 0.25) 0%,
+          rgba(34, 197, 94, 0.15) 100%
+        );
+      }
+
+      .clarity-mark {
+        background: linear-gradient(
+          120deg,
+          rgba(249, 115, 22, 0.25) 0%,
+          rgba(249, 115, 22, 0.15) 100%
+        );
+      }
+
+      .development-mark {
+        background: linear-gradient(
+          120deg,
+          rgba(147, 51, 234, 0.25) 0%,
+          rgba(147, 51, 234, 0.15) 100%
+        );
+      }
+
+      .positive-mark {
+        background: linear-gradient(
+          120deg,
+          rgba(16, 185, 129, 0.25) 0%,
+          rgba(16, 185, 129, 0.15) 100%
+        );
+        font-weight: 600;
+      }
+
+      .annotation-marker {
+        display: inline;
+        color: white;
+        font-size: 0.65rem;
+        padding: 2px 5px;
+        border-radius: 10px;
+        margin-left: 3px;
+        font-weight: 700;
+        vertical-align: super;
+        font-family: "Inter", sans-serif;
+        box-shadow: var(--shadow-sm);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .marker-grammar {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+      }
+      .marker-word {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+      }
+      .marker-structure {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+      }
+      .marker-clarity {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+      }
+      .marker-development {
+        background: linear-gradient(135deg, #9333ea, #7c3aed);
+      }
+      .marker-positive {
+        background: linear-gradient(135deg, #10b981, #059669);
+      }
+
+      .annotation-section {
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .annotation-block {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        padding: 1rem;
+        font-size: 0.82rem;
+        line-height: 1.4;
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 280px;
+        max-width: 100%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        font-family: "Inter", sans-serif;
+        transition: all 0.15s ease;
+        box-sizing: border-box;
+      }
+
+      .annotation-block * {
+        font-size: 0.82rem;
+        line-height: 1.4;
+        font-family: "Inter", sans-serif;
+      }
+
+      .annotation-block br + * {
+        margin-top: 0.3rem;
+      }
+
+      .annotation-block:hover {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        transform: translateY(-0.5px);
+      }
+
+      .annotation-block.wide {
+        flex: 1 1 100%;
+        min-width: 100%;
+      }
+      .annotation-block.full {
+        flex: 1 1 100%;
+        min-width: 100%;
+      }
+
+      .annotation-header {
+        font-weight: 600;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        margin-bottom: 0.6rem;
+        padding-bottom: 0.3rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        letter-spacing: 0.3px;
+        opacity: 0.9;
+      }
+
+      .grammar-block {
+        border-left: 3px solid #ef4444;
+      }
+      .grammar-block .annotation-header {
+        color: #dc2626;
+      }
+
+      .word-block {
+        border-left: 3px solid #3b82f6;
+      }
+      .word-block .annotation-header {
+        color: #2563eb;
+      }
+
+      .structure-block {
+        border-left: 3px solid #22c55e;
+      }
+      .structure-block .annotation-header {
+        color: #16a34a;
+      }
+
+      .clarity-block {
+        border-left: 3px solid #f97316;
+      }
+      .clarity-block .annotation-header {
+        color: #ea580c;
+      }
+
+      .development-block {
+        border-left: 3px solid #9333ea;
+      }
+      .development-block .annotation-header {
+        color: #7c3aed;
+      }
+
+      .positive-block {
+        border-left: 3px solid #10b981;
+        background: rgba(240, 253, 250, 0.3);
+      }
+      .positive-block .annotation-header {
+        color: #059669;
+      }
+
+      .original-text {
+        background: linear-gradient(120deg, #fecaca, #fca5a5);
+        padding: 4px 8px;
+        font-style: italic;
+        border-radius: 4px;
+        font-size: 0.82rem;
+        display: inline-block;
+        font-family: "Inter", sans-serif;
+        box-shadow: var(--shadow-sm);
+        margin: 2px 0;
+        max-width: 100%;
+        word-wrap: break-word;
+        line-height: 1.4;
+      }
+
+      .suggested-text {
+        background: linear-gradient(120deg, #bbf7d0, #86efac);
+        padding: 4px 8px;
+        font-weight: 500;
+        border-radius: 4px;
+        font-size: 0.82rem;
+        display: inline-block;
+        font-family: "Inter", sans-serif;
+        box-shadow: var(--shadow-sm);
+        margin: 2px 0;
+        max-width: 100%;
+        word-wrap: break-word;
+        line-height: 1.4;
+      }
+
+      .annotation-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.82rem;
+        margin-top: 0.4rem;
+        margin-bottom: 0.2rem;
+        display: block;
+        font-family: "Inter", sans-serif;
+      }
+
+      .paragraph-feedback {
+        background: linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%);
+        border: 1px solid #93c5fd;
+        border-left: 4px solid #3b82f6;
+        padding: 1.2rem;
+        margin: 1.5rem 0;
+        font-size: 1rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        font-family: "Inter", sans-serif;
+        line-height: 1.5;
+      }
+
+      .paragraph-feedback.positive {
+        background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+        border-color: #86efac;
+        border-left-color: #22c55e;
+      }
+
+      .paragraph-feedback.excellent {
+        background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+        border-color: #fbbf24;
+        border-left-color: #f59e0b;
+      }
+
+      .paragraph-feedback strong {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .score-summary {
+        border: 1px solid var(--border-medium);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        background: white;
+        box-shadow: var(--shadow-md);
+        font-family: "Inter", sans-serif;
+      }
+
+      .score-summary h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .score-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .score-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .score-badge {
+        font-weight: 700;
+        padding: 0.25rem 0.75rem;
+        background: linear-gradient(135deg, #059669, #047857);
+        color: white;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        box-shadow: var(--shadow-sm);
+        min-width: 45px;
+        text-align: center;
+      }
+
+      .average-score {
+        text-align: center;
+        font-weight: 700;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--border-medium);
+        font-size: 1.1rem;
+        color: #059669;
+      }
+
+      .priority-section {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      .priority-excellence {
+        background: linear-gradient(135deg, #f0fdf4 0%, #fefefe 100%);
+        border-left: 4px solid #22c55e;
+      }
+
+      .priority-techniques {
+        background: linear-gradient(135deg, #faf5ff 0%, #fefefe 100%);
+        border-left: 4px solid #9333ea;
+      }
+
+      .priority-advanced {
+        background: linear-gradient(135deg, #eff6ff 0%, #fefefe 100%);
+        border-left: 4px solid #3b82f6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🏆 ISEE Essay - Score 5/5 Example</h1>
+      <div class="prompt">
+        <strong>Prompt:</strong> If you could plan your perfect day, what would
+        you do?
+      </div>
+    </div>
+
+    <div class="student-info">
+      <div><strong>Student:</strong> Example Student</div>
+      <div><strong>Date:</strong> Sample Essay</div>
+      <div><strong>Grade Level:</strong> Upper Level ISEE</div>
+      <div><strong>Score:</strong> 5/5 (Exceptional)</div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color grammar-mark"></div>
+        <span>Grammar</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color word-mark"></div>
+        <span>Advanced Vocabulary</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color structure-mark"></div>
+        <span>Sophisticated Structure</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color development-mark"></div>
+        <span>Rich Development</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color clarity-mark"></div>
+        <span>Complex Ideas</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color positive-mark"></div>
+        <span>Exceptional Techniques</span>
+      </div>
+    </div>
+
+    <div class="essay-container">
+      <div class="essay-title">
+        Score 5/5 Essay Example with Advanced Techniques
+      </div>
+
+      <div class="essay-text">
+        <!-- PARAGRAPH 1 - Sophisticated Introduction -->
+        <div class="text-block">
+          <div class="text-line">
+            <span class="marked-text positive-mark"
+              >The concept of a "perfect day" is inherently subjective, yet for
+              me, it would seamlessly blend intellectual stimulation, creative
+              expression, and meaningful human connection.<span
+                class="annotation-marker marker-positive"
+                >✓1</span
+              ></span
+            >
+            <span class="marked-text structure-mark"
+              >Rather than pursuing fleeting pleasures, my ideal day would
+              cultivate experiences that nourish both mind and spirit while
+              strengthening the bonds that make life truly fulfilling.<span
+                class="annotation-marker marker-structure"
+                >S1</span
+              ></span
+            >
+            <span class="marked-text word-mark"
+              >This carefully orchestrated symphony of activities would
+              encompass culinary artistry, technological innovation, and the
+              irreplaceable warmth of friendship.<span
+                class="annotation-marker marker-word"
+                >W1</span
+              ></span
+            >
+          </div>
+
+          <div class="annotation-section">
+            <div class="annotation-block positive-block">
+              <div class="annotation-header">Sophisticated Hook (✓1)</div>
+              <div class="annotation-label">Advanced technique:</div>
+              <span class="suggested-text"
+                >Opens with philosophical reflection on subjectivity</span
+              ><br />
+              <div class="annotation-label">Shows maturity:</div>
+              Acknowledges different perspectives while establishing personal
+              viewpoint<br />
+              <div class="annotation-label">Academic strength:</div>
+              Uses abstract concepts to frame concrete experiences
+            </div>
+
+            <div class="annotation-block structure-block">
+              <div class="annotation-header">Complex Thesis Structure (S1)</div>
+              <div class="annotation-label">Sophisticated approach:</div>
+              <span class="suggested-text"
+                >Contrasts "fleeting pleasures" with deeper values</span
+              ><br />
+              <div class="annotation-label">Advanced thinking:</div>
+              Shows understanding of different types of satisfaction<br />
+              <div class="annotation-label">Organization:</div>
+              Sets up thematic rather than chronological structure
+            </div>
+
+            <div class="annotation-block word-block">
+              <div class="annotation-header">Elevated Vocabulary (W1)</div>
+              <div class="annotation-label">Advanced terms:</div>
+              <span class="suggested-text"
+                >"orchestrated symphony," "culinary artistry," "technological
+                innovation"</span
+              ><br />
+              <div class="annotation-label">Metaphorical language:</div>
+              Uses musical metaphor to describe day's structure<br />
+              <div class="annotation-label">Precision:</div>
+              Each word choice adds specific meaning and sophistication
+            </div>
+          </div>
+
+          <div class="paragraph-feedback excellent">
+            <strong>🏆 Paragraph 1 - Exceptional Introduction:</strong> This
+            introduction demonstrates college-level thinking with its
+            philosophical opening, sophisticated vocabulary, and thematic
+            organization. The metaphorical language and abstract concepts show
+            exceptional maturity for this level.
+          </div>
+        </div>
+
+        <!-- PARAGRAPH 2 - Morning: Culinary Artistry -->
+        <div class="text-block">
+          <div class="text-line">
+            <span class="marked-text development-mark"
+              >My morning would commence with the meditative ritual of preparing
+              a nutritionally balanced breakfast, transforming simple
+              ingredients into a harmonious composition of flavors and
+              textures.<span class="annotation-marker marker-development"
+                >D1</span
+              ></span
+            >
+            <span class="marked-text positive-mark"
+              >The process itself—the rhythmic chopping of fresh herbs, the
+              gentle sizzling of farm-fresh eggs in olive oil, the aromatic
+              steam rising from perfectly toasted artisanal bread—would engage
+              all my senses in a mindful celebration of sustenance.<span
+                class="annotation-marker marker-positive"
+                >✓2</span
+              ></span
+            >
+            <span class="marked-text clarity-mark"
+              >This deliberate approach to nourishment reflects my belief that
+              how we begin each day sets the tone for everything that follows,
+              making breakfast not merely fuel for the body, but food for the
+              soul.<span class="annotation-marker marker-clarity"
+                >C1</span
+              ></span
+            >
+          </div>
+
+          <div class="annotation-section">
+            <div class="annotation-block development-block">
+              <div class="annotation-header">Rich Sensory Development (D1)</div>
+              <div class="annotation-label">Advanced technique:</div>
+              <span class="suggested-text"
+                >Transforms mundane activity into meaningful experience</span
+              ><br />
+              <div class="annotation-label">Sophisticated language:</div>
+              "meditative ritual," "harmonious composition" elevate simple
+              cooking<br />
+              <div class="annotation-label">Depth:</div>
+              Shows understanding of mindfulness and intentional living
+            </div>
+
+            <div class="annotation-block positive-block">
+              <div class="annotation-header">
+                Exceptional Sensory Writing (✓2)
+              </div>
+              <div class="annotation-label">Literary technique:</div>
+              <span class="suggested-text"
+                >Uses specific sensory details: sound, smell, sight,
+                texture</span
+              ><br />
+              <div class="annotation-label">Advanced vocabulary:</div>
+              "rhythmic chopping," "aromatic steam," "artisanal bread"<br />
+              <div class="annotation-label">Sophistication:</div>
+              Creates vivid scene that engages reader's imagination<br />
+              <div class="annotation-label">Structure:</div>
+              Uses parallel structure and alliteration for rhythm
+            </div>
+
+            <div class="annotation-block clarity-block">
+              <div class="annotation-header">Philosophical Insight (C1)</div>
+              <div class="annotation-label">Mature reflection:</div>
+              <span class="suggested-text"
+                >Connects daily routine to larger life philosophy</span
+              ><br />
+              <div class="annotation-label">Abstract thinking:</div>
+              Distinguishes between "fuel for body" and "food for soul"<br />
+              <div class="annotation-label">Depth:</div>
+              Shows understanding of how small actions reflect values
+            </div>
+          </div>
+
+          <div class="paragraph-feedback excellent">
+            <strong>🏆 Paragraph 2 - Culinary Artistry:</strong> This paragraph
+            demonstrates exceptional writing through vivid sensory details,
+            sophisticated vocabulary, and philosophical depth. The
+            transformation of cooking into a meaningful ritual shows mature
+            thinking and literary skill.
+          </div>
+        </div>
+
+        <!-- PARAGRAPH 3 - Afternoon: Innovation and Learning -->
+        <div class="text-block">
+          <div class="text-line">
+            <span class="marked-text structure-mark"
+              >Transitioning from nourishing the body to challenging the mind,
+              my afternoon would be dedicated to the exhilarating pursuit of
+              technological innovation through robotics engineering.<span
+                class="annotation-marker marker-structure"
+                >S2</span
+              ></span
+            >
+            <span class="marked-text development-mark"
+              >The intricate process of designing, programming, and
+              troubleshooting autonomous systems would satisfy my innate
+              curiosity about the intersection of creativity and logic, where
+              artistic vision meets mathematical precision.<span
+                class="annotation-marker marker-development"
+                >D2</span
+              ></span
+            >
+            <span class="marked-text positive-mark"
+              >Each failed attempt would be not a setback but a stepping stone,
+              teaching me resilience while the eventual breakthrough would
+              provide that incomparable rush of discovery that makes all the
+              struggle worthwhile.<span
+                class="annotation-marker marker-positive"
+                >✓3</span
+              ></span
+            >
+            <span class="marked-text word-mark"
+              >This intellectual odyssey would culminate in a moment of profound
+              satisfaction as my creation springs to life, embodying the
+              beautiful marriage of human imagination and technological
+              capability.<span class="annotation-marker marker-word"
+                >W2</span
+              ></span
+            >
+          </div>
+
+          <div class="annotation-section">
+            <div class="annotation-block structure-block">
+              <div class="annotation-header">Sophisticated Transition (S2)</div>
+              <div class="annotation-label">Advanced technique:</div>
+              <span class="suggested-text"
+                >Creates thematic bridge between body and mind nourishment</span
+              ><br />
+              <div class="annotation-label">Parallel structure:</div>
+              Links "nourishing the body" with "challenging the mind"<br />
+              <div class="annotation-label">Flow:</div>
+              Maintains essay's philosophical thread while shifting focus
+            </div>
+
+            <div class="annotation-block development-block">
+              <div class="annotation-header">
+                Complex Concept Development (D2)
+              </div>
+              <div class="annotation-label">Sophisticated analysis:</div>
+              <span class="suggested-text"
+                >Explores intersection of creativity and logic</span
+              ><br />
+              <div class="annotation-label">Abstract thinking:</div>
+              Connects "artistic vision" with "mathematical precision"<br />
+              <div class="annotation-label">Depth:</div>
+              Shows understanding of interdisciplinary learning
+            </div>
+
+            <div class="annotation-block positive-block">
+              <div class="annotation-header">
+                Growth Mindset Philosophy (✓3)
+              </div>
+              <div class="annotation-label">Mature perspective:</div>
+              <span class="suggested-text"
+                >Reframes failure as learning opportunity</span
+              ><br />
+              <div class="annotation-label">Emotional intelligence:</div>
+              Understands the psychology of perseverance and discovery<br />
+              <div class="annotation-label">Advanced insight:</div>
+              Shows appreciation for process over just results
+            </div>
+
+            <div class="annotation-block word-block">
+              <div class="annotation-header">Metaphorical Language (W2)</div>
+              <div class="annotation-label">Literary devices:</div>
+              <span class="suggested-text"
+                >"intellectual odyssey," "springs to life," "beautiful
+                marriage"</span
+              ><br />
+              <div class="annotation-label">Sophistication:</div>
+              Uses extended metaphors to elevate technical description<br />
+              <div class="annotation-label">Precision:</div>
+              Each metaphor adds emotional and intellectual depth
+            </div>
+          </div>
+
+          <div class="paragraph-feedback excellent">
+            <strong>🏆 Paragraph 3 - Innovation & Learning:</strong> Exceptional
+            demonstration of complex thinking through sophisticated analysis of
+            the creative-logical intersection. The growth mindset philosophy and
+            metaphorical language show remarkable maturity and literary skill.
+          </div>
+        </div>
+
+        <!-- PARAGRAPH 4 - Evening: Human Connection -->
+        <div class="text-block">
+          <div class="text-line">
+            <span class="marked-text positive-mark"
+              >As twilight approaches, my perfect day would shift toward its
+              most essential element: the irreplaceable joy of authentic human
+              connection through an intimate gathering with my closest
+              friends.<span class="annotation-marker marker-positive"
+                >✓4</span
+              ></span
+            >
+            <span class="marked-text development-mark"
+              >We would engage in the kind of deep, meandering conversations
+              that only emerge when technology is set aside and genuine presence
+              takes precedence—discussing everything from philosophical
+              questions about the nature of happiness to sharing our most
+              ambitious dreams for the future.<span
+                class="annotation-marker marker-development"
+                >D3</span
+              ></span
+            >
+            <span class="marked-text structure-mark"
+              >The evening would unfold organically, perhaps beginning with a
+              thought-provoking film that serves as a catalyst for discussion,
+              then evolving into collaborative games that challenge our minds
+              while strengthening our bonds.<span
+                class="annotation-marker marker-structure"
+                >S3</span
+              ></span
+            >
+            <span class="marked-text clarity-mark"
+              >These moments of shared laughter, mutual support, and
+              intellectual stimulation would remind me that while individual
+              pursuits nourish the soul, it is our connections with others that
+              give life its deepest meaning.<span
+                class="annotation-marker marker-clarity"
+                >C2</span
+              ></span
+            >
+          </div>
+
+          <div class="annotation-section">
+            <div class="annotation-block positive-block">
+              <div class="annotation-header">
+                Sophisticated Value System (✓4)
+              </div>
+              <div class="annotation-label">Mature priorities:</div>
+              <span class="suggested-text"
+                >Identifies human connection as "most essential element"</span
+              ><br />
+              <div class="annotation-label">Emotional intelligence:</div>
+              Understands the difference between superficial and authentic
+              relationships<br />
+              <div class="annotation-label">Depth:</div>
+              Shows appreciation for quality over quantity in friendships
+            </div>
+
+            <div class="annotation-block development-block">
+              <div class="annotation-header">Rich Social Analysis (D3)</div>
+              <div class="annotation-label">Sophisticated observation:</div>
+              <span class="suggested-text"
+                >Contrasts digital vs. genuine presence</span
+              ><br />
+              <div class="annotation-label">Specific examples:</div>
+              "philosophical questions," "ambitious dreams" show depth of
+              conversation<br />
+              <div class="annotation-label">Social awareness:</div>
+              Understands conditions that foster meaningful dialogue
+            </div>
+
+            <div class="annotation-block structure-block">
+              <div class="annotation-header">Organic Development (S3)</div>
+              <div class="annotation-label">Advanced technique:</div>
+              <span class="suggested-text"
+                >Shows how evening would "unfold organically"</span
+              ><br />
+              <div class="annotation-label">Natural progression:</div>
+              Film → discussion → games shows realistic social flow<br />
+              <div class="annotation-label">Sophistication:</div>
+              Avoids rigid scheduling in favor of authentic interaction
+            </div>
+
+            <div class="annotation-block clarity-block">
+              <div class="annotation-header">Philosophical Conclusion (C2)</div>
+              <div class="annotation-label">Profound insight:</div>
+              <span class="suggested-text"
+                >Balances individual growth with relational meaning</span
+              ><br />
+              <div class="annotation-label">Mature understanding:</div>
+              Recognizes both solitary and social needs<br />
+              <div class="annotation-label">Wisdom:</div>
+              Shows deep understanding of what makes life meaningful
+            </div>
+          </div>
+
+          <div class="paragraph-feedback excellent">
+            <strong>🏆 Paragraph 4 - Human Connection:</strong> Demonstrates
+            exceptional emotional intelligence and social awareness. The
+            sophisticated analysis of authentic vs. superficial relationships
+            and the philosophical reflection on life's meaning show remarkable
+            maturity.
+          </div>
+        </div>
+
+        <!-- PARAGRAPH 5 - Sophisticated Conclusion -->
+        <div class="text-block">
+          <div class="text-line">
+            <span class="marked-text positive-mark"
+              >This carefully curated day would represent far more than a mere
+              sequence of enjoyable activities; it would embody a holistic
+              approach to living that honors the multifaceted nature of human
+              fulfillment.<span class="annotation-marker marker-positive"
+                >✓5</span
+              ></span
+            >
+            <span class="marked-text development-mark"
+              >By weaving together sensory pleasure, intellectual challenge,
+              creative expression, and emotional connection, such a day would
+              serve as a microcosm of the balanced life I aspire to create—one
+              where each element enhances and enriches the others in an endless
+              cycle of growth and gratitude.<span
+                class="annotation-marker marker-development"
+                >D4</span
+              ></span
+            >
+            <span class="marked-text structure-mark"
+              >Ultimately, the true perfection of this day would lie not in its
+              flawless execution, but in its reflection of my deepest values and
+              its potential to inspire countless other days lived with equal
+              intention and joy.<span class="annotation-marker marker-structure"
+                >S4</span
+              ></span
+            >
+          </div>
+
+          <div class="annotation-section">
+            <div class="annotation-block positive-block wide">
+              <div class="annotation-header">Exceptional Synthesis (✓5)</div>
+              <div class="annotation-label">Advanced technique:</div>
+              <span class="suggested-text"
+                >Elevates day from "activities" to "holistic approach to
+                living"</span
+              ><br />
+              <div class="annotation-label">Sophisticated thinking:</div>
+              Recognizes "multifaceted nature of human fulfillment"<br />
+              <div class="annotation-label">Maturity:</div>
+              Shows understanding that perfect day reflects life philosophy<br />
+              <div class="annotation-label">Academic strength:</div>
+              Uses abstract concepts to provide deeper meaning
+            </div>
+
+            <div class="annotation-block development-block">
+              <div class="annotation-header">
+                Complex Thematic Integration (D4)
+              </div>
+              <div class="annotation-label">Advanced analysis:</div>
+              <span class="suggested-text"
+                >Shows how different elements "enhance and enrich" each
+                other</span
+              ><br />
+              <div class="annotation-label">Sophisticated metaphor:</div>
+              Day as "microcosm" of balanced life<br />
+              <div class="annotation-label">Cyclical thinking:</div>
+              "endless cycle of growth and gratitude" shows systems thinking
+            </div>
+
+            <div class="annotation-block structure-block">
+              <div class="annotation-header">Profound Conclusion (S4)</div>
+              <div class="annotation-label">Wisdom:</div>
+              <span class="suggested-text"
+                >True perfection lies in reflection of values, not flawless
+                execution</span
+              ><br />
+              <div class="annotation-label">Forward-thinking:</div>
+              Connects single day to "countless other days"<br />
+              <div class="annotation-label">Inspirational:</div>
+              Ends with concept of intentional living and sustained joy
+            </div>
+          </div>
+
+          <div class="paragraph-feedback excellent">
+            <strong>🏆 Paragraph 5 - Masterful Conclusion:</strong> This
+            conclusion demonstrates exceptional sophistication through its
+            synthesis of themes, philosophical depth, and inspirational vision.
+            The connection between a single day and a life philosophy shows
+            remarkable wisdom and maturity.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="score-summary">
+      <h3>🏆 Score 5/5 Analysis - What Makes This Exceptional</h3>
+      <div class="score-grid">
+        <div class="score-item">
+          <span>1. Clarity and Organization</span>
+          <span class="score-badge">5/5</span>
+        </div>
+        <div class="score-item">
+          <span>2. Relevance to Prompt</span>
+          <span class="score-badge">5/5</span>
+        </div>
+        <div class="score-item">
+          <span>3. Development and Support</span>
+          <span class="score-badge">5/5</span>
+        </div>
+        <div class="score-item">
+          <span>4. Language and Style</span>
+          <span class="score-badge">5/5</span>
+        </div>
+        <div class="score-item">
+          <span>5. Grammar and Mechanics</span>
+          <span class="score-badge">5/5</span>
+        </div>
+      </div>
+      <div class="average-score">Perfect Score: 5.0/5</div>
+
+      <div class="priority-section priority-excellence">
+        <strong>🏆 Exceptional Qualities Demonstrated:</strong><br />
+        • <strong>Philosophical depth:</strong> Opens with abstract concepts and
+        maintains sophisticated thinking throughout<br />
+        • <strong>Advanced vocabulary:</strong> Uses precise, elevated language
+        without being pretentious<br />
+        • <strong>Complex sentence structures:</strong> Varies sentence length
+        and complexity for rhythm and emphasis<br />
+        • <strong>Thematic organization:</strong> Organizes by concepts rather
+        than simple chronology<br />
+        • <strong>Sensory writing:</strong> Engages all five senses with
+        specific, vivid details<br />
+        • <strong>Metaphorical language:</strong> Uses extended metaphors and
+        literary devices effectively<br />
+        • <strong>Emotional intelligence:</strong> Shows deep understanding of
+        human psychology and relationships
+      </div>
+
+      <div class="priority-section priority-techniques">
+        <strong>🎯 Advanced Writing Techniques Used:</strong><br />
+        • <strong>Sophisticated transitions:</strong> Creates thematic bridges
+        between paragraphs<br />
+        • <strong>Parallel structure:</strong> Uses repetition for emphasis and
+        rhythm<br />
+        • <strong>Abstract thinking:</strong> Connects concrete experiences to
+        larger philosophical concepts<br />
+        • <strong>Synthesis:</strong> Weaves multiple themes together in
+        conclusion<br />
+        • <strong>Growth mindset:</strong> Shows mature perspective on failure
+        and learning<br />
+        • <strong>Systems thinking:</strong> Understands how different elements
+        interact and enhance each other<br />
+        • <strong>Reflective analysis:</strong> Goes beyond description to
+        examine meaning and significance
+      </div>
+
+      <div class="priority-section priority-advanced">
+        <strong>📚 What Sets This Apart from Score 4 Essays:</strong><br />
+        • <strong>Philosophical framework:</strong> Uses abstract concepts to
+        frame entire essay<br />
+        • <strong>Literary sophistication:</strong> Employs advanced literary
+        devices and metaphorical language<br />
+        • <strong>Emotional depth:</strong> Shows exceptional understanding of
+        human psychology and values<br />
+        • <strong>Intellectual complexity:</strong> Explores intersections
+        between different fields and concepts<br />
+        • <strong>Wisdom and maturity:</strong> Demonstrates insights typically
+        seen in much older writers<br />
+        • <strong>Inspirational vision:</strong> Connects personal experience to
+        universal human aspirations<br />
+        • <strong>Flawless execution:</strong> Perfect grammar, varied syntax,
+        and precise word choice throughout
+      </div>
+    </div>
+  </body>
+</html>
