@@ -1,13 +1,12 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { handleHello } from './lib/handlers'
+import { adaptVercelRequest, ResponseAdapter } from './lib/types'
 
 export const runtime = 'nodejs';
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
-  const { name = 'World' } = req.query;
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const platformReq = adaptVercelRequest(req)
+  const platformRes = new ResponseAdapter(res, 'vercel')
   
-  res.status(200).json({
-    message: `Hello ${name}! Essay Tutor API is running.`,
-    timestamp: new Date().toISOString(),
-    method: req.method
-  });
+  await handleHello(platformReq, platformRes)
 }

@@ -1,0 +1,28 @@
+{
+  "name": "essay-tutor-server",
+  "version": "1.0.0",
+  "description": "Self-hosted Express.js server for Essay Tutor",
+  "type": "module",
+  "main": "dist/express-server.js",
+  "scripts": {
+    "dev": "tsx express-server.ts",
+    "build": "tsc",
+    "start": "node dist/express-server.js",
+    "start:dev": "tsx express-server.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "formidable": "^3.5.4",
+    "openai": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.11.19",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+}
