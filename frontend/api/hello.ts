@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+export const runtime = 'nodejs';
+
 export default function handler(req: VercelRequest, res: VercelResponse) {
   const { name = 'World' } = req.query;
   
