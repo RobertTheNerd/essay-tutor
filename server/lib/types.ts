@@ -58,3 +58,38 @@ export class ResponseAdapter {
     this.res.setHeader(name, value)
   }
 }
+
+// Enhanced topic detection types for Phase 2
+export interface EnhancedTopicResult {
+  detectedTopic: string
+  promptType: 'describe' | 'explain' | 'persuade' | 'narrative' | 'compare' | 'other'
+  iseeCategory: 'narrative' | 'expository' | 'persuasive' | 'creative' | 'analytical'
+  confidence: number
+  keywords: string[]
+  suggestedStructure: string[]
+  relatedTopics: string[]
+}
+
+export interface EssayStructure {
+  hasIntroduction: boolean
+  hasBodyParagraphs: boolean
+  hasConclusion: boolean
+  paragraphCount: number
+  estimatedWordCount: number
+}
+
+export interface AdvancedTextStatistics {
+  normalizedText: string
+  paragraphs: number
+  sentences: number
+  words: number
+  characters: number
+  charactersNoSpaces: number
+  averageWordsPerSentence: number
+  averageSentencesPerParagraph: number
+  averageCharactersPerWord: number
+  longSentences: number
+  shortSentences: number
+  complexWords: number
+  complexityScore: number
+}

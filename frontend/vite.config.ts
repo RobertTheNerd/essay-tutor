@@ -7,11 +7,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3001',
         changeOrigin: true,
         configure: () => {
           // For development, we'll create a simple Express server to handle API routes
-          console.log('API proxy configured - run backend server on port 3000')
+          console.log('API proxy configured - run backend server on port 3001')
         }
       }
     }

@@ -4,7 +4,7 @@
 import formidable from 'formidable'
 import { promises as fs } from 'fs'
 import { aiClient } from './ai-client.js'
-import type { PlatformRequest, PlatformResponse } from './types.js'
+import type { PlatformRequest, PlatformResponse, EnhancedTopicResult, EssayStructure, AdvancedTextStatistics } from './types.js'
 
 export interface ProcessTextRequest {
   text: string
@@ -15,6 +15,7 @@ export interface ProcessTextRequest {
 export interface ProcessTextResponse {
   success: boolean
   processing: {
+    // Legacy fields for backward compatibility
     detectedTopic: string
     wordCount: number
     characterCount: number
@@ -25,10 +26,83 @@ export interface ProcessTextResponse {
     textPreview: string
     analysisReady: boolean
     aiProcessed: boolean
+    // Enhanced Phase 2 fields
+    enhancedTopic?: EnhancedTopicResult
+    essayStructure?: EssayStructure
+    advancedStats?: AdvancedTextStatistics
   }
   message: string
   timestamp: string
   nextSteps: string[]
+}
+
+// Helper function to analyze essay structure
+function analyzeEssayStructure(text: string): EssayStructure {
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0)
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0)
+  const words = text.trim().split(/\s+/).filter(word => word.length > 0)
+  
+  // Simple heuristics for structure detection
+  const hasIntroduction = paragraphs.length > 0 && paragraphs[0].length > 50
+  const hasConclusion = paragraphs.length > 1 && paragraphs[paragraphs.length - 1].length > 30
+  const hasBodyParagraphs = paragraphs.length >= 3
+  
+  return {
+    hasIntroduction,
+    hasBodyParagraphs,
+    hasConclusion,
+    paragraphCount: paragraphs.length,
+    estimatedWordCount: words.length
+  }
+}
+
+// Text normalization and cleaning functions
+function normalizeText(text: string): string {
+  return text
+    // Normalize whitespace
+    .replace(/\s+/g, ' ')
+    // Remove extra spaces around punctuation
+    .replace(/\s+([.!?,:;])/g, '$1')
+    // Ensure space after punctuation
+    .replace(/([.!?])([A-Z])/g, '$1 $2')
+    // Clean up quotes
+    .replace(/``/g, '"')
+    .replace(/''/g, '"')
+    // Trim
+    .trim()
+}
+
+function getAdvancedTextStatistics(text: string) {
+  const normalizedText = normalizeText(text)
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0)
+  const sentences = normalizedText.split(/[.!?]+/).filter(s => s.trim().length > 0)
+  const words = normalizedText.trim().split(/\s+/).filter(word => word.length > 0)
+  
+  // Advanced statistics
+  const averageWordsPerSentence = sentences.length > 0 ? (words.length / sentences.length) : 0
+  const averageSentencesPerParagraph = paragraphs.length > 0 ? (sentences.length / paragraphs.length) : 0
+  const averageCharactersPerWord = words.length > 0 ? (words.join('').length / words.length) : 0
+  
+  // Complexity indicators
+  const longSentences = sentences.filter(s => s.split(/\s+/).length > 20).length
+  const shortSentences = sentences.filter(s => s.split(/\s+/).length < 8).length
+  const complexWords = words.filter(w => w.length > 6).length
+  
+  return {
+    normalizedText,
+    paragraphs: paragraphs.length,
+    sentences: sentences.length,
+    words: words.length,
+    characters: normalizedText.length,
+    charactersNoSpaces: normalizedText.replace(/\s+/g, '').length,
+    averageWordsPerSentence: Math.round(averageWordsPerSentence * 10) / 10,
+    averageSentencesPerParagraph: Math.round(averageSentencesPerParagraph * 10) / 10,
+    averageCharactersPerWord: Math.round(averageCharactersPerWord * 10) / 10,
+    longSentences,
+    shortSentences,
+    complexWords,
+    complexityScore: Math.round(((complexWords / words.length) * 100) * 10) / 10
+  }
 }
 
 export async function handleProcessText(
@@ -52,12 +126,14 @@ export async function handleProcessText(
 
     const startTime = Date.now()
     let detectedTopic = null
+    let enhancedTopic = null
     let processingError = null
     let aiProcessed = false
 
-    // Process with AI client
+    // Process with enhanced AI topic detection
     try {
-      detectedTopic = await aiClient.detectTopic(text)
+      enhancedTopic = await aiClient.detectTopicEnhanced(text)
+      detectedTopic = enhancedTopic.detectedTopic
       aiProcessed = !detectedTopic.includes('not available') && !detectedTopic.includes('failed')
     } catch (aiError) {
       console.error('AI processing error:', aiError)
@@ -67,33 +143,42 @@ export async function handleProcessText(
 
     const processingTime = Date.now() - startTime
     
-    // Calculate text statistics
-    const actualWordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length
-    const actualCharCount = text.length
-    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length
-    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0).length
+    // Advanced text analysis
+    const advancedStats = getAdvancedTextStatistics(text)
+    
+    // Analyze essay structure
+    const essayStructure = analyzeEssayStructure(text)
 
     const response: ProcessTextResponse = {
       success: true,
       processing: {
         detectedTopic: detectedTopic || 'Topic detection not available',
-        wordCount: actualWordCount,
-        characterCount: actualCharCount,
-        sentences,
-        paragraphs,
+        wordCount: advancedStats.words,
+        characterCount: advancedStats.characters,
+        sentences: advancedStats.sentences,
+        paragraphs: advancedStats.paragraphs,
         processingTime,
-        confidence: aiProcessed ? 0.9 : 0.0,
+        confidence: aiProcessed ? (enhancedTopic?.confidence || 0.9) : 0.0,
         textPreview: text.substring(0, 200) + (text.length > 200 ? '...' : ''),
         analysisReady: true,
-        aiProcessed
+        aiProcessed,
+        // Enhanced Phase 2 data
+        enhancedTopic: enhancedTopic || undefined,
+        essayStructure,
+        advancedStats
       },
       message: processingError 
         ? `Text processed but AI analysis failed: ${processingError}`
         : aiProcessed 
-          ? 'Text processed successfully with AI topic detection!'
-          : 'Text processed successfully. Set OPENAI_API_KEY for AI topic detection.',
+          ? `Enhanced text analysis complete! Detected: ${enhancedTopic?.iseeCategory || 'Unknown'} essay (${enhancedTopic?.promptType || 'unknown'} type)`
+          : 'Text processed successfully. Set OPENAI_API_KEY for enhanced AI analysis.',
       timestamp: new Date().toISOString(),
-      nextSteps: [
+      nextSteps: aiProcessed && enhancedTopic ? [
+        `Review ${enhancedTopic.iseeCategory} essay structure and topic`,
+        `Consider these keywords: ${enhancedTopic.keywords.slice(0, 3).join(', ')}`,
+        'Proceed to detailed ISEE rubric analysis (Phase 3)',
+        'Generate comprehensive feedback report'
+      ] : [
         'Review your essay text and statistics',
         'Proceed to detailed ISEE rubric analysis (Phase 3)',
         'Generate comprehensive feedback report'
@@ -202,8 +287,9 @@ export async function handleUploadMultiple(
         await fs.unlink(filePath)
       }
 
-      // Detect page ordering and topic from combined text
-      const detectedTopic = await aiClient.detectTopic(combinedText)
+      // Detect page ordering and enhanced topic from combined text
+      const enhancedTopic = await aiClient.detectTopicEnhanced(combinedText)
+      const detectedTopic = enhancedTopic.detectedTopic
       
       // Simple page ordering (in future, implement AI-based ordering)
       const pageOrder = Array.from({ length: uploadedFiles.length }, (_, i) => i + 1)
@@ -229,7 +315,10 @@ export async function handleUploadMultiple(
           confidence: processingResults.reduce((sum, r) => sum + r.confidence, 0) / processingResults.length,
           totalPages: uploadedFiles.length,
           pageOrder,
-          aiProcessed: anyAiProcessed
+          aiProcessed: anyAiProcessed,
+          // Enhanced Phase 2 data
+          enhancedTopic: anyAiProcessed ? enhancedTopic : undefined,
+          essayStructure: anyAiProcessed ? analyzeEssayStructure(combinedText) : undefined
         },
         message: anyAiProcessed 
           ? `Successfully processed ${uploadedFiles.length} page${uploadedFiles.length !== 1 ? 's' : ''} with AI text extraction!`
