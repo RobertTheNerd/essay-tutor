@@ -26,15 +26,6 @@ app.get('/api/hello', (req, res) => {
   })
 })
 
-// Simple upload endpoint for testing (without AI for now)
-app.post('/api/upload', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Single file upload endpoint working! (Full functionality requires Vercel deployment)',
-    timestamp: new Date().toISOString(),
-  })
-})
-
 // Multiple image upload endpoint for testing
 app.post('/api/upload-multiple', (req, res) => {
   res.json({
@@ -75,7 +66,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Development API server running on http://localhost:${PORT}`)
   console.log(`📁 API routes:`)
   console.log(`   GET  http://localhost:${PORT}/api/hello`)
-  console.log(`   POST http://localhost:${PORT}/api/upload`)
   console.log(`   POST http://localhost:${PORT}/api/upload-multiple`)
   console.log(`   POST http://localhost:${PORT}/api/process-text`)
   console.log(`💡 For full functionality, deploy to Vercel with OpenAI API key`)
