@@ -12,10 +12,26 @@ function App() {
   const testAPI = async () => {
     try {
       const response = await fetch('/api/hello?name=EssayTutor')
+      
+      // Check if response is ok
+      if (!response.ok) {
+        const errorText = await response.text()
+        setApiResponse(`HTTP Error ${response.status}: ${errorText.substring(0, 500)}`)
+        return
+      }
+      
+      // Check content type
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text()
+        setApiResponse(`Invalid content type: ${contentType}\nResponse: ${responseText.substring(0, 500)}`)
+        return
+      }
+      
       const data = await response.json()
       setApiResponse(JSON.stringify(data, null, 2))
     } catch (error) {
-      setApiResponse(`Error: ${error}`)
+      setApiResponse(`Error: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 

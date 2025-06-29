@@ -1,0 +1,10 @@
+{
+  "name": "essay-tutor",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@vercel/node": "^5.3.0",
+    "formidable": "^3.5.4",
+    "openai": "^5.8.2"
+  }
+}
