@@ -6,8 +6,9 @@ import cors from 'cors'
 import multer from 'multer'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { handleProcessText, handleUploadMultiple, handleHello } from '../api/lib/handlers'
-import { adaptExpressRequest, ResponseAdapter } from '../api/lib/types'
+import { handleProcessText, handleUploadMultiple, handleHello } from '../api/lib/handlers.js'
+import { adaptExpressRequest } from '../api/lib/types.js'
+import { ResponseAdapter } from '../api/lib/types.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

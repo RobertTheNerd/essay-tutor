@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "allowJs": true,
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "../",
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -19,8 +19,9 @@
     "sourceMap": true
   },
   "include": [
-    "**/*.ts",
-    "../api/**/*.ts"
+    "*.ts",
+    "types/**/*.d.ts",
+    "../api/lib/**/*.ts"
   ],
   "exclude": [
     "node_modules",

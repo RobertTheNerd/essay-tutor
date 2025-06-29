@@ -135,11 +135,15 @@ export async function handleUploadMultiple(
 
       const [, files] = await form.parse(rawReq)
       
-      if (!files.files || files.files.length === 0) {
+      if (!files.files) {
         return res.status(400).json({ error: 'No files uploaded' })
       }
 
       uploadedFiles = Array.isArray(files.files) ? files.files : [files.files]
+      
+      if (uploadedFiles.length === 0) {
+        return res.status(400).json({ error: 'No files uploaded' })
+      }
     } else if (req.files) {
       // Express/multer parsed files
       uploadedFiles = Array.isArray(req.files) ? req.files : Object.values(req.files).flat()
