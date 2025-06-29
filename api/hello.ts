@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { handleHello } from './lib/handlers'
-import { adaptVercelRequest, ResponseAdapter } from './lib/types'
+import { handleHello } from '../server/lib/handlers.js'
+import { adaptVercelRequest, ResponseAdapter } from '../server/lib/types.js'
 
 export const runtime = 'nodejs';
 
