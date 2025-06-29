@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { aiClient } from '../lib/ai-client'
+import { aiClient } from './lib/ai-client'
 
 export const runtime = 'nodejs';
 

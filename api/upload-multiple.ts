@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import formidable from 'formidable'
 import { promises as fs } from 'fs'
-import { aiClient } from '../lib/ai-client'
+import { aiClient } from './lib/ai-client'
 
 export const runtime = 'nodejs';
 
