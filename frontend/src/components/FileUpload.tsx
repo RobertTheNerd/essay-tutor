@@ -49,12 +49,9 @@ export default function FileUpload({ onUpload, maxFiles = 10 }: FileUploadProps)
       // Add all files to form data
       acceptedFiles.forEach((file) => {
         formData.append(`files`, file)
-        formData.append(`fileNames`, file.name)
       })
-      
-      formData.append('totalFiles', acceptedFiles.length.toString())
 
-      const uploadResponse = await fetch('/api/upload-multiple', {
+      const uploadResponse = await fetch('/api/process', {
         method: 'POST',
         body: formData,
       })

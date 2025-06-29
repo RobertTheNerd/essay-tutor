@@ -27,15 +27,13 @@ export default function TextEditor({ onTextChange, placeholder }: TextEditorProp
     }
 
     try {
-      const response = await fetch('/api/process-text', {
+      const response = await fetch('/api/process', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: text.trim(),
-          wordCount,
-          charCount
+          text: text.trim()
         }),
       })
 

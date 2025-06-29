@@ -10,11 +10,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
-import {
-  handleHello,
-  handleProcessText,
-  handleUploadMultiple,
-} from "./lib/handlers.js";
+import { handleHello } from "./lib/simple-handlers.js";
 import { handleUnifiedProcessing } from "./lib/unified-handlers.js";
 import { adaptExpressRequest, ResponseAdapter } from "./lib/types.js";
 
@@ -64,14 +60,7 @@ app.get("/api/hello", async (req, res) => {
   await handleHello(platformReq, platformRes);
 });
 
-app.post("/api/process-text", async (req, res) => {
-  const platformReq = adaptExpressRequest(req);
-  const platformRes = new ResponseAdapter(res, "express");
-
-  await handleProcessText(platformReq, platformRes);
-});
-
-// New unified processing endpoint (handles both text and files)
+// Unified processing endpoint (handles both text and files)
 app.post(
   "/api/process",
   upload.array("files", 10),
@@ -91,24 +80,6 @@ app.post(
   }
 );
 
-app.post(
-  "/api/upload-multiple",
-  upload.array("files", 10),
-  async (req, res) => {
-    try {
-      const platformReq = adaptExpressRequest(req);
-      const platformRes = new ResponseAdapter(res, "express");
-
-      await handleUploadMultiple(platformReq, platformRes);
-    } catch (error) {
-      console.error("Upload error:", error);
-      res.status(500).json({
-        error: "File upload failed",
-        details: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  }
-);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -161,8 +132,6 @@ const server = app.listen(PORT, () => {
   console.log(`📁 API endpoints:`);
   console.log(`   GET  http://localhost:${PORT}/api/hello`);
   console.log(`   POST http://localhost:${PORT}/api/process (unified - text & files)`);
-  console.log(`   POST http://localhost:${PORT}/api/process-text (legacy)`);
-  console.log(`   POST http://localhost:${PORT}/api/upload-multiple (legacy)`);
   console.log(`   GET  http://localhost:${PORT}/health`);
   console.log(`🌐 Frontend: http://localhost:${PORT}`);
   console.log(`💡 Environment: ${process.env.NODE_ENV || "development"}`);
