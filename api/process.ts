@@ -4,13 +4,21 @@ export const runtime = 'nodejs';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const { handleUnifiedProcessing } = await import('../server/lib/unified-handlers.js')
-    const { adaptVercelRequest, ResponseAdapter } = await import('../server/lib/types.js')
+    // For now, return a placeholder response to test deployment
+    // TODO: Implement full unified processing once ES module issues are resolved
     
-    const platformReq = adaptVercelRequest(req)
-    const platformRes = new ResponseAdapter(res, 'vercel')
-    
-    await handleUnifiedProcessing(platformReq, platformRes, req)
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' })
+    }
+
+    const response = {
+      success: true,
+      message: 'Unified processing endpoint - under development for Vercel deployment',
+      timestamp: new Date().toISOString(),
+      platform: 'Vercel'
+    }
+
+    return res.status(200).json(response)
   } catch (error) {
     console.error('API error:', error)
     res.status(500).json({ error: 'Internal server error' })
