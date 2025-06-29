@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import FileUpload from './components/FileUpload'
+import InputMethodSelector, { type InputMethod } from './components/InputMethodSelector'
+import TextEditor from './components/TextEditor'
 
 function App() {
   const [apiResponse, setApiResponse] = useState<string>('')
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const [inputMethod, setInputMethod] = useState<InputMethod>('text')
+  const [, setEssayText] = useState<string>('')
 
   const testAPI = async () => {
     try {
@@ -15,8 +19,19 @@ function App() {
     }
   }
 
-  const handleFileUpload = (file: File) => {
-    setUploadedFile(file)
+  const handleFileUpload = (files: File[]) => {
+    setUploadedFiles(files)
+  }
+
+  const handleTextChange = (text: string) => {
+    setEssayText(text)
+  }
+
+  const handleMethodChange = (method: InputMethod) => {
+    setInputMethod(method)
+    // Clear previous data when switching methods
+    setUploadedFiles([])
+    setEssayText('')
   }
 
   return (
@@ -31,19 +46,31 @@ function App() {
           </p>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-semibold mb-4">Upload Essay</h2>
-          <FileUpload onUpload={handleFileUpload} />
-          
-          {uploadedFile && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-md">
-              <h3 className="font-medium text-blue-900">File Ready for Processing</h3>
-              <p className="text-sm text-blue-700 mt-1">
-                {uploadedFile.name} - AI processing will be added in Phase 2
-              </p>
-            </div>
-          )}
-        </div>
+        <InputMethodSelector 
+          selectedMethod={inputMethod}
+          onMethodChange={handleMethodChange}
+        />
+
+        {inputMethod === 'text' ? (
+          <TextEditor 
+            onTextChange={handleTextChange}
+            placeholder="Write your ISEE essay here. Focus on clear structure with an introduction, body paragraphs with supporting details, and a strong conclusion."
+          />
+        ) : (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-semibold mb-4">Upload Essay Images</h2>
+            <FileUpload onUpload={handleFileUpload} maxFiles={10} />
+            
+            {uploadedFiles.length > 0 && (
+              <div className="mt-4 p-4 bg-blue-50 rounded-md">
+                <h3 className="font-medium text-blue-900">Files Ready for Processing</h3>
+                <p className="text-sm text-blue-700 mt-1">
+                  {uploadedFiles.length} page{uploadedFiles.length !== 1 ? 's' : ''} selected - AI will extract text and detect page ordering
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4">API Test</h2>
@@ -81,11 +108,15 @@ function App() {
             </li>
             <li className="flex items-center">
               <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-              File upload handling
+              Multiple input methods (text + images)
             </li>
             <li className="flex items-center">
-              <span className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></span>
-              AI integration (pending)
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+              Multi-page image upload with OCR
+            </li>
+            <li className="flex items-center">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+              AI integration with GPT-4 Vision
             </li>
           </ul>
         </div>

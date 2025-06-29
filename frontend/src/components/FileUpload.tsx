@@ -2,17 +2,19 @@ import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 
 interface FileUploadProps {
-  onUpload?: (file: File) => void
+  onUpload?: (files: File[]) => void
+  maxFiles?: number
 }
 
 interface UploadResponse {
   success: boolean
-  file?: {
+  files?: Array<{
     name: string
     type: string
     size: number
     processed: boolean
-  }
+    pageNumber?: number
+  }>
   processing?: {
     extractedText: string
     detectedTopic?: string
@@ -20,27 +22,38 @@ interface UploadResponse {
     characterCount: number
     processingTime: number
     confidence: number
+    totalPages: number
+    pageOrder: number[]
   }
   message?: string
   error?: string
 }
 
-export default function FileUpload({ onUpload }: FileUploadProps) {
+export default function FileUpload({ onUpload, maxFiles = 10 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [response, setResponse] = useState<UploadResponse | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0]
-    if (!file) return
+    if (acceptedFiles.length === 0) return
 
+    // Update selected files for preview
+    setSelectedFiles(acceptedFiles)
     setUploading(true)
     setResponse(null)
     
     try {
       const formData = new FormData()
-      formData.append('file', file)
+      
+      // Add all files to form data
+      acceptedFiles.forEach((file) => {
+        formData.append(`files`, file)
+        formData.append(`fileNames`, file.name)
+      })
+      
+      formData.append('totalFiles', acceptedFiles.length.toString())
 
-      const uploadResponse = await fetch('/api/upload', {
+      const uploadResponse = await fetch('/api/upload-multiple', {
         method: 'POST',
         body: formData,
       })
@@ -49,7 +62,7 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
       setResponse(result)
       
       if (result.success && onUpload) {
-        onUpload(file)
+        onUpload(acceptedFiles)
       }
     } catch (error) {
       setResponse({
@@ -64,13 +77,12 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'text/plain': ['.txt'],
-      'application/pdf': ['.pdf'],
       'image/jpeg': ['.jpg', '.jpeg'],
       'image/png': ['.png']
     },
-    maxFiles: 1,
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxFiles: maxFiles,
+    maxSize: 10 * 1024 * 1024, // 10MB per file
+    multiple: true,
   })
 
   return (
@@ -89,33 +101,58 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
         <input {...getInputProps()} />
         
         <div className="space-y-4">
-          <div className="text-4xl">📄</div>
+          <div className="text-4xl">📸</div>
           
           {uploading ? (
             <div>
-              <div className="text-lg font-medium text-gray-900">Uploading...</div>
-              <div className="text-sm text-gray-500">Processing your file</div>
+              <div className="text-lg font-medium text-gray-900">Processing Images...</div>
+              <div className="text-sm text-gray-500">
+                Uploading {selectedFiles.length} page{selectedFiles.length !== 1 ? 's' : ''} and extracting text
+              </div>
             </div>
           ) : isDragActive ? (
             <div>
-              <div className="text-lg font-medium text-blue-900">Drop your file here</div>
+              <div className="text-lg font-medium text-blue-900">Drop your images here</div>
               <div className="text-sm text-blue-600">Release to upload</div>
             </div>
           ) : (
             <div>
               <div className="text-lg font-medium text-gray-900">
-                Drag & drop your essay file here
+                Drag & drop essay images here
               </div>
               <div className="text-sm text-gray-500">
-                or click to select a file
+                or click to select multiple images
               </div>
               <div className="text-xs text-gray-400 mt-2">
-                Supports: .txt, .pdf, .jpg, .png (max 10MB)
+                Supports: .jpg, .png (max {maxFiles} pages, 10MB each)
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* File Preview */}
+      {selectedFiles.length > 0 && !uploading && (
+        <div className="mt-4">
+          <h3 className="font-medium text-gray-900 mb-2">
+            Selected Files ({selectedFiles.length} page{selectedFiles.length !== 1 ? 's' : ''})
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`Page ${index + 1}`}
+                  className="w-full h-20 object-cover rounded border"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b">
+                  Page {index + 1}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {response && (
         <div className="mt-4 space-y-4">
@@ -130,7 +167,7 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
               <div>
                 <div className="font-medium text-green-900">Upload Successful!</div>
                 <div className="text-sm text-green-700 mt-1">
-                  {response.file?.name} ({((response.file?.size || 0) / 1024).toFixed(1)}KB)
+                  {response.files?.length || 0} page{(response.files?.length || 0) !== 1 ? 's' : ''} processed
                 </div>
                 <div className="text-sm text-green-600 mt-1">
                   {response.message}
@@ -152,6 +189,10 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
               
               <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                 <div>
+                  <span className="font-medium text-blue-800">Total Pages:</span>
+                  <span className="ml-2 text-blue-700">{response.processing.totalPages}</span>
+                </div>
+                <div>
                   <span className="font-medium text-blue-800">Word Count:</span>
                   <span className="ml-2 text-blue-700">{response.processing.wordCount}</span>
                 </div>
@@ -166,6 +207,10 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
                 <div>
                   <span className="font-medium text-blue-800">Confidence:</span>
                   <span className="ml-2 text-blue-700">{(response.processing.confidence * 100).toFixed(1)}%</span>
+                </div>
+                <div>
+                  <span className="font-medium text-blue-800">Page Order:</span>
+                  <span className="ml-2 text-blue-700">{response.processing.pageOrder.join(' → ')}</span>
                 </div>
               </div>
 
