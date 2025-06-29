@@ -58,6 +58,27 @@ export default function FileUpload({ onUpload, maxFiles = 10 }: FileUploadProps)
         body: formData,
       })
 
+      // Check if response is ok
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text()
+        setResponse({
+          success: false,
+          error: `HTTP Error ${uploadResponse.status}: ${errorText.substring(0, 500)}`
+        })
+        return
+      }
+      
+      // Check content type
+      const contentType = uploadResponse.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await uploadResponse.text()
+        setResponse({
+          success: false,
+          error: `Invalid content type: ${contentType}\nResponse: ${responseText.substring(0, 500)}`
+        })
+        return
+      }
+
       const result: UploadResponse = await uploadResponse.json()
       setResponse(result)
       

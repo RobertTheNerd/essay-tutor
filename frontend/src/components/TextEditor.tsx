@@ -39,6 +39,21 @@ export default function TextEditor({ onTextChange, placeholder }: TextEditorProp
         }),
       })
 
+      // Check if response is ok
+      if (!response.ok) {
+        const errorText = await response.text()
+        alert(`HTTP Error ${response.status}: ${errorText.substring(0, 200)}`)
+        return
+      }
+      
+      // Check content type
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text()
+        alert(`Invalid content type: ${contentType}\nResponse: ${responseText.substring(0, 200)}`)
+        return
+      }
+
       const result = await response.json()
       console.log('Text processing result:', result)
       
