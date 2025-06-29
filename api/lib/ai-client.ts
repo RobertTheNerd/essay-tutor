@@ -1,8 +1,13 @@
 import OpenAI from 'openai'
 
-// Initialize OpenAI client only if API key is available
+// Initialize OpenAI client with Azure configuration if available
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.AZURE_OPENAI_ENDPOINT ? `${process.env.AZURE_OPENAI_ENDPOINT}/openai/deployments/${process.env.AZURE_OPENAI_DEPLOYMENT_NAME}` : undefined,
+  defaultQuery: process.env.AZURE_OPENAI_ENDPOINT ? { 'api-version': process.env.AZURE_OPENAI_API_VERSION || '2024-02-15-preview' } : undefined,
+  defaultHeaders: process.env.AZURE_OPENAI_ENDPOINT ? {
+    'api-key': process.env.OPENAI_API_KEY,
+  } : undefined,
 }) : null
 
 export interface DocumentProcessingResult {
@@ -56,7 +61,7 @@ export class AIClient {
           // Use GPT-4 Vision for OCR
           const base64Image = fileBuffer.toString('base64')
           const response = await openai.chat.completions.create({
-            model: 'gpt-4-vision-preview',
+            model: process.env.AZURE_OPENAI_VISION_MODEL || 'gpt-4o-mini',
             messages: [
               {
                 role: 'user',
@@ -125,7 +130,7 @@ export class AIClient {
 
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: process.env.AZURE_OPENAI_TEXT_MODEL || 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
