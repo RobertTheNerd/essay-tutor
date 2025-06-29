@@ -24,6 +24,7 @@ interface UploadResponse {
     confidence: number
     totalPages: number
     pageOrder: number[]
+    aiProcessed: boolean
   }
   message?: string
   error?: string

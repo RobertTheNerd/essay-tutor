@@ -47,107 +47,104 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let processingError = null
     let combinedText = ''
     let totalProcessingTime = 0
+    let anyAiProcessed = false
 
-    // Process each image if OpenAI API key is available
-    if (process.env.OPENAI_API_KEY) {
-      try {
-        for (let i = 0; i < uploadedFiles.length; i++) {
-          const file = uploadedFiles[i]
-          const fileContent = await fs.readFile(file.filepath)
-          
-          const result = await aiClient.extractTextFromDocument(
-            fileContent,
-            file.mimetype || 'image/jpeg',
-            file.originalFilename || `page-${i + 1}`
-          )
-          
-          processingResults.push({
-            pageNumber: i + 1,
-            filename: file.originalFilename,
-            extractedText: result.extractedText,
-            processingTime: result.processingTime,
-            confidence: result.confidence
-          })
-          
-          combinedText += `\n\n--- Page ${i + 1} ---\n${result.extractedText}`
-          totalProcessingTime += result.processingTime
-          
-          // Clean up temporary file (FERPA compliance)
-          await fs.unlink(file.filepath)
-        }
-
-        // Detect page ordering and topic from combined text
-        const detectedTopic = await aiClient.detectTopic(combinedText)
+    // Process each image with AI client
+    try {
+      for (let i = 0; i < uploadedFiles.length; i++) {
+        const file = uploadedFiles[i]
+        const fileContent = await fs.readFile(file.filepath)
         
-        // Simple page ordering (in future, implement AI-based ordering)
-        const pageOrder = Array.from({ length: uploadedFiles.length }, (_, i) => i + 1)
+        const result = await aiClient.extractTextFromDocument(
+          fileContent,
+          file.mimetype || 'image/jpeg',
+          file.originalFilename || `page-${i + 1}`
+        )
         
-        const wordCount = combinedText.trim().split(/\s+/).filter(word => word.length > 0).length
-        const characterCount = combinedText.length
-
-        const response = {
-          success: true,
-          files: uploadedFiles.map((file, index) => ({
-            name: file.originalFilename,
-            type: file.mimetype,
-            size: file.size,
-            processed: true,
-            pageNumber: index + 1,
-          })),
-          processing: {
-            extractedText: combinedText.substring(0, 1000) + '...', // Preview only
-            detectedTopic,
-            wordCount,
-            characterCount,
-            processingTime: totalProcessingTime,
-            confidence: processingResults.reduce((sum, r) => sum + r.confidence, 0) / processingResults.length,
-            totalPages: uploadedFiles.length,
-            pageOrder
-          },
-          message: `Successfully processed ${uploadedFiles.length} page${uploadedFiles.length !== 1 ? 's' : ''} with AI text extraction!`,
-          timestamp: new Date().toISOString(),
-        }
-
-        return res.status(200).json(response)
-
-      } catch (aiError) {
-        console.error('AI processing error:', aiError)
-        processingError = aiError instanceof Error ? aiError.message : 'AI processing failed'
+        processingResults.push({
+          pageNumber: i + 1,
+          filename: file.originalFilename,
+          extractedText: result.extractedText,
+          processingTime: result.processingTime,
+          confidence: result.confidence,
+          aiProcessed: result.aiProcessed
+        })
         
-        // Clean up files even if AI processing fails
-        for (const file of uploadedFiles) {
-          try {
-            await fs.unlink(file.filepath)
-          } catch (unlinkError) {
-            console.error('File cleanup error:', unlinkError)
-          }
-        }
-      }
-    } else {
-      // Clean up files when no API key
-      for (const file of uploadedFiles) {
+        combinedText += `\n\n--- Page ${i + 1} ---\n${result.extractedText}`
+        totalProcessingTime += result.processingTime
+        anyAiProcessed = anyAiProcessed || result.aiProcessed
+        
+        // Clean up temporary file (FERPA compliance)
         await fs.unlink(file.filepath)
       }
-    }
 
-    // Response when AI processing is not available or failed
-    const response = {
-      success: true,
-      files: uploadedFiles.map((file, index) => ({
-        name: file.originalFilename,
-        type: file.mimetype,
-        size: file.size,
-        processed: false,
-        pageNumber: index + 1,
-      })),
-      processing: null,
-      message: processingError 
-        ? `Files uploaded but AI processing failed: ${processingError}`
-        : `${uploadedFiles.length} page${uploadedFiles.length !== 1 ? 's' : ''} uploaded successfully. Set OPENAI_API_KEY to enable AI processing.`,
-      timestamp: new Date().toISOString(),
-    }
+      // Detect page ordering and topic from combined text
+      const detectedTopic = await aiClient.detectTopic(combinedText)
+      
+      // Simple page ordering (in future, implement AI-based ordering)
+      const pageOrder = Array.from({ length: uploadedFiles.length }, (_, i) => i + 1)
+      
+      const wordCount = combinedText.trim().split(/\s+/).filter(word => word.length > 0).length
+      const characterCount = combinedText.length
 
-    return res.status(200).json(response)
+      const response = {
+        success: true,
+        files: uploadedFiles.map((file, index) => ({
+          name: file.originalFilename,
+          type: file.mimetype,
+          size: file.size,
+          processed: processingResults[index]?.aiProcessed || false,
+          pageNumber: index + 1,
+        })),
+        processing: {
+          extractedText: combinedText.substring(0, 1000) + '...', // Preview only
+          detectedTopic,
+          wordCount,
+          characterCount,
+          processingTime: totalProcessingTime,
+          confidence: processingResults.reduce((sum, r) => sum + r.confidence, 0) / processingResults.length,
+          totalPages: uploadedFiles.length,
+          pageOrder,
+          aiProcessed: anyAiProcessed
+        },
+        message: anyAiProcessed 
+          ? `Successfully processed ${uploadedFiles.length} page${uploadedFiles.length !== 1 ? 's' : ''} with AI text extraction!`
+          : `${uploadedFiles.length} page${uploadedFiles.length !== 1 ? 's' : ''} uploaded successfully. Set OPENAI_API_KEY to enable AI processing.`,
+        timestamp: new Date().toISOString(),
+      }
+
+      return res.status(200).json(response)
+
+    } catch (aiError) {
+      console.error('AI processing error:', aiError)
+      processingError = aiError instanceof Error ? aiError.message : 'AI processing failed'
+      
+      // Clean up files even if AI processing fails
+      for (const file of uploadedFiles) {
+        try {
+          await fs.unlink(file.filepath)
+        } catch (unlinkError) {
+          console.error('File cleanup error:', unlinkError)
+        }
+      }
+
+      // Response when AI processing failed
+      const response = {
+        success: true,
+        files: uploadedFiles.map((file, index) => ({
+          name: file.originalFilename,
+          type: file.mimetype,
+          size: file.size,
+          processed: false,
+          pageNumber: index + 1,
+        })),
+        processing: null,
+        message: `Files uploaded but processing failed: ${processingError}`,
+        timestamp: new Date().toISOString(),
+      }
+
+      return res.status(200).json(response)
+    }
 
   } catch (error) {
     console.error('Upload error:', error)

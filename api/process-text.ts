@@ -22,15 +22,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const startTime = Date.now()
     let detectedTopic = null
     let processingError = null
+    let aiProcessed = false
 
-    // Process with AI if API key is available
-    if (process.env.OPENAI_API_KEY) {
-      try {
-        detectedTopic = await aiClient.detectTopic(text)
-      } catch (aiError) {
-        console.error('AI processing error:', aiError)
-        processingError = aiError instanceof Error ? aiError.message : 'AI processing failed'
-      }
+    // Process with AI client
+    try {
+      detectedTopic = await aiClient.detectTopic(text)
+      aiProcessed = !detectedTopic.includes('not available') && !detectedTopic.includes('failed')
+    } catch (aiError) {
+      console.error('AI processing error:', aiError)
+      processingError = aiError instanceof Error ? aiError.message : 'AI processing failed'
+      detectedTopic = 'Topic detection failed'
     }
 
     const processingTime = Date.now() - startTime
@@ -50,13 +51,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         sentences,
         paragraphs,
         processingTime,
-        confidence: detectedTopic ? 0.9 : 0.0,
+        confidence: aiProcessed ? 0.9 : 0.0,
         textPreview: text.substring(0, 200) + (text.length > 200 ? '...' : ''),
         analysisReady: true,
+        aiProcessed
       },
       message: processingError 
         ? `Text processed but AI analysis failed: ${processingError}`
-        : detectedTopic 
+        : aiProcessed 
           ? 'Text processed successfully with AI topic detection!'
           : 'Text processed successfully. Set OPENAI_API_KEY for AI topic detection.',
       timestamp: new Date().toISOString(),

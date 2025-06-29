@@ -1,18 +1,16 @@
 import OpenAI from 'openai'
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY environment variable is required')
-}
-
-const openai = new OpenAI({
+// Initialize OpenAI client only if API key is available
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-})
+}) : null
 
 export interface DocumentProcessingResult {
   extractedText: string
   detectedTopic?: string
   confidence: number
   processingTime: number
+  aiProcessed: boolean
   metadata: {
     fileType: string
     wordCount: number
@@ -47,40 +45,49 @@ export class AIClient {
 
     try {
       let extractedText = ''
+      let aiProcessed = false
 
       if (mimeType === 'text/plain') {
         // Direct text extraction
         extractedText = fileBuffer.toString('utf-8')
+        aiProcessed = false
       } else if (mimeType.startsWith('image/')) {
-        // Use GPT-4 Vision for OCR
-        const base64Image = fileBuffer.toString('base64')
-        const response = await openai.chat.completions.create({
-          model: 'gpt-4-vision-preview',
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: 'Extract all text from this image. Return only the text content, maintaining the original structure and formatting as much as possible.',
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:${mimeType};base64,${base64Image}`,
+        if (openai) {
+          // Use GPT-4 Vision for OCR
+          const base64Image = fileBuffer.toString('base64')
+          const response = await openai.chat.completions.create({
+            model: 'gpt-4-vision-preview',
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Extract all text from this image. Return only the text content, maintaining the original structure and formatting as much as possible.',
                   },
-                },
-              ],
-            },
-          ],
-          max_tokens: 2000,
-        })
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:${mimeType};base64,${base64Image}`,
+                    },
+                  },
+                ],
+              },
+            ],
+            max_tokens: 2000,
+          })
 
-        extractedText = response.choices[0]?.message?.content || ''
+          extractedText = response.choices[0]?.message?.content || ''
+          aiProcessed = true
+        } else {
+          extractedText = `[AI OCR not available - API key required to extract text from ${fileName}]`
+          aiProcessed = false
+        }
       } else if (mimeType === 'application/pdf') {
         // For Phase 1, we'll use basic text extraction
         // In Phase 2, we'll add proper PDF parsing with pdf-parse
         extractedText = 'PDF text extraction will be enhanced in Phase 2'
+        aiProcessed = false
       }
 
       // Basic topic detection
@@ -93,8 +100,9 @@ export class AIClient {
       return {
         extractedText,
         detectedTopic: topic,
-        confidence: 0.85, // Placeholder confidence score
+        confidence: aiProcessed ? 0.85 : 0.0,
         processingTime,
+        aiProcessed,
         metadata: {
           fileType: mimeType,
           wordCount,
@@ -111,6 +119,10 @@ export class AIClient {
    * Detect the topic/prompt from essay content
    */
   async detectTopic(text: string): Promise<string> {
+    if (!openai) {
+      return 'Topic detection not available - AI API key required'
+    }
+
     try {
       const response = await openai.chat.completions.create({
         model: 'gpt-4',
