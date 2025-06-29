@@ -5,6 +5,7 @@ import formidable from 'formidable'
 import { promises as fs } from 'fs'
 import { aiClient } from './ai-client.js'
 import type { PlatformRequest, PlatformResponse, EnhancedTopicResult, EssayStructure, AdvancedTextStatistics } from './types.js'
+import type { BatchImageProcessingResult } from './ai-client.js'
 
 export interface ProcessTextRequest {
   text: string
@@ -248,14 +249,14 @@ export async function handleUploadMultiple(
       }
     }
 
-    let processingResults = []
     let processingError = null
-    let combinedText = ''
-    let totalProcessingTime = 0
-    let anyAiProcessed = false
+    let batchResult: BatchImageProcessingResult | null = null
 
-    // Process each image with AI client
+    // Prepare files for batch processing
     try {
+      const imageFiles = []
+      
+      // Read all files first
       for (let i = 0; i < uploadedFiles.length; i++) {
         const file = uploadedFiles[i]
         const filePath = file.filepath || file.path
@@ -264,64 +265,55 @@ export async function handleUploadMultiple(
         
         const fileContent = await fs.readFile(filePath)
         
-        const result = await aiClient.extractTextFromDocument(
-          fileContent,
-          mimeType || 'image/jpeg',
-          fileName || `page-${i + 1}`
-        )
-        
-        processingResults.push({
-          pageNumber: i + 1,
-          filename: fileName,
-          extractedText: result.extractedText,
-          processingTime: result.processingTime,
-          confidence: result.confidence,
-          aiProcessed: result.aiProcessed
+        imageFiles.push({
+          buffer: fileContent,
+          filename: fileName || `page-${i + 1}`,
+          mimeType: mimeType || 'image/jpeg'
         })
-        
-        combinedText += `\n\n--- Page ${i + 1} ---\n${result.extractedText}`
-        totalProcessingTime += result.processingTime
-        anyAiProcessed = anyAiProcessed || result.aiProcessed
         
         // Clean up temporary file (FERPA compliance)
         await fs.unlink(filePath)
       }
 
-      // Detect page ordering and enhanced topic from combined text
-      const enhancedTopic = await aiClient.detectTopicEnhanced(combinedText)
-      const detectedTopic = enhancedTopic.detectedTopic
+      // Process all images in a single batch request
+      batchResult = await aiClient.processBatchImages(imageFiles)
       
-      // Simple page ordering (in future, implement AI-based ordering)
-      const pageOrder = Array.from({ length: uploadedFiles.length }, (_, i) => i + 1)
-      
-      const wordCount = combinedText.trim().split(/\s+/).filter(word => word.length > 0).length
-      const characterCount = combinedText.length
+      const wordCount = batchResult.fullText.trim().split(/\s+/).filter(word => word.length > 0).length
+      const characterCount = batchResult.fullText.length
 
       const response = {
         success: true,
-        files: uploadedFiles.map((file, index) => ({
-          name: file.originalFilename || file.name,
-          type: file.mimetype || file.type,
-          size: file.size,
-          processed: processingResults[index]?.aiProcessed || false,
-          pageNumber: index + 1,
-        })),
+        files: uploadedFiles.map((file, index) => {
+          // Find the corresponding page in ordered results
+          const pageInfo = batchResult!.orderedPages.find(p => p.originalIndex === index)
+          return {
+            name: file.originalFilename || file.name,
+            type: file.mimetype || file.type,
+            size: file.size,
+            processed: batchResult!.aiProcessed,
+            pageNumber: pageInfo?.correctOrder || index + 1,
+            originalIndex: index,
+            correctOrder: pageInfo?.correctOrder || index + 1
+          }
+        }),
         processing: {
-          extractedText: combinedText.substring(0, 1000) + '...', // Preview only
-          detectedTopic,
+          extractedText: batchResult.fullText.substring(0, 1000) + (batchResult.fullText.length > 1000 ? '...' : ''),
+          fullText: batchResult.fullText, // Complete text for analysis
+          detectedTopic: batchResult.detectedTopic,
           wordCount,
           characterCount,
-          processingTime: totalProcessingTime,
-          confidence: processingResults.reduce((sum, r) => sum + r.confidence, 0) / processingResults.length,
-          totalPages: uploadedFiles.length,
-          pageOrder,
-          aiProcessed: anyAiProcessed,
+          processingTime: batchResult.processingTime,
+          confidence: batchResult.orderedPages.reduce((sum, p) => sum + p.confidence, 0) / batchResult.orderedPages.length,
+          totalPages: batchResult.totalPages,
+          pageOrder: batchResult.orderedPages.map(p => p.correctOrder),
+          orderedPages: batchResult.orderedPages,
+          aiProcessed: batchResult.aiProcessed,
           // Enhanced Phase 2 data
-          enhancedTopic: anyAiProcessed ? enhancedTopic : undefined,
-          essayStructure: anyAiProcessed ? analyzeEssayStructure(combinedText) : undefined
+          enhancedTopic: batchResult.aiProcessed ? batchResult.enhancedTopic : undefined,
+          essayStructure: batchResult.aiProcessed ? analyzeEssayStructure(batchResult.fullText) : undefined
         },
-        message: anyAiProcessed 
-          ? `Successfully processed ${uploadedFiles.length} page${uploadedFiles.length !== 1 ? 's' : ''} with AI text extraction!`
+        message: batchResult.aiProcessed 
+          ? `Successfully processed ${uploadedFiles.length} page${uploadedFiles.length !== 1 ? 's' : ''} with batch AI processing and automatic ordering!`
           : `${uploadedFiles.length} page${uploadedFiles.length !== 1 ? 's' : ''} uploaded successfully. Set OPENAI_API_KEY to enable AI processing.`,
         timestamp: new Date().toISOString(),
       }

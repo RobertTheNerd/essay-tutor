@@ -68,6 +68,7 @@ export interface EnhancedTopicResult {
   keywords: string[]
   suggestedStructure: string[]
   relatedTopics: string[]
+  topicSource: 'extracted' | 'summarized' // Whether topic was found in text or summarized from content
 }
 
 export interface EssayStructure {

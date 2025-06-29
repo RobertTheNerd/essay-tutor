@@ -46,6 +46,22 @@ export interface DocumentProcessingResult {
   };
 }
 
+export interface BatchImageProcessingResult {
+  fullText: string;
+  detectedTopic: string;
+  enhancedTopic: EnhancedTopicResult;
+  orderedPages: {
+    originalIndex: number;
+    correctOrder: number;
+    filename: string;
+    extractedText: string;
+    confidence: number;
+  }[];
+  processingTime: number;
+  totalPages: number;
+  aiProcessed: boolean;
+}
+
 export interface EssayAnalysisResult {
   rubricScores: {
     grammarMechanics: number;
@@ -61,6 +77,230 @@ export interface EssayAnalysisResult {
 }
 
 export class AIClient {
+  /**
+   * Process multiple images in batch with AI ordering and topic extraction
+   */
+  async processBatchImages(
+    imageFiles: { buffer: Buffer; filename: string; mimeType: string }[]
+  ): Promise<BatchImageProcessingResult> {
+    const startTime = Date.now();
+    const client = getOpenAIClient();
+
+    if (!client) {
+      return {
+        fullText: "AI processing not available - API key required",
+        detectedTopic: "Topic detection not available - AI API key required",
+        enhancedTopic: {
+          detectedTopic: "Topic detection not available - AI API key required",
+          promptType: "other",
+          iseeCategory: "expository",
+          confidence: 0,
+          keywords: [],
+          suggestedStructure: [],
+          relatedTopics: [],
+          topicSource: "extracted"
+        },
+        orderedPages: imageFiles.map((file, index) => ({
+          originalIndex: index,
+          correctOrder: index + 1,
+          filename: file.filename,
+          extractedText: "AI processing not available",
+          confidence: 0
+        })),
+        processingTime: Date.now() - startTime,
+        totalPages: imageFiles.length,
+        aiProcessed: false
+      };
+    }
+
+    try {
+      // Prepare images for AI processing
+      const imageContent = imageFiles.map((file, index) => ({
+        type: "image_url" as const,
+        image_url: {
+          url: `data:${file.mimeType};base64,${file.buffer.toString("base64")}`,
+          detail: "high" as const
+        }
+      }));
+
+      // Single AI request to process all images, extract text, and determine order
+      const response = await client.chat.completions.create({
+        model: process.env.AZURE_OPENAI_VISION_MODEL || "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are an expert at processing essay images. You need to:
+
+1. Extract all text from each image
+2. Look for an EXPLICIT writing prompt/question (usually at the beginning)
+3. Determine the correct page order (images may be uploaded out of order)
+4. Combine all text in the correct order
+
+IMPORTANT: Only use "extracted" if you find an ACTUAL writing prompt/question in the text. If the essay starts directly with the student's response (no prompt visible), use "summarized".
+
+Respond with ONLY a valid JSON object:
+{
+  "detectedTopic": "The writing prompt OR topic summary",
+  "topicSource": "extracted or summarized",
+  "pages": [
+    {
+      "originalIndex": 0,
+      "correctOrder": 1,
+      "extractedText": "Full text from this page",
+      "confidence": 0.95
+    }
+  ]
+}
+
+Use topicSource: "extracted" ONLY if you find explicit prompts like:
+- "What is your favorite hobby?"
+- "Describe a time when you overcame a challenge"
+- "Do you agree that students should wear uniforms?"
+
+Use topicSource: "summarized" if the essay starts directly with the student's response like:
+- "One person who impacted me is..."
+- "My favorite hobby is basketball because..."
+- "Last summer I faced a challenge..."
+
+For summarized topics, create a brief description like "Essay about a teacher's impact" not a fictional prompt.`
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `Process these ${imageFiles.length} essay images. Extract text, identify the writing prompt, and determine correct page order. Images are provided in upload order (may not be correct order).`
+              },
+              ...imageContent
+            ]
+          }
+        ],
+        max_tokens: 4000,
+        temperature: 0.1
+      });
+
+      const content = response.choices[0]?.message?.content || "";
+      
+      try {
+        const aiResult = JSON.parse(content);
+        
+        // Validate and process AI response
+        const orderedPages = (aiResult.pages || []).map((page: any, index: number) => ({
+          originalIndex: page.originalIndex || index,
+          correctOrder: page.correctOrder || index + 1,
+          filename: imageFiles[page.originalIndex || index]?.filename || `page-${index + 1}`,
+          extractedText: page.extractedText || "",
+          confidence: Math.max(0, Math.min(1, page.confidence || 0.8))
+        }));
+
+        // Sort by correct order and combine text
+        const sortedPages = [...orderedPages].sort((a, b) => a.correctOrder - b.correctOrder);
+        const fullText = sortedPages.map(page => page.extractedText).join('\n\n');
+        
+        // Extract topic and source from AI response 
+        let detectedTopic = aiResult.detectedTopic || "";
+        let topicSource = aiResult.topicSource || "summarized";
+        
+        // Get enhanced topic analysis
+        const enhancedTopic = await this.detectTopicEnhanced(fullText);
+        enhancedTopic.topicSource = topicSource;
+        
+        // Use enhanced topic if AI didn't provide a good topic
+        if (!detectedTopic || detectedTopic.length < 10) {
+          detectedTopic = enhancedTopic.detectedTopic;
+          topicSource = "summarized"; // Default to summarized if we fall back
+          enhancedTopic.topicSource = "summarized";
+        }
+
+        return {
+          fullText,
+          detectedTopic,
+          enhancedTopic,
+          orderedPages,
+          processingTime: Date.now() - startTime,
+          totalPages: imageFiles.length,
+          aiProcessed: true
+        };
+
+      } catch (parseError) {
+        console.warn("Failed to parse batch processing response, falling back to individual processing:", parseError);
+        
+        // Fallback: process images individually
+        const fallbackResults = [];
+        let combinedText = "";
+        
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          try {
+            const result = await this.extractTextFromDocument(
+              file.buffer,
+              file.mimeType,
+              file.filename
+            );
+            
+            fallbackResults.push({
+              originalIndex: i,
+              correctOrder: i + 1,
+              filename: file.filename,
+              extractedText: result.extractedText,
+              confidence: result.confidence
+            });
+            
+            combinedText += result.extractedText + "\n\n";
+          } catch (error) {
+            fallbackResults.push({
+              originalIndex: i,
+              correctOrder: i + 1,
+              filename: file.filename,
+              extractedText: `Error processing ${file.filename}`,
+              confidence: 0
+            });
+          }
+        }
+        
+        const enhancedTopic = await this.detectTopicEnhanced(combinedText);
+        
+        return {
+          fullText: combinedText,
+          detectedTopic: enhancedTopic.detectedTopic,
+          enhancedTopic,
+          orderedPages: fallbackResults,
+          processingTime: Date.now() - startTime,
+          totalPages: imageFiles.length,
+          aiProcessed: true
+        };
+      }
+
+    } catch (error) {
+      console.error("Batch image processing error:", error);
+      
+      return {
+        fullText: "Batch processing failed",
+        detectedTopic: "Topic detection failed",
+        enhancedTopic: {
+          detectedTopic: "Topic detection failed",
+          promptType: "other",
+          iseeCategory: "expository",
+          confidence: 0,
+          keywords: [],
+          suggestedStructure: [],
+          relatedTopics: [],
+          topicSource: "summarized"
+        },
+        orderedPages: imageFiles.map((file, index) => ({
+          originalIndex: index,
+          correctOrder: index + 1,
+          filename: file.filename,
+          extractedText: "Processing failed",
+          confidence: 0
+        })),
+        processingTime: Date.now() - startTime,
+        totalPages: imageFiles.length,
+        aiProcessed: false
+      };
+    }
+  }
+
   /**
    * Extract text from various document formats using GPT-4 Vision
    */
@@ -172,6 +412,7 @@ export class AIClient {
         keywords: [],
         suggestedStructure: [],
         relatedTopics: [],
+        topicSource: "extracted"
       };
     }
 
@@ -204,14 +445,19 @@ Prompt Types:
 
 Respond with ONLY a valid JSON object with these exact fields:
 {
-  "detectedTopic": "The exact writing prompt/question given to the student",
+  "detectedTopic": "The writing prompt OR topic summary",
   "promptType": "describe|explain|persuade|narrative|compare|other",
   "iseeCategory": "narrative|expository|persuasive|creative|analytical",
   "confidence": 0.95,
   "keywords": ["key", "terms", "from", "prompt"],
   "suggestedStructure": ["Introduction with thesis", "Body paragraph 1", "Body paragraph 2", "Conclusion"],
-  "relatedTopics": ["related", "topic", "suggestions"]
-}`,
+  "relatedTopics": ["related", "topic", "suggestions"],
+  "topicSource": "extracted or summarized"
+}
+
+If you find an explicit writing prompt/question in the text (like "What is your favorite..." or "Describe a time when..."), use topicSource: "extracted" and include the exact prompt.
+
+If no explicit prompt is found, use topicSource: "summarized" and create a concise topic summary based on what the essay is about.`,
           },
           {
             role: "user",
@@ -244,6 +490,9 @@ Respond with ONLY a valid JSON object with these exact fields:
 
         // Validate confidence is between 0 and 1
         result.confidence = Math.max(0, Math.min(1, result.confidence || 0.5));
+        
+        // Ensure topicSource is valid
+        result.topicSource = result.topicSource === "extracted" ? "extracted" : "summarized";
 
         return result;
       } catch (parseError) {
@@ -261,6 +510,7 @@ Respond with ONLY a valid JSON object with these exact fields:
           keywords: [],
           suggestedStructure: ["Introduction", "Body paragraphs", "Conclusion"],
           relatedTopics: [],
+          topicSource: "summarized"
         };
       }
     } catch (error) {
@@ -273,6 +523,7 @@ Respond with ONLY a valid JSON object with these exact fields:
         keywords: [],
         suggestedStructure: [],
         relatedTopics: [],
+        topicSource: "summarized"
       };
     }
   }
