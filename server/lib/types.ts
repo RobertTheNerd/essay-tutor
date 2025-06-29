@@ -94,3 +94,60 @@ export interface AdvancedTextStatistics {
   complexWords: number
   complexityScore: number
 }
+
+// Unified Architecture Data Structures
+
+export interface DocumentPage {
+  pageNumber: number
+  content: string
+  confidence: number
+  metadata?: {
+    originalFilename?: string
+    originalIndex?: number // For reordered pages
+    processingTime?: number
+  }
+}
+
+export interface MultiPageDocument {
+  pages: DocumentPage[]
+  metadata: {
+    source: 'text' | 'images' | 'pdf'
+    totalPages: number
+    processingTime: number
+    confidence: number
+    aiProcessed: boolean
+  }
+}
+
+export interface WritingPrompt {
+  text: string
+  source: 'extracted' | 'summarized' | 'user_provided'
+  confidence: number
+  iseeCategory?: 'narrative' | 'expository' | 'persuasive' | 'creative' | 'analytical'
+  promptType?: 'describe' | 'explain' | 'persuade' | 'narrative' | 'compare' | 'other'
+}
+
+export interface StructuredEssay {
+  writingPrompt: WritingPrompt
+  studentEssay: {
+    fullText: string
+    structure: EssayStructure
+    statistics: AdvancedTextStatistics
+    enhancedTopic: EnhancedTopicResult
+  }
+  metadata: {
+    originalDocument: MultiPageDocument
+    processingTime: number
+    timestamp: string
+  }
+}
+
+// Unified API Response Structure
+export interface UnifiedProcessingResponse {
+  success: boolean
+  document: MultiPageDocument
+  essay: StructuredEssay
+  message: string
+  timestamp: string
+  processingTime: number
+}

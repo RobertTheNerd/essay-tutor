@@ -15,6 +15,7 @@ import {
   handleProcessText,
   handleUploadMultiple,
 } from "./lib/handlers.js";
+import { handleUnifiedProcessing } from "./lib/unified-handlers.js";
 import { adaptExpressRequest, ResponseAdapter } from "./lib/types.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -69,6 +70,26 @@ app.post("/api/process-text", async (req, res) => {
 
   await handleProcessText(platformReq, platformRes);
 });
+
+// New unified processing endpoint (handles both text and files)
+app.post(
+  "/api/process",
+  upload.array("files", 10),
+  async (req, res) => {
+    try {
+      const platformReq = adaptExpressRequest(req);
+      const platformRes = new ResponseAdapter(res, "express");
+
+      await handleUnifiedProcessing(platformReq, platformRes);
+    } catch (error) {
+      console.error("Unified processing error:", error);
+      res.status(500).json({
+        error: "Processing failed",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+);
 
 app.post(
   "/api/upload-multiple",
@@ -139,8 +160,9 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Essay Tutor Express Server running on port ${PORT}`);
   console.log(`📁 API endpoints:`);
   console.log(`   GET  http://localhost:${PORT}/api/hello`);
-  console.log(`   POST http://localhost:${PORT}/api/process-text`);
-  console.log(`   POST http://localhost:${PORT}/api/upload-multiple`);
+  console.log(`   POST http://localhost:${PORT}/api/process (unified - text & files)`);
+  console.log(`   POST http://localhost:${PORT}/api/process-text (legacy)`);
+  console.log(`   POST http://localhost:${PORT}/api/upload-multiple (legacy)`);
   console.log(`   GET  http://localhost:${PORT}/health`);
   console.log(`🌐 Frontend: http://localhost:${PORT}`);
   console.log(`💡 Environment: ${process.env.NODE_ENV || "development"}`);
