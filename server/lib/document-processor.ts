@@ -1,7 +1,7 @@
 // Unified Document Processing Service
 // Handles conversion of all input types to MultiPageDocument → StructuredEssay pipeline
 
-import { aiClient } from './ai-client.js'
+import { aiClient } from './ai-client'
 import type { 
   MultiPageDocument, 
   DocumentPage, 
@@ -10,7 +10,7 @@ import type {
   AdvancedTextStatistics,
   EssayStructure,
   EnhancedTopicResult 
-} from './types.js'
+} from './types'
 
 /**
  * Convert text input to MultiPageDocument

@@ -2,7 +2,7 @@
   "name": "essay-tutor-server",
   "version": "1.0.0",
   "description": "Self-hosted Express.js server for Essay Tutor",
-  "type": "module",
+  "type": "commonjs",
   "main": "dist/express-server.js",
   "scripts": {
     "dev": "tsx express-server.ts",

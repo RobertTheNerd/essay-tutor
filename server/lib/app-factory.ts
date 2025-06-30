@@ -8,9 +8,9 @@ import path from "path"
 import { fileURLToPath } from "url"
 
 // Import handlers (will be available after compilation)
-import { handleHello } from "./simple-handlers.js"
-import { handleUnifiedProcessing } from "./unified-handlers.js"
-import { adaptExpressRequest, ResponseAdapter } from "./types.js"
+import { handleHello } from "./simple-handlers"
+import { handleUnifiedProcessing } from "./unified-handlers"
+import { adaptExpressRequest, ResponseAdapter } from "./types"
 
 export interface AppOptions {
   isServerless?: boolean

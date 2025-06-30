@@ -6,15 +6,13 @@ dotenv.config({ path: ".env.local" });
 // Uses shared app factory to eliminate code duplication
 
 import path from "path";
-import { fileURLToPath } from "url";
-import { createApp } from "./lib/app-factory.js";
+import { createApp } from "./lib/app-factory";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// In CommonJS, __dirname is available directly
 
 const PORT = process.env.PORT || 3001;
 
-// Create Express app using shared factory
+// Create Express app using shared factory  
 const frontendPath = path.join(__dirname, "../frontend/dist");
 const app = createApp({ 
   isServerless: false,

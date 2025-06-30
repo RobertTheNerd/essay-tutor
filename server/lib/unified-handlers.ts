@@ -3,8 +3,8 @@
 
 import formidable from 'formidable'
 import { promises as fs } from 'fs'
-import { convertTextToDocument, convertImagesToDocument, extractStructuredEssay } from './document-processor.js'
-import type { PlatformRequest, PlatformResponse, UnifiedProcessingResponse } from './types.js'
+import { convertTextToDocument, convertImagesToDocument, extractStructuredEssay } from './document-processor'
+import type { PlatformRequest, PlatformResponse, UnifiedProcessingResponse } from './types'
 
 export interface ProcessRequest {
   text?: string
