@@ -33,6 +33,10 @@ function getOpenAIClient(): OpenAI | null {
   return openai;
 }
 
+function getTextModel(): string {
+  return process.env.AZURE_OPENAI_TEXT_MODEL || "gpt-4o-mini";
+}
+
 export interface DocumentProcessingResult {
   extractedText: string;
   detectedTopic?: string;
@@ -74,9 +78,24 @@ export interface EssayAnalysisResult {
   feedback: string[];
   strengths: string[];
   areasForImprovement: string[];
+  annotations?: {
+    originalText: string;
+    category: string;
+    explanation: string;
+    suggestedText?: string;
+  }[];
+  nextSteps?: string;
 }
 
 export class AIClient {
+  private client: any
+  private textModel: string
+
+  constructor() {
+    this.client = getOpenAIClient()
+    this.textModel = getTextModel()
+  }
+
   /**
    * Process multiple images in batch with AI ordering and topic extraction
    */
@@ -535,19 +554,174 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
     text: string,
     topic?: string
   ): Promise<EssayAnalysisResult> {
-    // Phase 1: Basic structure, will be fully implemented in Phase 3
+    try {
+      const prompt = this.buildISEEEvaluationPrompt(text, topic);
+      
+      const response = await this.client.chat.completions.create({
+        model: this.textModel,
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert ISEE writing evaluator for grades 7-8. Provide detailed, constructive feedback based on the ISEE Upper Level rubric."
+          },
+          {
+            role: "user", 
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 2000
+      });
+
+      const aiResponse = response.choices[0]?.message?.content;
+      if (!aiResponse) {
+        throw new Error('No response from AI');
+      }
+
+      return this.parseEvaluationResponse(aiResponse);
+      
+    } catch (error) {
+      console.error('Essay analysis failed:', error);
+      // Fallback to basic analysis
+      return this.getBasicAnalysis(text);
+    }
+  }
+
+  /**
+   * Build comprehensive ISEE evaluation prompt
+   */
+  private buildISEEEvaluationPrompt(text: string, topic?: string): string {
+    return `
+Please evaluate this ISEE Upper Level (Grades 7-8) essay according to the official rubric. 
+
+${topic ? `Writing Prompt: ${topic}` : ''}
+
+Essay to Evaluate:
+"""
+${text}
+"""
+
+Please provide a detailed evaluation with:
+
+1. SCORES (1-5 scale for each category):
+   - Grammar & Mechanics (sentence structure, punctuation, spelling)
+   - Word Choice & Vocabulary (advanced vocabulary, precise word choice)
+   - Structure & Organization (essay organization, transitions, paragraphs)
+   - Development & Support (ideas development, examples, evidence)
+   - Clarity & Focus (clear thesis, coherent ideas, logical flow)
+   - Strengths & Excellence (exceptional techniques, sophisticated elements)
+
+2. DETAILED FEEDBACK for each category with specific examples from the text
+
+3. SPECIFIC ANNOTATIONS: Identify 3-5 specific text segments that need improvement, with:
+   - Original text excerpt
+   - Category (grammar/vocabulary/structure/development/clarity/strengths)
+   - Explanation of the issue
+   - Suggested improvement
+
+4. SUMMARY:
+   - Top 3 strengths
+   - Top 3 areas for improvement
+   - Next steps for growth
+
+Format your response as valid JSON with this structure:
+{
+  "scores": {
+    "grammar": 1-5,
+    "vocabulary": 1-5, 
+    "structure": 1-5,
+    "development": 1-5,
+    "clarity": 1-5,
+    "strengths": 1-5
+  },
+  "overallScore": calculated_average,
+  "feedback": ["detailed feedback for each category"],
+  "annotations": [
+    {
+      "originalText": "exact text from essay",
+      "category": "grammar|vocabulary|structure|development|clarity|strengths",
+      "explanation": "specific issue explanation",
+      "suggestedText": "suggested improvement"
+    }
+  ],
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "areasForImprovement": ["improvement 1", "improvement 2", "improvement 3"],
+  "nextSteps": "specific guidance for improvement"
+}
+
+Be constructive, specific, and encouraging while maintaining high standards appropriate for grades 7-8.
+`;
+  }
+
+  /**
+   * Parse AI evaluation response
+   */
+  private parseEvaluationResponse(aiResponse: string): EssayAnalysisResult {
+    try {
+      // Clean up the response to extract JSON
+      const jsonStart = aiResponse.indexOf('{');
+      const jsonEnd = aiResponse.lastIndexOf('}') + 1;
+      
+      if (jsonStart === -1 || jsonEnd === 0) {
+        throw new Error('No JSON found in AI response');
+      }
+      
+      const jsonStr = aiResponse.substring(jsonStart, jsonEnd);
+      const parsed = JSON.parse(jsonStr);
+      
+      return {
+        rubricScores: {
+          grammarMechanics: parsed.scores?.grammar || 3,
+          wordChoiceVocabulary: parsed.scores?.vocabulary || 3,
+          structureOrganization: parsed.scores?.structure || 3,
+          developmentSupport: parsed.scores?.development || 3,
+          clarityFocus: parsed.scores?.clarity || 3,
+        },
+        overallScore: parsed.overallScore || 3,
+        feedback: parsed.feedback || ["AI evaluation completed"],
+        strengths: parsed.strengths || ["Essay demonstrates understanding"],
+        areasForImprovement: parsed.areasForImprovement || ["Continue developing skills"],
+        annotations: parsed.annotations || [],
+        nextSteps: parsed.nextSteps || "Focus on continued improvement"
+      };
+      
+    } catch (error) {
+      console.error('Failed to parse AI response:', error);
+      console.log('Raw AI response:', aiResponse);
+      
+      // Return basic analysis if parsing fails
+      return this.getBasicAnalysis(aiResponse.substring(0, 500));
+    }
+  }
+
+  /**
+   * Fallback basic analysis when AI fails
+   */
+  private getBasicAnalysis(text: string): EssayAnalysisResult {
+    const wordCount = text.trim().split(/\s+/).length;
+    const sentenceCount = text.split(/[.!?]+/).length - 1;
+    const paragraphCount = text.split(/\n\s*\n/).length;
+    
+    // Basic scoring based on text metrics
+    const baseScore = Math.min(5, Math.max(1, Math.floor(wordCount / 50) + 1));
+    
     return {
       rubricScores: {
-        grammarMechanics: 0,
-        wordChoiceVocabulary: 0,
-        structureOrganization: 0,
-        developmentSupport: 0,
-        clarityFocus: 0,
+        grammarMechanics: baseScore,
+        wordChoiceVocabulary: Math.max(1, baseScore - 1),
+        structureOrganization: paragraphCount > 1 ? baseScore : Math.max(1, baseScore - 1),
+        developmentSupport: wordCount > 100 ? baseScore : Math.max(1, baseScore - 1),
+        clarityFocus: baseScore,
       },
-      overallScore: 0,
-      feedback: ["Essay analysis will be implemented in Phase 3"],
-      strengths: ["Analysis pending"],
-      areasForImprovement: ["Full rubric evaluation coming in Phase 3"],
+      overallScore: baseScore,
+      feedback: [
+        `Essay contains ${wordCount} words across ${paragraphCount} paragraphs`,
+        "Basic analysis completed - AI evaluation temporarily unavailable"
+      ],
+      strengths: ["Essay demonstrates effort and understanding"],
+      areasForImprovement: ["Continue developing writing skills"],
+      annotations: [],
+      nextSteps: "Focus on expanding ideas with more detail and examples"
     };
   }
 }

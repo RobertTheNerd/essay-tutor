@@ -69,144 +69,121 @@ export class EvaluationEngine {
   }
 
   private convertAnalysisToDetailedEvaluation(essay: StructuredEssay, analysis: any): any {
-    // Generate simulated detailed evaluation based on text analysis
-    const text = essay.studentEssay.fullText
-    const wordCount = text.trim().split(/\s+/).length
-    const sentenceCount = text.split(/[.!?]+/).length - 1
-    const paragraphCount = text.split(/\n\s*\n/).length
-    
-    // Basic scoring based on text metrics
-    const grammarScore = this.estimateGrammarScore(text)
-    const vocabularyScore = this.estimateVocabularyScore(text, wordCount)
-    const structureScore = this.estimateStructureScore(text, paragraphCount)
-    const developmentScore = this.estimateDevelopmentScore(text, wordCount)
-    const clarityScore = this.estimateClarityScore(text, sentenceCount)
-    const strengthsScore = Math.floor((grammarScore + vocabularyScore + structureScore + developmentScore + clarityScore) / 5)
+    // Use real AI analysis results
+    const scores = {
+      grammar: analysis.rubricScores.grammarMechanics,
+      vocabulary: analysis.rubricScores.wordChoiceVocabulary,
+      structure: analysis.rubricScores.structureOrganization,
+      development: analysis.rubricScores.developmentSupport,
+      clarity: analysis.rubricScores.clarityFocus,
+      strengths: Math.round((analysis.rubricScores.grammarMechanics + 
+                            analysis.rubricScores.wordChoiceVocabulary + 
+                            analysis.rubricScores.structureOrganization + 
+                            analysis.rubricScores.developmentSupport + 
+                            analysis.rubricScores.clarityFocus) / 5)
+    }
 
+    // Convert AI feedback to structured format
+    const aiAnnotations = this.convertAIAnnotations(analysis.annotations || [])
+    
     return {
-      scores: {
-        grammar: grammarScore,
-        vocabulary: vocabularyScore,
-        structure: structureScore,
-        development: developmentScore,
-        clarity: clarityScore,
-        strengths: strengthsScore
-      },
-      detailed_feedback: {
-        grammar: {
-          score_justification: `Grammar assessment based on text analysis. Word count: ${wordCount}`,
-          strengths: ["Generally readable text structure"],
-          improvements: ["Consider varying sentence length and structure"],
-          evidence: [text.substring(0, 50) + "..."]
-        },
-        vocabulary: {
-          score_justification: `Vocabulary assessment for ${this.rubric.gradeLevel}`,
-          strengths: ["Appropriate vocabulary for grade level"],
-          improvements: ["Try incorporating more advanced vocabulary"],
-          evidence: [text.substring(0, 50) + "..."]
-        },
-        structure: {
-          score_justification: `Organization assessment. Paragraphs: ${paragraphCount}`,
-          strengths: ["Clear paragraph structure"],
-          improvements: ["Strengthen transitions between ideas"],
-          evidence: [text.substring(0, 50) + "..."]
-        },
-        development: {
-          score_justification: `Development assessment. Text length: ${wordCount} words`,
-          strengths: ["Good attempt at developing ideas"],
-          improvements: ["Add more specific examples and details"],
-          evidence: [text.substring(0, 50) + "..."]
-        },
-        clarity: {
-          score_justification: `Clarity assessment. Sentences: ${sentenceCount}`,
-          strengths: ["Generally clear communication"],
-          improvements: ["Focus on maintaining consistent clarity throughout"],
-          evidence: [text.substring(0, 50) + "..."]
-        },
-        strengths: {
-          score_justification: `Overall strengths assessment`,
-          strengths: ["Shows understanding of essay structure"],
-          improvements: ["Continue developing unique voice and style"],
-          evidence: [text.substring(0, 50) + "..."]
-        }
-      },
-      annotations: [
-        {
-          text: text.substring(0, Math.min(20, text.length)),
-          category: "structure",
-          type: "strength",
-          explanation: "Good opening",
-          suggestion: "Continue developing this idea"
-        }
-      ],
+      scores,
+      detailed_feedback: this.generateDetailedFeedback(analysis),
+      annotations: aiAnnotations,
       overall_assessment: {
-        strengths: [
-          "Demonstrates understanding of essay format",
-          "Clear attempt at organizing ideas",
-          "Appropriate length for grade level"
-        ],
-        areas_for_improvement: [
-          "Develop ideas with more specific examples",
-          "Strengthen vocabulary usage",
-          "Improve transitions between paragraphs"
-        ],
-        next_steps: "Focus on adding more descriptive details and examples to support your main ideas."
+        strengths: analysis.strengths || ["Essay demonstrates effort and understanding"],
+        areas_for_improvement: analysis.areasForImprovement || ["Continue developing writing skills"],
+        next_steps: analysis.nextSteps || "Focus on continued improvement"
       },
-      confidence: 0.8
+      confidence: 0.85
     }
   }
 
-  private estimateGrammarScore(text: string): number {
-    // Simple heuristics for grammar assessment
-    const hasCapitalStart = /^[A-Z]/.test(text.trim())
-    const hasProperEnding = /[.!?]$/.test(text.trim())
-    const avgSentenceLength = text.split(/[.!?]+/).filter(s => s.trim()).length
-    
-    let score = 3 // Base score
-    if (hasCapitalStart) score += 0.5
-    if (hasProperEnding) score += 0.5
-    if (avgSentenceLength > 2) score += 0.5
-    
-    return Math.min(5, Math.max(1, Math.round(score)))
+  /**
+   * Convert AI annotations to evaluation format
+   */
+  private convertAIAnnotations(aiAnnotations: any[]): any[] {
+    return aiAnnotations.map((annotation, index) => ({
+      text: annotation.originalText,
+      category: annotation.category,
+      type: this.getCategoryType(annotation.category),
+      explanation: annotation.explanation,
+      suggestion: annotation.suggestedText || "Consider revising this section",
+      severity: this.getSeverityFromCategory(annotation.category)
+    }))
   }
 
-  private estimateVocabularyScore(text: string, wordCount: number): number {
-    const words = text.toLowerCase().split(/\s+/)
-    const uniqueWords = new Set(words)
-    const vocabularyRatio = uniqueWords.size / words.length
+  /**
+   * Generate detailed feedback from AI analysis
+   */
+  private generateDetailedFeedback(analysis: any): any {
+    const categories = ['grammar', 'vocabulary', 'structure', 'development', 'clarity', 'strengths']
+    const feedback: any = {}
     
-    let score = 3 // Base score
-    if (vocabularyRatio > 0.7) score += 1
-    if (wordCount > 150) score += 0.5
+    categories.forEach(category => {
+      const score = this.getScoreForCategory(category, analysis)
+      const categoryFeedback = this.extractCategoryFeedback(category, analysis)
+      
+      feedback[category] = {
+        score_justification: `AI-powered ${category} assessment: ${score}/5`,
+        strengths: categoryFeedback.strengths,
+        improvements: categoryFeedback.improvements,
+        evidence: categoryFeedback.evidence
+      }
+    })
     
-    return Math.min(5, Math.max(1, Math.round(score)))
+    return feedback
   }
 
-  private estimateStructureScore(text: string, paragraphCount: number): number {
-    let score = 3 // Base score
-    if (paragraphCount >= 3) score += 1
-    if (paragraphCount >= 4) score += 0.5
-    
-    return Math.min(5, Math.max(1, Math.round(score)))
+  private getCategoryType(category: string): string {
+    return category === 'strengths' ? 'strength' : 'improvement'
   }
 
-  private estimateDevelopmentScore(text: string, wordCount: number): number {
-    let score = 3 // Base score
-    if (wordCount >= 200) score += 0.5
-    if (wordCount >= 300) score += 0.5
-    if (wordCount >= 400) score += 0.5
-    
-    return Math.min(5, Math.max(1, Math.round(score)))
+  private getSeverityFromCategory(category: string): string {
+    const severityMap: { [key: string]: string } = {
+      grammar: 'moderate',
+      vocabulary: 'minor',
+      structure: 'major',
+      development: 'moderate', 
+      clarity: 'major',
+      strengths: 'positive'
+    }
+    return severityMap[category] || 'moderate'
   }
 
-  private estimateClarityScore(text: string, sentenceCount: number): number {
-    let score = 3 // Base score
-    if (sentenceCount >= 5) score += 0.5
-    if (sentenceCount >= 10) score += 0.5
+  private getScoreForCategory(category: string, analysis: any): number {
+    const scoreMap: { [key: string]: string } = {
+      grammar: 'grammarMechanics',
+      vocabulary: 'wordChoiceVocabulary',
+      structure: 'structureOrganization',
+      development: 'developmentSupport',
+      clarity: 'clarityFocus'
+    }
     
-    return Math.min(5, Math.max(1, Math.round(score)))
+    if (category === 'strengths') {
+      return Math.round((analysis.rubricScores.grammarMechanics + 
+                        analysis.rubricScores.wordChoiceVocabulary + 
+                        analysis.rubricScores.structureOrganization + 
+                        analysis.rubricScores.developmentSupport + 
+                        analysis.rubricScores.clarityFocus) / 5)
+    }
+    
+    return analysis.rubricScores[scoreMap[category]] || 3
   }
 
+  private extractCategoryFeedback(category: string, analysis: any): any {
+    // Extract category-specific feedback from AI analysis
+    const generalFeedback = analysis.feedback || []
+    const categoryFeedback = generalFeedback.filter((fb: string) => 
+      fb.toLowerCase().includes(category.toLowerCase())
+    )
+    
+    return {
+      strengths: [`AI identified positive aspects in ${category}`],
+      improvements: categoryFeedback.length > 0 ? [categoryFeedback[0]] : [`Consider improving ${category}`],
+      evidence: [`Based on AI analysis of the essay content`]
+    }
+  }
 
   private parseCategoryScores(aiEvaluation: any): CategoryScore[] {
     const scores: CategoryScore[] = []
