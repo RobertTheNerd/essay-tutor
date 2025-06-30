@@ -5,11 +5,11 @@ import express from "express"
 import cors from "cors"
 import multer from "multer"
 import path from "path"
-import { fileURLToPath } from "url"
 
 // Import handlers (will be available after compilation)
 import { handleHello } from "./simple-handlers"
 import { handleUnifiedProcessing } from "./unified-handlers"
+import { handleEvaluation } from "./evaluation/evaluation-handler"
 import { adaptExpressRequest, ResponseAdapter } from "./types"
 
 export interface AppOptions {
@@ -69,6 +69,21 @@ export function createApp(options: AppOptions = {}) {
       console.error("Unified processing error:", error)
       res.status(500).json({
         error: "Processing failed",
+        details: error instanceof Error ? error.message : "Unknown error",
+      })
+    }
+  })
+
+  // ISEE Evaluation endpoint (Phase 3)
+  app.post("/api/evaluate", async (req, res) => {
+    try {
+      const platformReq = adaptExpressRequest(req)
+      const platformRes = new ResponseAdapter(res, "express")
+      await handleEvaluation(platformReq, platformRes)
+    } catch (error) {
+      console.error("Evaluation error:", error)
+      res.status(500).json({
+        error: "Evaluation failed",
         details: error instanceof Error ? error.message : "Unknown error",
       })
     }
