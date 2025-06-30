@@ -17,10 +17,6 @@ export interface EvaluationRequest {
     grade?: string
     date?: string
   }
-  options?: {
-    includeAnnotations?: boolean
-    generateReport?: boolean
-  }
 }
 
 export interface EvaluationResponse {
@@ -33,8 +29,8 @@ export interface EvaluationResponse {
     }
     scores: { [categoryId: string]: number }
     overall: number
-    annotations?: any[]
-    feedback?: any[]
+    annotations: any[]
+    feedback: any[]
     summary: {
       strengths: string[]
       improvements: string[]
@@ -47,7 +43,6 @@ export interface EvaluationResponse {
     }
   }
   annotatedText?: any
-  reportHtml?: string
   error?: string
 }
 
@@ -148,26 +143,15 @@ export async function handleEvaluation(
     // Perform evaluation
     const evaluation = await evaluationEngine.evaluateEssay(structuredEssay)
     
-    // Prepare response
+    // Generate annotated text for frontend consumption
+    const annotationGenerator = new AnnotationGenerator()
+    const annotatedText = annotationGenerator.generateAnnotatedText(structuredEssay, evaluation)
+
+    // Prepare clean response
     const response: EvaluationResponse = {
       success: true,
-      evaluation
-    }
-
-    // Generate annotations if requested
-    if (body.options?.includeAnnotations !== false) {
-      const annotationGenerator = new AnnotationGenerator()
-      response.annotatedText = annotationGenerator.generateAnnotatedText(structuredEssay, evaluation)
-    }
-
-    // Generate HTML report if requested
-    if (body.options?.generateReport) {
-      const annotationGenerator = new AnnotationGenerator()
-      response.reportHtml = annotationGenerator.generateHTMLReport(
-        structuredEssay,
-        evaluation,
-        body.studentInfo
-      )
+      evaluation,
+      annotatedText
     }
 
     return res.status(200).json(response)
