@@ -18,7 +18,7 @@ export default function TextEditor({ onTextChange, placeholder }: TextEditorProp
     if (onTextChange) {
       onTextChange(text)
     }
-  }, [text, onTextChange])
+  }, [text]) // Remove onTextChange from dependencies to prevent infinite loop
 
   const handleSubmit = async () => {
     if (!text.trim()) {

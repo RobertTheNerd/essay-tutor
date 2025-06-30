@@ -17,8 +17,8 @@ class EvaluationService {
   private baseUrl: string
 
   constructor() {
-    // Use the same base URL as the existing API calls
-    this.baseUrl = import.meta.env.DEV ? 'http://localhost:3001' : ''
+    // Use empty string to rely on Vite proxy in development
+    this.baseUrl = ''
   }
 
   async evaluateEssay(request: EvaluationRequest): Promise<EvaluationResponse> {
