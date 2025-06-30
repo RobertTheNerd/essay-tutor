@@ -8,8 +8,18 @@ interface FeedbackSectionProps {
 }
 
 const FeedbackSection = ({ feedbackBlocks, strengths, improvements, nextSteps }: FeedbackSectionProps) => {
+  // Add defensive checks for undefined/null props
+  const safeFeedbackBlocks = feedbackBlocks || []
+  const safeStrengths = strengths || []
+  const safeImprovements = improvements || []
+  const safeNextSteps = nextSteps || 'No specific next steps provided.'
+
   // Group feedback blocks by category
-  const groupedFeedback = feedbackBlocks.reduce((groups, block) => {
+  const groupedFeedback = safeFeedbackBlocks.reduce((groups, block) => {
+    if (!block || !block.category) {
+      console.warn('Invalid feedback block:', block)
+      return groups
+    }
     if (!groups[block.category]) {
       groups[block.category] = []
     }
@@ -50,7 +60,7 @@ const FeedbackSection = ({ feedbackBlocks, strengths, improvements, nextSteps }:
             Key Strengths
           </h3>
           <ul className="space-y-2">
-            {strengths.map((strength, index) => (
+            {safeStrengths.map((strength, index) => (
               <li key={index} className="text-green-700 text-sm flex items-start">
                 <span className="text-green-500 mr-2 mt-0.5">•</span>
                 {strength}
@@ -66,7 +76,7 @@ const FeedbackSection = ({ feedbackBlocks, strengths, improvements, nextSteps }:
             Areas for Growth
           </h3>
           <ul className="space-y-2">
-            {improvements.map((improvement, index) => (
+            {safeImprovements.map((improvement, index) => (
               <li key={index} className="text-blue-700 text-sm flex items-start">
                 <span className="text-blue-500 mr-2 mt-0.5">•</span>
                 {improvement}
@@ -83,7 +93,7 @@ const FeedbackSection = ({ feedbackBlocks, strengths, improvements, nextSteps }:
         </h3>
         
         {Object.entries(groupedFeedback).map(([category, blocks]) => (
-          <div key={category} className="space-y-3">
+          <div key={`category-${category}`} className="space-y-3">
             <h4 className="font-medium text-gray-700 capitalize flex items-center">
               <div 
                 className="w-3 h-3 rounded-full mr-2" 
@@ -93,28 +103,28 @@ const FeedbackSection = ({ feedbackBlocks, strengths, improvements, nextSteps }:
             </h4>
             
             <div className="grid gap-3 md:grid-cols-2">
-              {blocks.map((block) => (
+              {blocks.map((block, index) => (
                 <div 
-                  key={block.id} 
-                  className={`border rounded-lg p-4 ${getPriorityColor(block.priority)}`}
+                  key={block.id || `block-${category}-${index}`} 
+                  className={`border rounded-lg p-4 ${getPriorityColor(block.priority || 'medium')}`}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center">
-                      <span className="mr-2">{getTypeIcon(block.type)}</span>
-                      <h5 className="font-medium text-gray-800 text-sm">{block.title}</h5>
+                      <span className="mr-2">{getTypeIcon(block.type || 'default')}</span>
+                      <h5 className="font-medium text-gray-800 text-sm">{block.title || 'Untitled'}</h5>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded ${
                       block.priority === 'high' ? 'bg-red-100 text-red-700' :
                       block.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-green-100 text-green-700'
                     }`}>
-                      {block.priority}
+                      {block.priority || 'medium'}
                     </span>
                   </div>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    {block.content}
+                    {block.content || 'No content provided'}
                   </p>
-                  {block.relatedAnnotations.length > 0 && (
+                  {block.relatedAnnotations && block.relatedAnnotations.length > 0 && (
                     <div className="mt-2 text-xs text-gray-500">
                       Related annotations: {block.relatedAnnotations.join(', ')}
                     </div>
@@ -133,7 +143,7 @@ const FeedbackSection = ({ feedbackBlocks, strengths, improvements, nextSteps }:
           Next Steps for Improvement
         </h3>
         <p className="text-purple-700 text-sm leading-relaxed">
-          {nextSteps}
+          {safeNextSteps}
         </p>
       </div>
 
@@ -141,20 +151,20 @@ const FeedbackSection = ({ feedbackBlocks, strengths, improvements, nextSteps }:
       <div className="mt-6 pt-4 border-t border-gray-200">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
-            <div className="text-2xl font-bold text-green-600">{strengths.length}</div>
+            <div className="text-2xl font-bold text-green-600">{safeStrengths.length}</div>
             <div className="text-xs text-gray-600">Strengths</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-blue-600">{improvements.length}</div>
+            <div className="text-2xl font-bold text-blue-600">{safeImprovements.length}</div>
             <div className="text-xs text-gray-600">Improvements</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-purple-600">{feedbackBlocks.length}</div>
+            <div className="text-2xl font-bold text-purple-600">{safeFeedbackBlocks.length}</div>
             <div className="text-xs text-gray-600">Feedback Items</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-orange-600">
-              {feedbackBlocks.filter(b => b.priority === 'high').length}
+              {safeFeedbackBlocks.filter(b => b.priority === 'high').length}
             </div>
             <div className="text-xs text-gray-600">High Priority</div>
           </div>
