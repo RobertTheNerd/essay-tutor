@@ -1,5 +1,6 @@
 {
   "name": "frontend",
+  "description": "React frontend for Essay Tutor hierarchical evaluation platform",
   "private": true,
   "version": "0.0.0",
   "type": "module",

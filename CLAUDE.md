@@ -4,34 +4,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Essay Tutor is an AI-powered web application for evaluating ISEE essays. It features a unified platform-agnostic architecture that supports both serverless (Vercel) and self-hosted (Express) deployments with identical functionality.
+Essay Tutor is a hierarchical AI-powered essay evaluation platform that supports multiple standardized tests and grade levels. It features a unified platform-agnostic architecture with a sophisticated evaluation engine, currently focused on ISEE (Independent School Entrance Examination) across all grade levels (Elementary, Middle, Upper, High School).
 
 ## Architecture
 
 ### Unified API Architecture
 The project implements a unique **platform-agnostic design** where business logic is shared across deployment platforms:
 
-- **Shared Logic**: `/server/lib/` contains all core business logic
-  - `handlers.ts` - API endpoint implementations
+- **Shared Logic**: `/server/lib/` contains all core business logic (CommonJS)
+  - `unified-handlers.ts` - Unified API endpoint implementations
+  - `document-processor.ts` - Document processing pipeline (MultiPageDocument → StructuredEssay)
   - `ai-client.ts` - AI integration abstraction
+  - `app-factory.ts` - Express app factory for platform compatibility
+  - `evaluation/` - Hierarchical evaluation engine
+    - `rubric-system.ts` - Generic rubric framework
+    - `evaluation-engine.ts` - Level-adaptive evaluation logic
+    - `rubrics/isee/` - ISEE level configurations (Elementary, Middle, Upper, High School)
   - `types.ts` - Platform abstraction interfaces
 - **Platform Adapters**: 
   - Express server: `/server/express-server.ts`
-  - Vercel functions: `/api/*.ts` (thin wrappers around shared handlers)
+  - Vercel functions: `/api/index.ts` (single unified wrapper)
 
 ### Project Structure
 ```
 essay-tutor/
 ├── frontend/     # React 19 + TypeScript + Vite (port 5174 in dev)
-├── server/       # Express.js self-hosted server (port 3001)
-├── api/          # Vercel serverless functions (mirrors server endpoints)
-└── samples/      # Test data and examples
+│   └── src/components/evaluation/  # Hierarchical evaluation UI components
+├── server/       # Unified backend (Express + Vercel compatible, CommonJS)
+│   ├── lib/evaluation/             # Hierarchical evaluation engine
+│   │   └── rubrics/isee/          # ISEE level configurations
+│   └── express-server.ts          # Self-hosted server (port 3001)
+├── api/          # Vercel serverless wrapper (single unified endpoint)
+└── samples/      # Target designs (sample_output.html) and test data
 ```
 
 ### Technology Stack
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS 4.x, TanStack React Query
-- **Backend**: Express.js + Vercel Functions, TypeScript, OpenAI/Azure OpenAI
-- **AI**: GPT-4o-mini for text analysis and OCR processing
+- **Backend**: Unified Express.js + Vercel Functions, CommonJS, Node.js
+- **Evaluation Engine**: Hierarchical rubric system with level-adaptive scoring
+- **AI**: GPT-4o-mini for text analysis, OCR processing, and evaluation
+- **Reports**: Professional HTML with print optimization and color-coded annotations
 
 ## Development Commands
 
@@ -70,8 +82,15 @@ cd frontend && npm run lint && npm run format
 
 All endpoints work identically on both platforms:
 - `GET /api/hello` - Health check and AI configuration status
-- `POST /api/process-text` - Process text essays with AI analysis
-- `POST /api/upload-multiple` - Upload and OCR image files (up to 10 files, 10MB each)
+- `POST /api/process` - Unified processing endpoint for text and files
+  - Text input: JSON with `text` field for direct essay processing
+  - File input: FormData with `files` for multi-page image upload
+  - Features: AI OCR, topic detection, text analysis, ISEE categorization
+
+**Future Endpoints (Phase 3+):**
+- `POST /api/evaluate` - Full essay evaluation with rubric selection
+- `GET /api/rubrics` - Available rubric configurations
+- `POST /api/generate-report` - Professional report generation
 
 ## Environment Configuration
 
@@ -129,8 +148,9 @@ AZURE_OPENAI_TEXT_MODEL=gpt-4o-mini
 
 **Phase 1 (Complete)**: Core functionality with dual input methods and AI integration
 **Phase 2 (Complete)**: Enhanced document processing with batch AI analysis
-**Phase 2.5 (In Progress)**: Unified processing architecture refactor
-**Phase 3 (Next)**: Full ISEE rubric implementation with scoring system
+**Phase 2.5 (Complete)**: Unified processing architecture refactor
+**Phase 3 (In Progress)**: Hierarchical evaluation engine with ISEE level support
+**Phase 4 (Next)**: Advanced annotation UI and professional report generation
 
 ## Phase 2 Achievements (Recently Completed)
 
@@ -151,16 +171,42 @@ AZURE_OPENAI_TEXT_MODEL=gpt-4o-mini
 - Comprehensive validation of AI processing capabilities
 - Real-world testing with actual student essay samples
 
-## Upcoming: Unified Architecture (Phase 2.5)
+## Phase 2.5 Achievements (Recently Completed)
+
+### Unified Architecture Refactor
+- **Unified Processing Pipeline**: Complete `MultiPageDocument` → `StructuredEssay` workflow
+- **CommonJS Conversion**: Full conversion from ES modules to CommonJS for Vercel compatibility
+- **Zero Code Duplication**: Eliminated ~400 lines of duplicate code between platforms
+- **Clean API Design**: Single `/api/process` endpoint handling both text and file inputs
+- **Foundation for Evaluation**: Prepared architecture for hierarchical evaluation engine
+
+### Technical Improvements
+- **Platform Compatibility**: Seamless operation on both Vercel and self-hosted environments
+- **Import Simplification**: Removed file extensions from imports after CommonJS conversion
+- **Error Handling**: Comprehensive fallback processing for missing AI configuration
+- **Performance**: Optimized batch processing with intelligent AI request management
+
+## Phase 3: Hierarchical Evaluation Engine (In Progress)
 
 ### Goals
-- Create unified `MultiPageDocument` → `StructuredEssay` processing pipeline
-- Standardize handling of text input and file uploads
-- Clear separation of writing prompts vs student essay content
-- Foundation for Phase 3 evaluation engine and Phase 4 annotation system
+- **Generic Rubric Framework**: Test families → levels → specific rubrics architecture
+- **ISEE Level Support**: All four levels (Elementary, Middle, Upper, High School)
+- **Level-Adaptive Evaluation**: Age-appropriate criteria and feedback complexity
+- **Professional Annotation System**: Color-coded highlights matching sample_output.html
+- **Comprehensive Scoring**: Multi-category evaluation with detailed improvement guidance
 
-### Benefits
-- Consistent processing for all input types
-- Clean API design without legacy constraints
-- Better user experience with prompt clarification workflows
-- Scalable architecture for future enhancements
+### Target Architecture
+```
+Evaluation System
+├── ISEE (Test Family)
+│   ├── Elementary Level (Grades 2-4)
+│   ├── Middle Level (Grades 5-6)
+│   ├── Upper Level (Grades 7-8)
+│   └── High School Level (Grades 9-12)
+└── Future: SAT, AP, Custom rubrics
+```
+
+### Implementation Focus
+- **Grade-Appropriate Feedback**: Vocabulary and complexity matched to student level
+- **Extensible Design**: Easy addition of new test families and levels
+- **Sample-Driven Development**: Target UI quality shown in samples/sample_output.html

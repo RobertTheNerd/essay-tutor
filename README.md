@@ -1,21 +1,34 @@
-# Essay Tutor - AI-Powered ISEE Essay Evaluation
+# Essay Tutor - Hierarchical AI-Powered Essay Evaluation Platform
 
-A comprehensive web application for evaluating ISEE (Independent School Entrance Examination) essays using AI technology.
+A comprehensive web application for evaluating essays across multiple standardized tests and grade levels, with initial focus on ISEE (Independent School Entrance Examination) using advanced AI technology.
 
 ## Features
 
+### Core Evaluation System
+- **Hierarchical Rubric Support**: Test families → levels → specific rubrics (ISEE Elementary/Middle/Upper/High School)
+- **Level-Adaptive Analysis**: Age-appropriate evaluation criteria and feedback complexity
+- **Professional Annotation System**: Color-coded feedback with inline highlights and detailed suggestions
+- **Comprehensive Scoring**: Multi-category evaluation with detailed breakdown and improvement recommendations
+
+### Input and Processing
 - **Dual Input Methods**: Support for both text input and multi-page image uploads
-- **AI-Powered OCR**: Extract text from handwritten essay images
-- **Topic Detection**: Automatically identify essay topics and prompts
-- **Real-time Statistics**: Word count, character count, and writing analysis
+- **Advanced AI-Powered OCR**: Extract text from handwritten essay images with page ordering detection
+- **Smart Topic Detection**: Automatically identify essay topics and distinguish prompts from student content
+- **Real-time Statistics**: Advanced text analysis with complexity metrics and structure detection
 - **FERPA Compliant**: Secure handling of student data with automatic cleanup
+
+### Professional Reports
+- **Print-Optimized Reports**: Professional HTML reports with forced color printing support
+- **Grade-Appropriate Feedback**: Vocabulary and suggestions matched to student level
+- **Detailed Analytics**: Comprehensive evaluation across all rubric categories with specific improvement guidance
 
 ## Tech Stack
 
-- **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
-- **Backend**: Vercel Serverless Functions
-- **AI**: OpenAI GPT-4 Vision / Azure OpenAI
-- **Deployment**: Vercel + GitHub Actions
+- **Frontend**: React 18 + TypeScript + Vite + TailwindCSS + React Query
+- **Backend**: Unified Express.js + Vercel Serverless Functions (CommonJS)
+- **Evaluation Engine**: Hierarchical rubric system with level-adaptive scoring
+- **AI**: OpenAI GPT-4 Vision / Azure OpenAI for text analysis and OCR
+- **Deployment**: Vercel + Self-hosted Docker + GitHub Actions
 
 ## Setup
 
@@ -169,32 +182,50 @@ The application uses a **platform-agnostic architecture**:
 essay-tutor/
 ├── frontend/           # React frontend application
 │   ├── src/
-│   │   ├── components/ # React components
-│   │   └── App.tsx     # Main application
-│   ├── dist/           # Build output
+│   │   ├── components/     # React components
+│   │   │   ├── evaluation/ # Evaluation system components
+│   │   │   ├── FileUpload.tsx
+│   │   │   └── TextEditor.tsx
+│   │   └── App.tsx         # Main application
+│   ├── dist/               # Build output
 │   └── package.json
-├── api/                # Platform-agnostic API functions
-│   ├── lib/
-│   │   ├── ai-client.ts    # AI integration layer
-│   │   ├── handlers.ts     # Shared business logic
-│   │   └── types.ts        # Platform abstractions
-│   ├── upload-multiple.ts  # Vercel function wrapper
-│   ├── process-text.ts     # Vercel function wrapper
-│   └── hello.ts           # Health check endpoint
-├── server/             # Express.js self-hosted server
-│   ├── express-server.ts   # Full-featured API server
-│   ├── package.json
+├── server/             # Unified backend (Express + Vercel compatible)
+│   ├── lib/                # Shared business logic
+│   │   ├── ai-client.ts         # AI integration layer
+│   │   ├── document-processor.ts # Document processing pipeline
+│   │   ├── unified-handlers.ts   # API endpoint handlers
+│   │   ├── app-factory.ts       # Express app factory
+│   │   ├── evaluation/          # Hierarchical evaluation engine
+│   │   │   ├── rubric-system.ts     # Rubric definitions
+│   │   │   ├── evaluation-engine.ts # Level-aware evaluation
+│   │   │   ├── annotation-generator.ts # Annotation system
+│   │   │   └── rubrics/
+│   │   │       └── isee/            # ISEE level configurations
+│   │   │           ├── elementary.ts
+│   │   │           ├── middle.ts
+│   │   │           ├── upper.ts
+│   │   │           └── high-school.ts
+│   │   └── types.ts             # Platform abstractions
+│   ├── express-server.ts        # Self-hosted Express server
+│   ├── package.json (CommonJS)
 │   └── tsconfig.json
+├── api/                # Vercel serverless function wrappers
+│   └── index.ts            # Main Vercel handler
+├── samples/            # Sample outputs and test data
+│   ├── sample_output.html  # Target UI design
+│   └── sample_data/        # Test essays and images
 ├── vercel.json         # Vercel deployment config
 └── README.md
 ```
 
 ### Key Directories
 
-- **`/api/lib/`**: Platform-agnostic business logic used by both Vercel and Express
-- **`/api/*.ts`**: Thin Vercel function wrappers
-- **`/server/`**: Complete Express.js alternative for self-hosting
-- **`/frontend/`**: React application with dual input methods
+- **`/server/lib/`**: Unified business logic for all platforms (CommonJS)
+- **`/server/lib/evaluation/`**: Hierarchical evaluation engine with ISEE rubrics
+- **`/api/`**: Thin Vercel serverless function wrapper
+- **`/server/`**: Complete Express.js server for self-hosting
+- **`/frontend/src/components/evaluation/`**: Evaluation UI components
+- **`/samples/`**: Target designs and test data for development
 
 ## Platform Migration
 
@@ -247,56 +278,74 @@ AZURE_OPENAI_DEPLOYMENT_NAME=your_deployment
 - [x] Vercel serverless deployment
 - [x] Docker containerization support
 
-### Phase 2: Enhanced Processing (In Progress)
+### Phase 2: Enhanced Document Processing ✅
 - [x] AI-powered OCR with GPT-4 Vision
-- [x] Topic detection and analysis
-- [ ] PDF document support
-- [ ] Advanced page ordering detection
-- [ ] Batch processing optimization
-- [ ] Enhanced error handling and retry logic
+- [x] Topic detection and analysis with source attribution
+- [x] Advanced page ordering detection using AI
+- [x] Batch processing optimization (single AI request for multiple pages)
+- [x] Enhanced error handling and retry logic
+- [x] Comprehensive text statistics and structure analysis
 
-### Phase 3: ISEE Rubric Integration (Planned)
-- [ ] Complete ISEE rubric implementation
-- [ ] Detailed scoring across all rubric categories
-- [ ] Comprehensive feedback generation
-- [ ] Score reporting and analytics
-- [ ] Export functionality (PDF, JSON, CSV)
-- [ ] Progress tracking over time
+### Phase 2.5: Unified Architecture Refactor ✅
+- [x] Unified processing pipeline (MultiPageDocument → StructuredEssay)
+- [x] CommonJS conversion for Vercel compatibility
+- [x] Zero code duplication between platforms
+- [x] Clean separation of prompts vs. student content
+- [x] Foundation for hierarchical evaluation system
 
-### Phase 4: Advanced Features (Planned)
-- [ ] User authentication and accounts
-- [ ] Essay history and progress tracking
-- [ ] Teacher/student dashboard
-- [ ] Analytics and insights
-- [ ] REST API for integrations
-- [ ] Webhook support for notifications
+### Phase 3: Hierarchical Evaluation Engine (In Progress)
+- [ ] Generic rubric framework with test family hierarchy
+- [ ] ISEE level implementations (Elementary/Middle/Upper/High School)
+- [ ] Level-adaptive evaluation criteria and feedback complexity
+- [ ] Professional annotation system with color-coded highlights
+- [ ] Comprehensive scoring across all rubric categories
+- [ ] Grade-appropriate feedback generation and vocabulary
+
+### Phase 4: Advanced Annotation UI (Planned)
+- [ ] Dynamic annotation display adapting to rubric configuration
+- [ ] Print-optimized professional HTML reports
+- [ ] Level-specific report templates and styling
+- [ ] Export functionality (PDF, HTML, JSON)
+- [ ] Mobile-responsive annotation interface
+
+### Phase 5: Platform Expansion (Planned)
+- [ ] Additional test family support (SAT, AP, custom rubrics)
+- [ ] User authentication and multi-tenant support
+- [ ] Progress tracking and analytics dashboard
+- [ ] REST API for institutional integrations
+- [ ] Advanced administrative features
 
 ## API Endpoints
 
 **Available on both Vercel and Express servers:**
 
-### POST /api/upload-multiple
-**Upload and process essay images**
-- Supports: `.jpg`, `.png` (up to 10 files, 10MB each)
-- AI OCR text extraction
-- Topic detection from combined text
-- Page ordering and statistics
-
-### POST /api/process-text
-**Process text essay input**
-- AI topic detection
-- Text statistics (words, characters, sentences, paragraphs)
-- Processing time and confidence metrics
+### POST /api/process
+**Unified processing endpoint for text and files**
+- **Text Input**: JSON with `text` field for direct essay processing
+- **File Input**: FormData with `files` for multi-page image upload
+- **Features**:
+  - AI OCR text extraction with page ordering detection
+  - Enhanced topic detection with source attribution (extracted vs. summarized)
+  - Comprehensive text statistics and structure analysis
+  - ISEE categorization with confidence scoring
+  - Processing time and performance metrics
 
 ### GET /api/hello
 **Health check and configuration**
-- Server status and platform information
-- Timestamp and method verification
+- Server status and platform information (Vercel vs. Self-hosted)
+- AI configuration validation
+- Version and timestamp information
 
 ### GET /health (Express only)
-**Detailed health check**
-- Service status and version
-- AI configuration status
+**Detailed health check for self-hosted deployments**
+- Service status and detailed version information
+- AI provider configuration status
+- Environment validation
+
+**Future API Endpoints (Phase 3+):**
+- `POST /api/evaluate` - Full essay evaluation with rubric selection
+- `GET /api/rubrics` - Available rubric configurations
+- `POST /api/generate-report` - Professional report generation
 
 ## Testing
 

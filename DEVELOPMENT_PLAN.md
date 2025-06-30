@@ -68,158 +68,169 @@ Web application for automated ISEE essay evaluation with AI-powered document pro
 
 ---
 
-## Phase 3: Evaluation Engine (Weeks 5-7)
-**Status:** ⏳ Pending  
+## Phase 3: Hierarchical Evaluation Engine (Weeks 5-7)
+**Status:** 🔄 **IN PROGRESS** (Started: 2025-06-30)  
 **Duration:** 3 weeks  
-**Key Deliverables:** Core ISEE rubric scoring system
+**Key Deliverables:** Hierarchical evaluation system with ISEE level support
 
-### 3.1 ISEE Rubric Implementation
-- [ ] Define scoring criteria for 5 categories:
-  - [ ] Grammar & Mechanics
-  - [ ] Word Choice & Vocabulary
-  - [ ] Structure & Organization
-  - [ ] Development & Support
-  - [ ] Clarity & Focus
-- [ ] Build rule-based grammar/mechanics detection
-- [ ] Implement vocabulary complexity analysis
-- [ ] Create structure recognition (thesis, body, conclusion)
+### 3.1 Generic Rubric Framework (Week 1)
+- [ ] Define hierarchical rubric system: Test Family → Level → Specific Rubric
+- [ ] Create `EvaluationRubric`, `TestFamily`, `TestLevel` interfaces
+- [ ] Build configurable scoring scales and category definitions
+- [ ] Implement rubric selection and validation system
+- [ ] Create foundation for level-adaptive evaluation logic
 
-### 3.2 AI-Powered Analysis
-- [ ] Integrate AI for comprehensive essay evaluation
-- [ ] Implement scoring algorithms (1-5 scale per category)
-- [ ] Build feedback generation system
-- [ ] Create weighted scoring calculation
+### 3.2 ISEE Level Implementation (Week 2)
+- [ ] **Elementary Level (Grades 2-4)**: Basic structure focus, simple vocabulary expectations
+- [ ] **Middle Level (Grades 5-6)**: Standard 5 categories with age-appropriate criteria
+- [ ] **Upper Level (Grades 7-8)**: Enhanced complexity and sophistication requirements
+- [ ] **High School Level (Grades 9-12)**: Advanced analysis and college-prep expectations
+- [ ] Level-specific feedback generation with appropriate vocabulary complexity
 
-**Success Criteria:**
-- All 5 rubric categories scoring accurately
-- AI provides consistent, detailed feedback
-- Scores align with human evaluator standards
-
----
-
-## Phase 4: Annotation System (Weeks 8-9)
-**Status:** ⏳ Pending  
-**Duration:** 2 weeks  
-**Key Deliverables:** Color-coded feedback visualization
-
-### 4.1 Color-Coded Feedback
-- [ ] Implement 6-color annotation system:
+### 3.3 Evaluation Engine & Annotation System (Week 3)
+- [ ] Build level-aware evaluation engine with rubric-specific scoring
+- [ ] Implement professional annotation generation (6-color system):
   - [ ] Red: Grammar & Mechanics
-  - [ ] Blue: Word Choice & Vocabulary
+  - [ ] Blue: Word Choice & Vocabulary  
   - [ ] Green: Structure & Organization
   - [ ] Purple: Development & Support
   - [ ] Orange: Clarity & Focus
   - [ ] Teal: Strengths & Positive Elements
-- [ ] Build inline text highlighting
-- [ ] Create paragraph-level commentary
-- [ ] Link annotations to specific feedback categories
-
-### 4.2 Feedback Engine
-- [ ] Generate specific improvement suggestions
-- [ ] Identify and highlight strengths
-- [ ] Create actionable improvement plans
-- [ ] Build comprehensive feedback aggregation
+- [ ] Create comprehensive feedback aggregation system
+- [ ] Generate improvement suggestions matched to student level
 
 **Success Criteria:**
-- Visual annotations clearly categorize issues
-- Feedback is specific and actionable
-- Strengths are properly highlighted
+- All four ISEE levels implemented with appropriate differentiation
+- Annotation quality matches sample_output.html for Upper Level
+- Level-adaptive feedback with grade-appropriate vocabulary
+- Extensible framework ready for additional test families
 
 ---
 
-## Phase 5: Report Generation (Weeks 10-11)
+## Phase 4: Advanced Annotation UI (Weeks 8-9)
 **Status:** ⏳ Pending  
 **Duration:** 2 weeks  
-**Key Deliverables:** Professional HTML reports with print optimization
+**Key Deliverables:** Professional annotation interface and report generation
 
-### 5.1 HTML Report System
-- [ ] Design professional report templates
-- [ ] Implement responsive layout with print optimization
-- [ ] Add Space Mono typography for essay text
-- [ ] Create export/download functionality
+### 4.1 Dynamic Annotation Display
+- [ ] Build hierarchical rubric selector (Test Family → Level)
+- [ ] Create level-adaptive annotation display components
+- [ ] Implement responsive color-coded highlighting system
+- [ ] Build interactive annotation markers with detailed feedback
+- [ ] Create grade-appropriate feedback complexity display
 
-### 5.2 Print Optimization
-- [ ] Configure CSS for forced color printing
-- [ ] Optimize layout for various paper sizes
-- [ ] Test print quality and readability
-- [ ] Add print preview functionality
+### 4.2 Professional Report Generation
+- [ ] Implement print-optimized HTML report system
+- [ ] Create level-specific report templates matching sample_output.html quality
+- [ ] Build forced color printing support for annotations
+- [ ] Add export functionality (HTML, PDF generation)
+- [ ] Implement mobile-responsive annotation interface
 
 **Success Criteria:**
-- Reports look professional on screen and print
-- All colors print correctly
-- Layout adapts to different screen sizes
+- Annotation interface adapts to all ISEE levels dynamically
+- Report quality matches sample_output.html professional standard
+- Print output maintains color coding and professional layout
+- Mobile interface provides excellent user experience
 
 ---
 
-## Phase 6: Frontend Integration (Weeks 12-13)
+## Phase 5: Platform Expansion (Weeks 10-11)
 **Status:** ⏳ Pending  
 **Duration:** 2 weeks  
-**Key Deliverables:** Complete user interface
+**Key Deliverables:** Additional test family support and institutional features
 
-### 6.1 User Interface
-- [ ] Complete React components for all features
-- [ ] Implement client-side topic storage
-- [ ] Build real-time processing indicators
-- [ ] Add accessibility features (WCAG 2.1)
+### 5.1 Test Family Expansion
+- [ ] Implement SAT essay rubric as second test family
+- [ ] Create AP Language & Composition rubric configuration
+- [ ] Build custom rubric creation interface for institutions
+- [ ] Add rubric import/export functionality
 
-### 6.2 User Experience
-- [ ] Optimize for mobile responsiveness
-- [ ] Add loading states and error handling
-- [ ] Implement progressive enhancement
-- [ ] Create intuitive navigation flow
+### 5.2 Institutional Features
+- [ ] Implement user authentication and multi-tenant support
+- [ ] Create teacher/administrator dashboard
+- [ ] Build student progress tracking across multiple essays
+- [ ] Add bulk processing for classroom use
 
 **Success Criteria:**
-- Interface is intuitive and accessible
-- Works well on mobile and desktop
-- Processing states clearly communicated
+- Multiple test families working seamlessly
+- Institutional users can manage multiple students
+- Custom rubrics easy to create and deploy
+- Platform scales to classroom and school district use
 
 ---
 
-## Phase 7: Testing & Quality Assurance (Weeks 14-15)
+## Phase 6: Integration & Testing (Weeks 12-13)
 **Status:** ⏳ Pending  
 **Duration:** 2 weeks  
-**Key Deliverables:** Comprehensive testing and validation
+**Key Deliverables:** Complete system integration and comprehensive testing
 
-### 7.1 Automated Testing
-- [ ] Unit tests for core evaluation logic
-- [ ] Integration tests for AI services
-- [ ] End-to-end testing for full workflows
-- [ ] Performance testing for large documents
+### 6.1 System Integration
+- [ ] Complete end-to-end workflow testing across all ISEE levels
+- [ ] Integrate all evaluation components with frontend annotation display
+- [ ] Optimize performance for large essay processing
+- [ ] Implement comprehensive error handling and recovery
 
-### 7.2 Manual Testing & Validation
-- [ ] Test with real student essays
-- [ ] Validate scoring accuracy against human evaluators
-- [ ] Cross-browser compatibility testing
-- [ ] Print quality validation
+### 6.2 Quality Assurance
+- [ ] Automated testing for evaluation engine across all rubric levels
+- [ ] Cross-browser compatibility testing for annotation interface
+- [ ] Print quality validation for all report templates
+- [ ] Accessibility compliance verification (WCAG 2.1)
 
 **Success Criteria:**
-- 95%+ grammar detection accuracy achieved
-- Processing time under 3 seconds
-- Cross-browser compatibility confirmed
+- All ISEE levels produce professional-quality results
+- System handles edge cases and errors gracefully
+- Performance meets requirements (< 3 seconds processing)
+- Annotation interface works flawlessly across devices
 
 ---
 
-## Phase 8: Deployment & Documentation (Week 16)
+## Phase 7: User Validation & Refinement (Weeks 14-15)
+**Status:** ⏳ Pending  
+**Duration:** 2 weeks  
+**Key Deliverables:** User testing and evaluation accuracy validation
+
+### 7.1 Educational Validation
+- [ ] Test with real student essays across all ISEE levels
+- [ ] Validate scoring accuracy against experienced ISEE evaluators
+- [ ] Collect feedback from educators on rubric appropriateness
+- [ ] Refine level-specific criteria based on expert input
+
+### 7.2 User Experience Testing
+- [ ] Conduct usability testing with teachers and students
+- [ ] Test annotation interface with different user groups
+- [ ] Validate print quality and report usefulness
+- [ ] Gather feedback on grade-appropriate language and suggestions
+
+**Success Criteria:**
+- Scoring accuracy aligns with human evaluators (>90% agreement)
+- User feedback indicates intuitive interface and valuable insights
+- Print quality meets professional standards
+- All ISEE levels produce appropriate feedback complexity
+
+---
+
+## Phase 8: Production Deployment & Documentation (Week 16)
 **Status:** ⏳ Pending  
 **Duration:** 1 week  
-**Key Deliverables:** Production deployment and documentation
+**Key Deliverables:** Production-ready deployment and comprehensive documentation
 
 ### 8.1 Production Deployment
-- [ ] Set up production environment
-- [ ] Configure AI API rate limiting
-- [ ] Implement monitoring and logging
-- [ ] Security hardening and FERPA compliance
+- [ ] Deploy to production with full hierarchical evaluation system
+- [ ] Configure AI API rate limiting and monitoring
+- [ ] Implement comprehensive logging and error tracking
+- [ ] Complete security hardening and FERPA compliance verification
 
-### 8.2 Documentation & Training
-- [ ] Create user documentation
-- [ ] Build admin/setup guides
-- [ ] Document API endpoints
-- [ ] Create troubleshooting guides
+### 8.2 Documentation & Training Materials
+- [ ] Create user guides for each ISEE level
+- [ ] Build administrator setup and configuration guides
+- [ ] Document complete API for institutional integrations
+- [ ] Create troubleshooting guides and FAQ
 
 **Success Criteria:**
-- Application deployed and accessible
-- All documentation complete
-- FERPA compliance verified
+- Production application handling all ISEE levels successfully
+- Complete documentation for all user types
+- FERPA compliance fully verified and documented
+- Monitoring and support systems operational
 
 ---
 
@@ -281,26 +292,29 @@ Web application for automated ISEE essay evaluation with AI-powered document pro
 
 ## Development Notes
 
-**Last Updated:** 2025-06-29  
-**Current Phase:** Phase 2.5 - Unified Architecture Refactor  
-**Next Milestone:** Unified processing pipeline for all input types  
+**Last Updated:** 2025-06-30  
+**Current Phase:** Phase 3 - Hierarchical Evaluation Engine  
+**Next Milestone:** Generic rubric framework and ISEE level implementations  
 **Blockers:** None  
-**Notes:** Phase 2 completed with advanced features. Next: implement unified processing architecture before Phase 3 evaluation engine.
+**Notes:** Phase 2.5 unified architecture completed successfully. CommonJS conversion eliminated all platform compatibility issues. Ready to implement hierarchical evaluation system with target UI quality from samples/sample_output.html.
 
-## Phase 2.5: Unified Architecture Refactor (Current)
-**Status:** 🔄 **IN PROGRESS** (Started: 2025-06-29)  
+## Phase 2.5: Unified Architecture Refactor (Completed)
+**Status:** ✅ **COMPLETED** (Completed: 2025-06-30)  
 **Duration:** 0.5 weeks  
-**Key Deliverables:** Clean unified processing pipeline
+**Key Deliverables:** Clean unified processing pipeline and CommonJS architecture
 
-### Architecture Goals
-- Unified `MultiPageDocument` → `StructuredEssay` pipeline
-- Clear separation of writing prompt vs student essay content
-- Consistent processing for text and file inputs
-- Foundation for Phase 3 evaluation engine
+### Architecture Achievements
+- ✅ Unified `MultiPageDocument` → `StructuredEssay` processing pipeline
+- ✅ CommonJS conversion for Vercel compatibility (eliminated ES module conflicts)
+- ✅ Zero code duplication between platforms (~400 lines eliminated)
+- ✅ Single `/api/process` endpoint handling both text and file inputs
+- ✅ Clear separation of writing prompt vs student essay content
+- ✅ Foundation prepared for hierarchical evaluation engine
 
-### Implementation Plan
-1. **Core Data Structures**: Create `MultiPageDocument` and `StructuredEssay` interfaces
-2. **Input Normalization**: Convert all inputs to `MultiPageDocument` format
-3. **Content Extraction**: Separate prompt from essay content systematically
-4. **Clean API Design**: Optimal response structure without legacy constraints
-5. **Foundation Setup**: Prepare for Phase 3 evaluation and Phase 4 annotation
+### Technical Implementation
+1. ✅ **CommonJS Conversion**: Changed from ES modules to CommonJS for Vercel compatibility
+2. ✅ **Unified API Endpoint**: Single `/api/process` handles both text and file processing
+3. ✅ **Shared App Factory**: `/server/lib/app-factory.ts` eliminates platform duplication
+4. ✅ **Clean Imports**: Removed file extensions from imports after CommonJS conversion
+5. ✅ **Document Processing Pipeline**: Complete `convertTextToDocument` and `convertImagesToDocument` functions
+6. ✅ **Structured Essay Extraction**: Enhanced topic detection with source attribution

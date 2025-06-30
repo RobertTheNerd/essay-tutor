@@ -1,7 +1,7 @@
 {
   "name": "essay-tutor-server",
   "version": "1.0.0",
-  "description": "Self-hosted Express.js server for Essay Tutor",
+  "description": "Unified Express.js/Vercel backend for Essay Tutor hierarchical evaluation system",
   "type": "commonjs",
   "main": "dist/express-server.js",
   "scripts": {
