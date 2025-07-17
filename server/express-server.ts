@@ -6,9 +6,12 @@ dotenv.config({ path: ".env.local" });
 // Uses shared app factory to eliminate code duplication
 
 import path from "path";
+import { fileURLToPath } from "url";
 import { createApp } from "./lib/app-factory";
 
-// In CommonJS, __dirname is available directly
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3001;
 

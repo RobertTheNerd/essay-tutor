@@ -12,7 +12,15 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:api": "node tests/api/test-api.js",
+    "test:api-structure": "node tests/api/check-api-structure.js",
+    "test:e2e": "node tests/puppeteer/test-evaluation-workflow.js",
+    "test:e2e-debug": "node tests/puppeteer/debug-evaluation.js",
+    "test:quick": "node tests/puppeteer/quick-test.js",
+    "test:ux": "node tests/puppeteer/test-enhanced-ux.js",
+    "test:ux-quick": "node tests/puppeteer/quick-ux-test.js",
+    "test:verify": "node tests/puppeteer/final-verification.js"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.11",

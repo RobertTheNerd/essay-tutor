@@ -8,14 +8,26 @@ This web application provides automated essay evaluation and feedback for ISEE U
 
 ### 1. Essay Input & Processing
 
-- **Text Input**: Web form for essay submission (copy and paste)
+#### Enhanced Text Input (Phase 5)
+- **Dual Input Fields**: Separate writing prompt and essay text fields
+- **Enhanced Context**: Better evaluation with prompt context
+- **Real-time Validation**: Live character/word count and field validation
+- **Direct Evaluation**: Immediate evaluation when both fields are complete
+
+#### Smart Image Processing (Phase 5)
 - **File Upload**: Support for .txt, .pdf, and image files (.jpg, .png, .tiff)
 - **OCR Processing**: Optical character recognition for scanned documents
 - **Multi-Page Handling**: Automatic page ordering detection for multiple images
-- **Topic Recognition**: Automatic extraction of writing topic from input
-- **Topic Management**: Manual topic input with client-side storage for defaults
+- **Intelligent Topic Recognition**: Automatic extraction vs summarization detection
+- **Conditional Flow**: 
+  - Auto-evaluate when writing prompt is extracted with high confidence
+  - Manual review when prompt is summarized or inferred
+- **Review Interface**: User can edit extracted prompt/essay before evaluation
+
+#### Unified Processing
+- **Consistent Results**: Same evaluation engine regardless of input method
+- **Context-Aware**: Evaluation receives both prompt and essay for better scoring
 - **Real-time Processing**: Immediate analysis upon submission
-- **Character/Word Count**: Live statistics display
 
 ### 2. Evaluation Engine
 
@@ -85,16 +97,25 @@ This web application provides automated essay evaluation and feedback for ISEE U
 ### Input Format
 
 ```
-Input Sources:
-- Text: Direct copy/paste of essay content
+Text Input Method:
+- Writing Prompt: [User-provided prompt text]
+- Essay Text: [User-provided essay content]
+- Processing: Direct evaluation with both prompt and essay context
+
+Image Input Method:
 - File: .txt, .pdf, or image files (.jpg, .png, .tiff)
 - Multi-page: Multiple image files for handwritten essays
+- AI Processing: OCR + prompt/essay extraction
+- Smart Flow:
+  - If prompt extracted with high confidence → Auto-evaluate
+  - If prompt summarized/inferred → Manual review interface
+- User Review: Edit extracted prompt/essay before evaluation
 
-Processing:
-- Essay Topic: [Auto-extracted or manual input]
-- Essay Text: [Extracted from any input format]
+Unified Processing:
+- Essay Topic: [Extracted, summarized, or user-provided]
+- Essay Text: [Extracted from any input format or user-provided]
 - Word Count: [Automatic calculation]
-- Target Level: ISEE Upper Level
+- Target Level: ISEE Upper Level (hardcoded for now)
 ```
 
 ### Output Format
@@ -151,24 +172,39 @@ Processing:
 
 ## Development Priorities
 
-1. **AI Integration**: Vision-capable AI model integration for document processing
-2. **Core Evaluation Engine**: Text analysis and scoring algorithms
-3. **Annotation System**: Color-coded feedback implementation
-4. **HTML Report Generation**: Template-based output creation
-5. **Web Interface**: User-friendly input and display with multi-format support
-6. **Print Optimization**: CSS for professional printing
-7. **Testing & Validation**: Quality assurance and accuracy verification
+### Current Phase 5 Implementation:
+1. **Enhanced UX Flow**: Dual input fields and smart image processing
+2. **Conditional Logic**: Auto-evaluate vs manual review based on AI confidence
+3. **Review Interface**: User editing of extracted prompt/essay content
+4. **Unified Evaluation**: Context-aware scoring with prompt information
+5. **Frontend Integration**: Seamless flow between input methods
+
+### Completed Phases:
+1. **AI Integration**: Vision-capable AI model integration for document processing ✓
+2. **Core Evaluation Engine**: Text analysis and scoring algorithms ✓
+3. **Annotation System**: Color-coded feedback implementation ✓
+4. **HTML Report Generation**: Template-based output creation ✓
+5. **Web Interface**: User-friendly input and display with multi-format support ✓
+6. **Print Optimization**: CSS for professional printing ✓
+7. **Testing & Validation**: Quality assurance and accuracy verification ✓
 
 ## Future Enhancements
 
-### Phase 2 Features
+### Phase 6: Multi-Level ISEE Support
 
-- **Multiple Essay Types**: Expand beyond ISEE format
+- **Generic Rubric Framework**: Test families → levels → specific rubrics architecture
+- **ISEE Level Support**: All four levels (Elementary, Middle, Upper, High School)
+- **Level-Adaptive Evaluation**: Age-appropriate criteria and feedback complexity
+- **Rubric Selection**: User interface for choosing appropriate level
+
+### Phase 7: Advanced Features
+
+- **Multiple Essay Types**: Expand beyond ISEE format (SAT, AP, Custom)
 - **Custom Rubrics**: User-defined evaluation criteria
 - **Batch Processing**: Multiple essay evaluation
 - **Progress Tracking**: Student improvement over time
 
-### Advanced Features
+### Phase 8: AI Enhancement
 
 - **AI-Powered Suggestions**: Machine learning recommendations
 - **Plagiarism Detection**: Originality verification

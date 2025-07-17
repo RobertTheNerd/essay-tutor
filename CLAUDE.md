@@ -86,9 +86,12 @@ All endpoints work identically on both platforms:
   - Text input: JSON with `text` field for direct essay processing
   - File input: FormData with `files` for multi-page image upload
   - Features: AI OCR, topic detection, text analysis, ISEE categorization
+- `POST /api/evaluate` - Full essay evaluation with rubric selection (Phase 3+)
+  - Input: `{text: string, prompt?: string, rubric?: {family: string, level: string}}`
+  - Output: Complete evaluation with scores, annotations, and feedback
+  - Features: AI-powered ISEE evaluation with context-aware scoring
 
-**Future Endpoints (Phase 3+):**
-- `POST /api/evaluate` - Full essay evaluation with rubric selection
+**Future Endpoints:**
 - `GET /api/rubrics` - Available rubric configurations
 - `POST /api/generate-report` - Professional report generation
 
@@ -124,11 +127,14 @@ AZURE_OPENAI_TEXT_MODEL=gpt-4o-mini
 - Temporary file storage with automatic cleanup
 
 ### Frontend Architecture
-- Dual input methods: rich text editor and image upload
-- Real-time text statistics (word/character count)
-- React Query for API state management
-- Responsive design with TailwindCSS
-- Typography optimized with Space Mono font for essay display
+- **Enhanced Input Methods**: 
+  - Text: Separate prompt and essay fields for better context
+  - Image: Smart processing with conditional evaluation flow
+- **Intelligent UX Flow**: Auto-evaluate vs manual review based on AI confidence
+- **Real-time Statistics**: Word/character count and validation
+- **React Query**: API state management for seamless evaluation
+- **Responsive Design**: TailwindCSS with mobile-friendly interface
+- **Typography**: Space Mono font optimized for essay display
 
 ### Development Features
 - Hot reload for both frontend and backend during development
@@ -143,6 +149,20 @@ AZURE_OPENAI_TEXT_MODEL=gpt-4o-mini
 - Business logic is platform-agnostic and thoroughly testable
 - File uploads are automatically cleaned up for privacy compliance
 - The app gracefully handles missing AI API keys with appropriate user feedback
+
+## 🚨 Test File Organization Policy
+
+**CRITICAL: ALL TEST FILES MUST BE CREATED IN THE `frontend/tests/` DIRECTORY STRUCTURE**
+
+- **NEVER** create test files in the frontend root directory
+- **ALWAYS** place test files in appropriate subdirectories:
+  - API tests → `frontend/tests/api/`
+  - Puppeteer E2E tests → `frontend/tests/puppeteer/`
+  - Screenshots → `frontend/tests/screenshots/`
+- **ALWAYS** update `frontend/tests/README.md` when adding new test files
+- **ALWAYS** use provided npm scripts for running tests
+
+This policy ensures a clean, maintainable codebase and prevents cluttering the frontend root directory.
 
 ## Current Development Phase
 
@@ -217,7 +237,67 @@ AZURE_OPENAI_TEXT_MODEL=gpt-4o-mini
 - **End-to-End Workflow**: Seamless flow from essay input to professional evaluation display
 - **Production Quality**: Build-tested and deployment-ready frontend interface
 
-## Phase 5: Multi-Level ISEE Support (Next)
+## Phase 5: Enhanced UX Flow (Current)
+
+### Goals
+- **Improved Text Input**: Separate writing prompt and essay text fields
+- **Smart Image Processing**: Auto-evaluate when prompt is extracted, manual review when not
+- **Unified Evaluation Flow**: Both text and image routes converge to same evaluation
+- **Enhanced User Experience**: Better guidance and feedback throughout the process
+
+### New UX Flow Design
+
+#### Text Input Method:
+1. **Dual Input Fields**: Writing prompt + essay text (separate fields)
+2. **Enhanced Context**: Better evaluation with prompt context
+3. **Direct Evaluation**: Immediate evaluation when both fields are complete
+
+#### Image Upload Method:
+1. **Upload Images**: Multi-page document upload with OCR processing
+2. **Smart Processing**: AI identifies writing prompt and essay content
+3. **Conditional Flow**:
+   - If `writingPrompt.source === 'extracted'` → Auto-evaluate immediately
+   - If `writingPrompt.source === 'summarized'` → Show review UI for user editing
+4. **Manual Review**: User can edit extracted prompt/essay before evaluation
+5. **Unified Path**: After review, follows same evaluation path as text input
+
+#### Evaluation Integration:
+- **Context-Aware**: Evaluation receives both prompt and essay for better scoring
+- **Consistent Results**: Same evaluation engine regardless of input method
+- **Better Feedback**: Prompt context improves annotation quality and relevance
+
+### Implementation Changes Required
+
+#### Frontend Updates:
+- **TextEditor Component**: Split into separate prompt and essay fields
+- **App.tsx State**: Add `promptText` and `essayText` state management
+- **Review UI Component**: New component for editing extracted text
+- **Conditional Logic**: Auto-evaluate vs manual review flow
+- **Process Images Button**: Add button to trigger image processing
+
+#### Backend Updates:
+- **Evaluation API**: Accept both prompt and essay text
+- **Enhanced Context**: Use prompt context for better evaluation
+- **Existing Logic**: Leverage current `writingPrompt.source` detection
+
+### Target Architecture
+```
+UX Flow
+├── Text Input Method
+│   ├── Writing Prompt Field
+│   ├── Essay Text Field
+│   └── Direct Evaluation
+├── Image Upload Method
+│   ├── Multi-page Upload
+│   ├── AI Processing (OCR + Analysis)
+│   ├── Smart Routing
+│   │   ├── Auto-evaluate (if prompt extracted)
+│   │   └── Manual Review (if prompt summarized)
+│   └── Unified Evaluation
+└── Evaluation Results (Same for Both)
+```
+
+### Phase 6: Multi-Level ISEE Support (Next)
 
 ### Goals
 - **Generic Rubric Framework**: Test families → levels → specific rubrics architecture

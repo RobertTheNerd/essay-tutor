@@ -1,0 +1,22 @@
+# Test outputs and temporary files
+screenshots/*.png
+*.log
+*.tmp
+
+# Test results
+test-results/
+coverage/
+
+# Node modules (if any test-specific packages)
+node_modules/
+
+# Test configuration overrides
+.env.test.local
+
+# 🚨 IMPORTANT: All test files should be in proper subdirectories
+# These patterns catch any test files accidentally placed in wrong locations
+../test-*.js
+../quick-*.js
+../debug-*.js
+../*-test.js
+../*-verification.js

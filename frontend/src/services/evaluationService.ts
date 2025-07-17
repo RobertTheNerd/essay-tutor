@@ -2,6 +2,7 @@ import type { EvaluationResponse } from '../types/evaluation'
 
 export interface EvaluationRequest {
   text: string
+  prompt?: string
   rubric?: {
     family: string
     level: string

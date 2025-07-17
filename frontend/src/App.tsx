@@ -2,6 +2,7 @@ import { useState } from 'react'
 import FileUpload from './components/FileUpload'
 import InputMethodSelector, { type InputMethod } from './components/InputMethodSelector'
 import TextEditor from './components/TextEditor'
+import ProcessingReview from './components/ProcessingReview'
 import EvaluationResults from './components/evaluation/EvaluationResults'
 import { evaluationService } from './services/evaluationService'
 import type { EvaluationResponse } from './types/evaluation'
@@ -10,10 +11,13 @@ function App() {
   const [apiResponse, setApiResponse] = useState<string>('')
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [inputMethod, setInputMethod] = useState<InputMethod>('text')
+  const [promptText, setPromptText] = useState<string>('')
   const [essayText, setEssayText] = useState<string>('')
   const [evaluationResult, setEvaluationResult] = useState<EvaluationResponse | null>(null)
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false)
-  const [currentView, setCurrentView] = useState<'editor' | 'results'>('editor')
+  const [isProcessingImages, setIsProcessingImages] = useState<boolean>(false)
+  const [processingResult, setProcessingResult] = useState<any>(null)
+  const [currentView, setCurrentView] = useState<'editor' | 'review' | 'results'>('editor')
 
   const testAPI = async () => {
     try {
@@ -45,15 +49,22 @@ function App() {
     setUploadedFiles(files)
   }
 
-  const handleTextChange = (text: string) => {
-    setEssayText(text)
+  const handlePromptChange = (prompt: string) => {
+    setPromptText(prompt)
+  }
+
+  const handleEssayChange = (essay: string) => {
+    setEssayText(essay)
   }
 
   const handleMethodChange = (method: InputMethod) => {
     setInputMethod(method)
     // Clear previous data when switching methods
     setUploadedFiles([])
+    setPromptText('')
     setEssayText('')
+    setProcessingResult(null)
+    setCurrentView('editor')
   }
 
   const handleEvaluateEssay = async () => {
@@ -67,6 +78,7 @@ function App() {
     try {
       const result = await evaluationService.evaluateEssay({
         text: essayText,
+        prompt: promptText.trim() || undefined, // Include prompt if provided
         rubric: {
           family: 'isee',
           level: 'upper'
@@ -87,6 +99,64 @@ function App() {
     setCurrentView('editor')
   }
 
+  const handleProcessImages = async () => {
+    if (uploadedFiles.length === 0) {
+      alert('Please upload images before processing.')
+      return
+    }
+
+    setIsProcessingImages(true)
+    
+    try {
+      const formData = new FormData()
+      uploadedFiles.forEach(file => {
+        formData.append('files', file)
+      })
+
+      const response = await fetch('/api/process', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`)
+      }
+
+      const result = await response.json()
+      setProcessingResult(result)
+      
+      // Check if we should auto-evaluate or show review
+      if (result.essay?.writingPrompt?.source === 'extracted') {
+        // Auto-evaluate: high confidence prompt extraction
+        setPromptText(result.essay.writingPrompt.text)
+        setEssayText(result.essay.studentEssay.fullText)
+        await handleEvaluateEssay()
+      } else {
+        // Show review: prompt was summarized/inferred
+        setCurrentView('review')
+      }
+      
+    } catch (error) {
+      console.error('Image processing failed:', error)
+      alert(`Image processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setIsProcessingImages(false)
+    }
+  }
+
+  const handleReviewConfirm = async (prompt: string, essay: string) => {
+    setPromptText(prompt)
+    setEssayText(essay)
+    setCurrentView('editor')
+    // Auto-evaluate after review
+    await handleEvaluateEssay()
+  }
+
+  const handleReviewCancel = () => {
+    setCurrentView('editor')
+    setProcessingResult(null)
+  }
+
   const handlePrintReport = () => {
     window.print()
   }
@@ -99,6 +169,14 @@ function App() {
             evaluation={evaluationResult}
             onClose={handleBackToEditor}
             onPrint={handlePrintReport}
+          />
+        ) : currentView === 'review' && processingResult ? (
+          <ProcessingReview
+            extractedPrompt={processingResult.essay?.writingPrompt?.text || ''}
+            extractedEssay={processingResult.essay?.studentEssay?.fullText || ''}
+            promptSource={processingResult.essay?.writingPrompt?.source || 'summarized'}
+            onConfirm={handleReviewConfirm}
+            onCancel={handleReviewCancel}
           />
         ) : (
           <>
@@ -119,8 +197,10 @@ function App() {
         {inputMethod === 'text' ? (
           <div className="space-y-4">
             <TextEditor 
-              onTextChange={handleTextChange}
-              placeholder="Write your ISEE essay here. Focus on clear structure with an introduction, body paragraphs with supporting details, and a strong conclusion."
+              onPromptChange={handlePromptChange}
+              onEssayChange={handleEssayChange}
+              promptPlaceholder="Enter the writing prompt here..."
+              essayPlaceholder="Write your ISEE essay here. Focus on clear structure with an introduction, body paragraphs with supporting details, and a strong conclusion."
             />
             
             {/* Evaluation Button */}
@@ -151,6 +231,11 @@ function App() {
                   </button>
                   <p className="text-sm text-gray-600 mt-2">
                     Get detailed AI-powered feedback and scoring
+                    {promptText.trim() && (
+                      <span className="block text-green-600 font-medium mt-1">
+                        ✓ Writing prompt provided for enhanced evaluation
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
@@ -158,15 +243,44 @@ function App() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-semibold mb-4">Upload Essay Images</h2>
+            <h2 className="text-2xl font-semibold mb-4">📸 Image Upload Method</h2>
             <FileUpload onUpload={handleFileUpload} maxFiles={10} />
             
             {uploadedFiles.length > 0 && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-md">
-                <h3 className="font-medium text-blue-900">Files Ready for Processing</h3>
-                <p className="text-sm text-blue-700 mt-1">
-                  {uploadedFiles.length} page{uploadedFiles.length !== 1 ? 's' : ''} selected - AI will extract text and detect page ordering
-                </p>
+              <div className="mt-4 space-y-4">
+                <div className="p-4 bg-blue-50 rounded-md">
+                  <h3 className="font-medium text-blue-900">Files Ready for Processing</h3>
+                  <p className="text-sm text-blue-700 mt-1">
+                    {uploadedFiles.length} page{uploadedFiles.length !== 1 ? 's' : ''} selected - AI will extract text and detect page ordering
+                  </p>
+                </div>
+                
+                <div className="text-center">
+                  <button
+                    onClick={handleProcessImages}
+                    disabled={isProcessingImages}
+                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors ${
+                      isProcessingImages
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-green-600 hover:bg-green-700'
+                    }`}
+                  >
+                    {isProcessingImages ? (
+                      <span className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing Images...
+                      </span>
+                    ) : (
+                      '🔍 Process Images'
+                    )}
+                  </button>
+                  <p className="text-sm text-gray-600 mt-2">
+                    AI will extract text and automatically evaluate if writing prompt is found
+                  </p>
+                </div>
               </div>
             )}
           </div>
