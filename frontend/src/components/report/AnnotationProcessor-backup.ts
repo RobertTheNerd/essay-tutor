@@ -106,33 +106,6 @@ export class AnnotationProcessor {
   }
 
   /**
-   * Convert API annotations to processed format
-   */
-  convertApiAnnotationsToProcessed(apiAnnotations: any[]): ProcessedAnnotation[] {
-    this.resetMarkerCounters();
-    
-    return apiAnnotations.map((annotation, index) => {
-      const category = annotation.category || 'grammar';
-      const colorConfig = ANNOTATION_COLORS[category as keyof typeof ANNOTATION_COLORS] || ANNOTATION_COLORS.grammar;
-      
-      return {
-        id: `api-annotation-${index}`,
-        category,
-        marker: this.generateMarker(category),
-        originalText: annotation.originalText || annotation.text || '',
-        explanation: annotation.explanation || 'AI-generated annotation',
-        suggestion: annotation.suggestedText || annotation.suggestion,
-        colorClass: colorConfig.background,
-        markerClass: colorConfig.marker,
-        blockClass: colorConfig.block,
-        startIndex: annotation.startIndex || 0,
-        endIndex: annotation.endIndex || annotation.originalText?.length || 0,
-        severity: annotation.severity || (category === 'strengths' ? 'positive' : 'moderate')
-      };
-    });
-  }
-
-  /**
    * Generate mock annotations for demonstration purposes
    * This creates sophisticated annotations matching the target design
    */

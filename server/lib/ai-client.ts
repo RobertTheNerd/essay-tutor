@@ -572,8 +572,8 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
     });
     
     if (!this.client) {
-      console.log('OpenAI client not available, returning fallback evaluation');
-      return this.getBasicAnalysis(text);
+      console.error('OpenAI client not available - cannot perform AI evaluation');
+      throw new Error('AI evaluation service unavailable. Please check API configuration.');
     }
 
     try {
@@ -604,8 +604,8 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
       
     } catch (error) {
       console.error('Essay analysis failed:', error);
-      // Fallback to basic analysis
-      return this.getBasicAnalysis(text);
+      // Re-throw the error to ensure AI-only evaluation
+      throw new Error('AI evaluation service unavailable. Please check API configuration.');
     }
   }
 
@@ -636,10 +636,10 @@ Please provide a detailed evaluation with:
 2. DETAILED FEEDBACK for each category with specific examples from the text
 
 3. SPECIFIC ANNOTATIONS: Identify 3-5 specific text segments that need improvement, with:
-   - Original text excerpt
+   - Original text excerpt (exact words from the essay, 3-15 words)
    - Category (grammar/vocabulary/structure/development/clarity/strengths)
-   - Explanation of the issue
-   - Suggested improvement
+   - Explanation of the issue or strength
+   - Suggested improvement (if applicable)\n   - Focus on both strengths and areas for improvement
 
 4. SUMMARY:
    - Top 3 strengths

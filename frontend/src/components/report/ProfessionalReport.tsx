@@ -29,7 +29,7 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
   // Initialize annotation processor
   const annotationProcessor = useMemo(() => new AnnotationProcessor(), []);
 
-  // Generate report content with sophisticated annotations
+  // Generate report content with real API annotations
   const reportContent = useMemo(() => {
     const score = evaluationData.overall || evaluationData.scores?.overall || 'N/A';
     const scores = evaluationData.scores || {};
@@ -52,8 +52,11 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       { category: 'strengths', label: 'Exceptional Techniques', color: 'positive-mark' }
     ];
 
-    // Generate sophisticated mock annotations for demonstration
-    const annotations = annotationProcessor.generateMockAnnotations(essayText);
+    // Use real API annotations or fallback to empty array
+    const apiAnnotations = evaluationData.annotations || [];
+    const annotations = apiAnnotations.length > 0 
+      ? annotationProcessor.convertApiAnnotationsToProcessed(apiAnnotations)
+      : annotationProcessor.generateMockAnnotations(essayText); // Fallback only when no API data
     
     // Split essay into text blocks
     const textBlocks = annotationProcessor.splitIntoTextBlocks(essayText);
