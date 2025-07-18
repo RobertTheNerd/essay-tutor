@@ -1,0 +1,1 @@
+export { default as ProfessionalReport } from './ProfessionalReport';

@@ -167,6 +167,8 @@ function App() {
         {currentView === 'results' && evaluationResult ? (
           <EvaluationResults
             evaluation={evaluationResult}
+            essayText={essayText}
+            prompt={promptText}
             onClose={handleBackToEditor}
             onPrint={handlePrintReport}
           />
