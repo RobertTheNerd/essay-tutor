@@ -29,30 +29,32 @@ export default function TextEditor({
   }, [essayText, onEssayChange])
 
   return (
-    <div className="space-y-8">
-      {/* Modern Writing Prompt Field - Notion inspired */}
-      <div className="space-y-3">
+    <div className="space-y-5">
+      {/* Enhanced Writing Prompt Field - More compact */}
+      <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">
           Writing prompt <span className="text-gray-400 font-normal">(optional)</span>
         </label>
-        <textarea
-          value={promptText}
-          onChange={e => setPromptText(e.target.value)}
-          placeholder={promptPlaceholder || 'Enter writing prompt...'}
-          className="w-full h-20 px-0 py-2 bg-transparent border-0 border-b border-gray-100 focus:border-blue-500 focus:outline-none transition-colors duration-200 resize-none text-base placeholder-gray-400 hover:border-gray-200"
-          rows={2}
-          style={{
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          }}
-        />
+        <div className="relative">
+          <textarea
+            value={promptText}
+            onChange={e => setPromptText(e.target.value)}
+            placeholder={promptPlaceholder || 'Enter writing prompt...'}
+            className="w-full h-16 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-500 focus:bg-white focus:outline-none transition-all duration-200 resize-none text-base placeholder-gray-400 hover:border-gray-300"
+            rows={2}
+            style={{
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            }}
+          />
+        </div>
       </div>
 
-      {/* Modern Essay Text Field - Clean and spacious */}
-      <div className="space-y-3">
+      {/* Enhanced Essay Text Field - More compact */}
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium text-gray-700">Essay</label>
           {essayText.trim() && (
-            <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
               {essayText.trim().split(/\s+/).length} words
             </span>
           )}
@@ -66,15 +68,17 @@ export default function TextEditor({
               essayPlaceholder ||
               'Start writing your essay...\n\nFocus on:\n• Clear introduction\n• Well-developed body paragraphs\n• Strong conclusion'
             }
-            className="w-full h-96 px-0 py-4 bg-transparent border-0 focus:outline-none resize-none text-base leading-relaxed placeholder-gray-400"
+            className="w-full h-80 px-3 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-500 focus:bg-white focus:outline-none transition-all duration-200 resize-none text-base leading-relaxed placeholder-gray-400 hover:border-gray-300"
             style={{
               fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               lineHeight: '1.7',
             }}
           />
 
-          {/* Subtle focus indicator */}
-          <div className="absolute left-0 top-0 w-0.5 h-full bg-blue-500 scale-y-0 origin-top transition-transform duration-200 focus-within:scale-y-100 opacity-0 focus-within:opacity-100"></div>
+          {/* Focus indicator */}
+          {essayText.trim() && (
+            <div className="absolute bottom-3 right-3 w-2 h-2 bg-green-500 rounded-full"></div>
+          )}
         </div>
       </div>
     </div>

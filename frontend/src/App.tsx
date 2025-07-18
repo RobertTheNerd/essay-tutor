@@ -179,17 +179,17 @@ function App() {
           />
         ) : (
           <>
-            {/* Modern, Minimal Header - Linear/Notion inspired */}
-            <div className="text-center py-16">
-              <h1 className="text-5xl font-semibold text-gray-900 mb-16 tracking-tight">
+            {/* Modern, Minimal Header - More compact */}
+            <div className="text-center py-8">
+              <h1 className="text-5xl font-semibold text-gray-900 mb-8 tracking-tight">
                 Essay Tutor
               </h1>
             </div>
 
-            {/* Main Interface Container - Card-based design */}
+            {/* Main Interface Container - Tighter spacing */}
             <div className="max-w-5xl mx-auto px-6">
-              {/* Modern Tab Design - Linear inspired */}
-              <div className="flex justify-center mb-12">
+              {/* Modern Tab Design - Closer to content */}
+              <div className="flex justify-center mb-6">
                 <div className="bg-gray-100 p-1 rounded-xl inline-flex">
                   <button
                     onClick={() => handleMethodChange('text')}
@@ -214,10 +214,10 @@ function App() {
                 </div>
               </div>
 
-              {/* Main Content Card - Modern card design */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
+              {/* Main Content Card - Reduced padding */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
                 {inputMethod === 'text' ? (
-                  <div className="p-8">
+                  <div className="p-6">
                     <TextEditor
                       onPromptChange={handlePromptChange}
                       onEssayChange={handleEssayChange}
@@ -226,31 +226,41 @@ function App() {
                     />
                   </div>
                 ) : (
-                  <div className="p-8">
+                  <div className="p-6">
                     <FileUpload onUpload={handleFileUpload} maxFiles={10} />
                   </div>
                 )}
 
-                {/* Action Bar - Bottom of card */}
-                <div className="border-t border-gray-50 bg-gray-50/50 px-8 py-6">
+                {/* Enhanced Action Bar - Reduced padding */}
+                <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       {inputMethod === 'text' ? (
                         <>
-                          {essayText.trim() && (
+                          {essayText.trim() ? (
                             <span className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                               Ready for analysis
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              Start writing to continue
                             </span>
                           )}
                         </>
                       ) : (
                         <>
-                          {uploadedFiles.length > 0 && (
+                          {uploadedFiles.length > 0 ? (
                             <span className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                               {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''}{' '}
                               ready
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              Upload files to continue
                             </span>
                           )}
                         </>
@@ -265,7 +275,7 @@ function App() {
                           className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                             isEvaluating || !essayText.trim()
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transform hover:scale-105'
                           }`}
                         >
                           {isEvaluating ? (
@@ -284,7 +294,7 @@ function App() {
                           className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                             isProcessingImages || uploadedFiles.length === 0
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transform hover:scale-105'
                           }`}
                         >
                           {isProcessingImages ? (
@@ -302,11 +312,11 @@ function App() {
                 </div>
               </div>
 
-              {/* Positive feedback when ready */}
+              {/* Enhanced positive feedback - More compact */}
               {essayText.trim() && !isEvaluating && inputMethod === 'text' && (
-                <div className="text-center py-8">
-                  <div className="inline-flex items-center gap-2 bg-green-50 border border-green-100 rounded-lg px-4 py-2 text-sm text-green-700">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                <div className="text-center py-3">
+                  <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-sm text-green-700">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                     Essay ready for AI analysis
                   </div>
                 </div>
