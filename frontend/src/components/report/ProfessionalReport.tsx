@@ -64,6 +64,9 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
     // Generate annotation blocks for detailed explanations
     const annotationBlocks = annotationProcessor.generateAnnotationBlocks(annotations);
 
+    // Get paragraph feedback from evaluation data
+    const paragraphFeedback = evaluationData.paragraphFeedback || [];
+
     return {
       score,
       categories,
@@ -71,6 +74,7 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       annotations,
       textBlocks,
       annotationBlocks,
+      paragraphFeedback,
       feedback: evaluationData.feedback || []
     };
   }, [evaluationData, essayText, annotationProcessor]);
@@ -190,6 +194,11 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
             // Get annotation blocks for this text block
             const relatedAnnotationBlocks = annotationProcessor.generateAnnotationBlocks(blockAnnotations);
 
+            // Find paragraph feedback for this block (paragraph number = blockIndex + 1)
+            const paragraphFeedback = reportContent.paragraphFeedback.find(
+              (feedback: any) => feedback.paragraphNumber === blockIndex + 1
+            );
+
             return (
               <div key={blockIndex} className="text-block">
                 <div className="text-line essay-text">
@@ -208,6 +217,17 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
                         <div dangerouslySetInnerHTML={{ __html: annotationBlock.content }} />
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {/* Paragraph Feedback Section */}
+                {paragraphFeedback && (
+                  <div className={`paragraph-feedback ${paragraphFeedback.type}`}>
+                    <strong>
+                      {paragraphFeedback.type === 'excellent' ? '🏆' : 
+                       paragraphFeedback.type === 'positive' ? '👍' : '📝'} 
+                      {paragraphFeedback.title}:
+                    </strong> {paragraphFeedback.content}
                   </div>
                 )}
               </div>

@@ -105,48 +105,67 @@ export default function FileUpload({ onUpload, maxFiles = 10 }: FileUploadProps)
   })
 
   return (
-    <div className="w-full">
-      <div
-        {...getRootProps()}
-        className={`
-          border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-          ${isDragActive 
-            ? 'border-blue-500 bg-blue-50' 
-            : 'border-gray-300 hover:border-gray-400'
-          }
-          ${uploading ? 'pointer-events-none opacity-50' : ''}
-        `}
-      >
-        <input {...getInputProps()} />
-        
-        <div className="space-y-4">
-          <div className="text-4xl">📸</div>
+    <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <span className="text-2xl">📸</span>
+          Upload Essay Images
+        </h2>
+        <p className="text-purple-100 text-sm mt-1">
+          Upload images of your handwritten or printed essay for AI analysis
+        </p>
+      </div>
+
+      <div className="p-6">
+        <div
+          {...getRootProps()}
+          className={`
+            border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200
+            ${isDragActive 
+              ? 'border-blue-500 bg-gradient-to-b from-blue-50 to-blue-100 shadow-inner' 
+              : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+            }
+            ${uploading ? 'pointer-events-none opacity-50' : ''}
+          `}
+        >
+          <input {...getInputProps()} />
           
-          {uploading ? (
-            <div>
-              <div className="text-lg font-medium text-gray-900">Processing Images...</div>
-              <div className="text-sm text-gray-500">
-                Uploading {selectedFiles.length} page{selectedFiles.length !== 1 ? 's' : ''} and extracting text
-              </div>
+          <div className="space-y-4">
+            <div className="text-6xl">
+              {uploading ? '⏳' : isDragActive ? '📥' : '📸'}
             </div>
-          ) : isDragActive ? (
-            <div>
-              <div className="text-lg font-medium text-blue-900">Drop your images here</div>
-              <div className="text-sm text-blue-600">Release to upload</div>
-            </div>
-          ) : (
-            <div>
-              <div className="text-lg font-medium text-gray-900">
-                Drag & drop essay images here
+            
+            {uploading ? (
+              <div>
+                <div className="text-xl font-bold text-gray-900">Processing Images...</div>
+                <div className="text-sm text-gray-600 mt-2">
+                  Uploading {selectedFiles.length} page{selectedFiles.length !== 1 ? 's' : ''} and extracting text with AI
+                </div>
+                <div className="mt-4">
+                  <div className="animate-pulse bg-blue-200 rounded-full h-2 w-48 mx-auto"></div>
+                </div>
               </div>
-              <div className="text-sm text-gray-500">
-                or click to select multiple images
+            ) : isDragActive ? (
+              <div>
+                <div className="text-xl font-bold text-blue-900">Drop your images here!</div>
+                <div className="text-sm text-blue-600 mt-2">Release to start processing</div>
               </div>
-              <div className="text-xs text-gray-400 mt-2">
-                Supports: .jpg, .png (max {maxFiles} pages, 10MB each)
+            ) : (
+              <div>
+                <div className="text-xl font-bold text-gray-900">
+                  📤 Drag & Drop Essay Images
+                </div>
+                <div className="text-sm text-gray-600 mt-2">
+                  or click to browse and select multiple images
+                </div>
+                <div className="mt-4 inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm">
+                  <span className="text-blue-500">📋</span>
+                  Supports: JPG, PNG • Max {maxFiles} pages • 10MB each
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

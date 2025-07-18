@@ -1,9 +1,4 @@
-import { useState } from 'react'
 import type { EvaluationResponse } from '../../types/evaluation'
-import ScoreSummary from './ScoreSummary'
-import AnnotatedText from './AnnotatedText'
-import FeedbackSection from './FeedbackSection'
-import ParagraphFeedback from './ParagraphFeedback'
 import { ProfessionalReport } from '../report'
 
 interface EvaluationResultsProps {
@@ -15,7 +10,6 @@ interface EvaluationResultsProps {
 }
 
 const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: EvaluationResultsProps) => {
-  const [viewMode, setViewMode] = useState<'detailed' | 'professional'>('detailed')
   if (!evaluation.success || !evaluation.evaluation) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
@@ -37,7 +31,7 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
     )
   }
 
-  const { evaluation: evalData, annotatedText } = evaluation
+  const { evaluation: evalData } = evaluation
 
   return (
     <div className="space-y-6">
@@ -53,30 +47,6 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
             </p>
           </div>
           <div className="flex gap-3">
-            {/* View Mode Toggle */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('detailed')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'detailed'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                📊 Detailed View
-              </button>
-              <button
-                onClick={() => setViewMode('professional')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'professional'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                📄 Professional Report
-              </button>
-            </div>
-            
             {onPrint && (
               <button
                 onClick={onPrint}
@@ -121,51 +91,14 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
         </div>
       </div>
 
-      {/* Conditional Content Based on View Mode */}
-      {viewMode === 'detailed' ? (
-        <>
-          {/* Score Summary */}
-          <ScoreSummary 
-            scores={evalData.scores} 
-            overall={evalData.overall}
-            rubricName={evalData.rubric.name}
-          />
-
-          {/* Annotated Text */}
-          {annotatedText && (
-            <AnnotatedText
-              segments={annotatedText.segments}
-              annotations={annotatedText.annotations}
-              legend={annotatedText.legend}
-              title="📖 Annotated Essay"
-            />
-          )}
-
-          {/* Detailed Feedback */}
-          <FeedbackSection
-            feedbackBlocks={evalData.feedback}
-            strengths={evalData.summary.strengths}
-            improvements={evalData.summary.improvements}
-            nextSteps={evalData.summary.nextSteps}
-          />
-
-          {/* Paragraph Feedback */}
-          {evalData.paragraphFeedback && evalData.paragraphFeedback.length > 0 && (
-            <ParagraphFeedback
-              paragraphFeedback={evalData.paragraphFeedback}
-            />
-          )}
-        </>
-      ) : (
-        /* Professional Report View */
-        <ProfessionalReport
-          evaluationData={evalData}
-          essayText={essayText}
-          prompt={prompt}
-          mode="screen"
-          onPrint={onPrint}
-        />
-      )}
+      {/* Professional Report View */}
+      <ProfessionalReport
+        evaluationData={evalData}
+        essayText={essayText}
+        prompt={prompt}
+        mode="screen"
+        onPrint={onPrint}
+      />
 
       {/* Footer with Additional Actions */}
       <div className="bg-white rounded-lg shadow-md p-6">
