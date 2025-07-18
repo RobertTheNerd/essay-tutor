@@ -8,7 +8,6 @@ import { evaluationService } from './services/evaluationService'
 import type { EvaluationResponse } from './types/evaluation'
 
 function App() {
-  const [apiResponse, setApiResponse] = useState<string>('')
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [inputMethod, setInputMethod] = useState<InputMethod>('text')
   const [promptText, setPromptText] = useState<string>('')
@@ -18,32 +17,6 @@ function App() {
   const [isProcessingImages, setIsProcessingImages] = useState<boolean>(false)
   const [processingResult, setProcessingResult] = useState<any>(null)
   const [currentView, setCurrentView] = useState<'editor' | 'review' | 'results'>('editor')
-
-  const testAPI = async () => {
-    try {
-      const response = await fetch('/api/hello?name=EssayTutor')
-      
-      // Check if response is ok
-      if (!response.ok) {
-        const errorText = await response.text()
-        setApiResponse(`HTTP Error ${response.status}: ${errorText.substring(0, 500)}`)
-        return
-      }
-      
-      // Check content type
-      const contentType = response.headers.get('content-type')
-      if (!contentType || !contentType.includes('application/json')) {
-        const responseText = await response.text()
-        setApiResponse(`Invalid content type: ${contentType}\nResponse: ${responseText.substring(0, 500)}`)
-        return
-      }
-      
-      const data = await response.json()
-      setApiResponse(JSON.stringify(data, null, 2))
-    } catch (error) {
-      setApiResponse(`Error: ${error instanceof Error ? error.message : String(error)}`)
-    }
-  }
 
   const handleFileUpload = (files: File[]) => {
     setUploadedFiles(files)
@@ -162,7 +135,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-4xl mx-auto px-4">
         {currentView === 'results' && evaluationResult ? (
           <EvaluationResults
@@ -182,13 +155,33 @@ function App() {
           />
         ) : (
           <>
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                Essay Tutor
-              </h1>
-              <p className="text-lg text-gray-600">
-                AI-powered ISEE essay evaluation with automated scoring and feedback
-              </p>
+            {/* Professional Header */}
+            <div className="text-center mb-8 pt-8">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-8">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <span className="text-4xl">📝</span>
+                    <h1 className="text-4xl font-bold text-white">Essay Tutor</h1>
+                  </div>
+                  <p className="text-blue-100 text-lg">
+                    AI-powered ISEE essay evaluation with automated scoring and feedback
+                  </p>
+                  <div className="mt-4 flex justify-center gap-6 text-sm text-blue-100">
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-200">🎯</span>
+                      <span>Professional Scoring</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-200">📊</span>
+                      <span>Detailed Feedback</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-200">⚡</span>
+                      <span>Instant Results</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
         
         <InputMethodSelector 
@@ -207,23 +200,23 @@ function App() {
             
             {/* Evaluation Button */}
             {essayText.trim() && (
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold mb-4">Ready to evaluate your essay?</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Ready to evaluate your essay?</h3>
                   <button
                     onClick={handleEvaluateEssay}
                     disabled={isEvaluating}
-                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors ${
+                    className={`px-8 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${
                       isEvaluating
                         ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105'
                     }`}
                   >
                     {isEvaluating ? (
                       <span className="flex items-center">
                         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         Evaluating...
                       </span>
@@ -231,11 +224,12 @@ function App() {
                       '🎯 Evaluate Essay'
                     )}
                   </button>
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className="text-sm text-gray-600 mt-3">
                     Get detailed AI-powered feedback and scoring
                     {promptText.trim() && (
-                      <span className="block text-green-600 font-medium mt-1">
-                        ✓ Writing prompt provided for enhanced evaluation
+                      <span className="block text-green-600 font-medium mt-2 flex items-center justify-center gap-2">
+                        <span className="text-green-500">✓</span>
+                        Writing prompt provided for enhanced evaluation
                       </span>
                     )}
                   </p>
@@ -244,15 +238,17 @@ function App() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-semibold mb-4">📸 Image Upload Method</h2>
+          <div className="space-y-6">
             <FileUpload onUpload={handleFileUpload} maxFiles={10} />
             
             {uploadedFiles.length > 0 && (
-              <div className="mt-4 space-y-4">
-                <div className="p-4 bg-blue-50 rounded-md">
-                  <h3 className="font-medium text-blue-900">Files Ready for Processing</h3>
-                  <p className="text-sm text-blue-700 mt-1">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 mb-4">
+                  <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                    <span className="text-green-600">✅</span>
+                    Files Ready for Processing
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
                     {uploadedFiles.length} page{uploadedFiles.length !== 1 ? 's' : ''} selected - AI will extract text and detect page ordering
                   </p>
                 </div>
@@ -261,10 +257,10 @@ function App() {
                   <button
                     onClick={handleProcessImages}
                     disabled={isProcessingImages}
-                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors ${
+                    className={`px-8 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${
                       isProcessingImages
                         ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-green-600 hover:bg-green-700'
+                        : 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-105'
                     }`}
                   >
                     {isProcessingImages ? (
@@ -279,7 +275,7 @@ function App() {
                       '🔍 Process Images'
                     )}
                   </button>
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className="text-sm text-gray-600 mt-3">
                     AI will extract text and automatically evaluate if writing prompt is found
                   </p>
                 </div>
@@ -287,55 +283,6 @@ function App() {
             )}
           </div>
         )}
-
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-semibold mb-4">API Test</h2>
-          <button 
-            onClick={testAPI}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
-          >
-            Test API Connection
-          </button>
-          
-          {apiResponse && (
-            <div className="mt-4">
-              <h3 className="text-lg font-medium mb-2">API Response:</h3>
-              <pre className="bg-gray-100 p-4 rounded-md text-sm font-mono overflow-auto">
-                {apiResponse}
-              </pre>
-            </div>
-          )}
-        </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-semibold mb-4">Current Features</h2>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                  Real AI-powered ISEE evaluation
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                  6-category scoring with detailed feedback
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                  Color-coded annotations and highlights
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                  Professional evaluation reports
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                  Multi-page image upload with OCR
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                  AI integration with GPT-4o-mini
-                </li>
-              </ul>
-            </div>
           </>
         )}
       </div>
