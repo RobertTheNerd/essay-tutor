@@ -1,15 +1,15 @@
-/* Modern, Clean Design System */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
+/* Tailwind CSS v3 imports */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Modern Design System - Linear/Notion inspired */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* Modern Color System */
 :root {
   --color-primary: #2563eb;
-  --color-primary-light: #3b82f6;
-  --color-primary-dark: #1d4ed8;
+  --color-primary-hover: #1d4ed8;
 
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
@@ -22,14 +22,14 @@
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
 
-  /* Clean Shadows */
+  /* Modern Shadows */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
 }
 
-/* Typography */
+/* Typography - Modern system font stack */
 @layer base {
   html {
     font-family:
@@ -39,15 +39,15 @@
       'Segoe UI',
       Roboto,
       sans-serif;
-    scroll-behavior: smooth;
     font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {
     background-color: #fafafa;
-    color: #1f2937;
+    color: #111827;
     line-height: 1.6;
   }
 
@@ -58,125 +58,65 @@
   h5,
   h6 {
     font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
   }
 
-  /* Better textarea styling */
-  textarea {
+  /* Modern input styling */
+  textarea,
+  input {
     font-family: inherit;
-    line-height: inherit;
   }
 
-  textarea::placeholder {
+  textarea::placeholder,
+  input::placeholder {
     color: #9ca3af;
     opacity: 1;
   }
+
+  /* Remove default focus outlines - we'll use custom ones */
+  button:focus,
+  textarea:focus,
+  input:focus {
+    outline: none;
+  }
 }
 
-/* Modern Component Styles */
+/* Modern Component System */
 @layer components {
-  .btn-primary {
-    background: #2563eb;
-    color: white;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.2s ease;
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
   }
 
-  .btn-primary:hover {
-    background: #1d4ed8;
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-1px);
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md;
   }
 
   .btn-secondary {
-    background: #f3f4f6;
-    color: #1f2937;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.2s ease;
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
   }
 
-  .btn-secondary:hover {
-    background: #e5e7eb;
-    box-shadow: var(--shadow-md);
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
   }
 
-  /* Smooth animations */
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
-  }
-}
-
-/* Refined animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
+  .focus-ring:focus-visible {
+    @apply ring-2 ring-blue-500 ring-opacity-50;
   }
 }
 
 /* Utilities */
 @layer utilities {
-  /* Subtle hover effects */
-  .hover-lift {
-    transition: all 0.2s ease;
+  .text-balance {
+    text-wrap: balance;
   }
 
-  .hover-lift:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
-  /* Modern glass effect */
-  .backdrop-blur-glass {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  /* Better text rendering */
-  .text-rendering-optimized {
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
