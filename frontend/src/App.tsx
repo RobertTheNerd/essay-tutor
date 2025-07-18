@@ -135,8 +135,13 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
+      {/* Background Decorations */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+      
+      <div className="relative z-10 max-w-6xl mx-auto px-4">
         {currentView === 'results' && evaluationResult ? (
           <EvaluationResults
             evaluation={evaluationResult}
@@ -155,29 +160,52 @@ function App() {
           />
         ) : (
           <>
-            {/* Professional Header */}
-            <div className="text-center mb-8 pt-8">
-              <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-8">
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <span className="text-4xl">📝</span>
-                    <h1 className="text-4xl font-bold text-white">Essay Tutor</h1>
-                  </div>
-                  <p className="text-blue-100 text-lg">
-                    AI-powered ISEE essay evaluation with automated scoring and feedback
-                  </p>
-                  <div className="mt-4 flex justify-center gap-6 text-sm text-blue-100">
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-200">🎯</span>
-                      <span>Professional Scoring</span>
+            {/* Hero Section */}
+            <div className="text-center pt-12 pb-8 animate-fade-in">
+              <div className="card-professional mx-auto max-w-5xl">
+                <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-8 py-12 relative overflow-hidden">
+                  {/* Decorative elements */}
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-center gap-4 mb-6">
+                      <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                        <span className="text-4xl">📝</span>
+                      </div>
+                      <div className="text-left">
+                        <h1 className="text-5xl font-bold text-white text-shadow mb-2">
+                          Essay Tutor
+                        </h1>
+                        <p className="text-xl text-blue-100 font-medium">
+                          AI-Powered Excellence
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-200">📊</span>
-                      <span>Detailed Feedback</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-200">⚡</span>
-                      <span>Instant Results</span>
+                    
+                    <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+                      Transform your ISEE essay writing with professional AI evaluation, detailed feedback, and personalized improvement strategies
+                    </p>
+                    
+                    <div className="flex flex-wrap justify-center gap-8 text-blue-100">
+                      <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl backdrop-blur-sm">
+                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                          <span className="text-white">🎯</span>
+                        </div>
+                        <span className="font-semibold">Professional Scoring</span>
+                      </div>
+                      <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl backdrop-blur-sm">
+                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                          <span className="text-white">📊</span>
+                        </div>
+                        <span className="font-semibold">Detailed Analytics</span>
+                      </div>
+                      <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl backdrop-blur-sm">
+                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                          <span className="text-white">⚡</span>
+                        </div>
+                        <span className="font-semibold">Instant Results</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -200,39 +228,73 @@ function App() {
             
             {/* Evaluation Button */}
             {essayText.trim() && (
-              <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Ready to evaluate your essay?</h3>
-                  <button
-                    onClick={handleEvaluateEssay}
-                    disabled={isEvaluating}
-                    className={`px-8 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${
-                      isEvaluating
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105'
-                    }`}
-                  >
-                    {isEvaluating ? (
-                      <span className="flex items-center">
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Evaluating...
-                      </span>
-                    ) : (
-                      '🎯 Evaluate Essay'
-                    )}
-                  </button>
-                  <p className="text-sm text-gray-600 mt-3">
-                    Get detailed AI-powered feedback and scoring
-                    {promptText.trim() && (
-                      <span className="block text-green-600 font-medium mt-2 flex items-center justify-center gap-2">
-                        <span className="text-green-500">✓</span>
-                        Writing prompt provided for enhanced evaluation
-                      </span>
-                    )}
-                  </p>
+              <div className="animate-scale-in">
+                <div className="card-professional p-8 hover-lift">
+                  <div className="text-center">
+                    <div className="mb-6">
+                      <h3 className="text-2xl font-bold text-gray-800 mb-2">Ready to evaluate your essay?</h3>
+                      <p className="text-gray-600 text-lg">Get professional AI-powered feedback and detailed scoring</p>
+                    </div>
+                    
+                    <button
+                      onClick={handleEvaluateEssay}
+                      disabled={isEvaluating}
+                      className={`group relative px-12 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ${
+                        isEvaluating
+                          ? 'bg-gray-400 cursor-not-allowed text-white'
+                          : 'bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 shadow-2xl hover:shadow-3xl transform hover:scale-105 text-white'
+                      }`}
+                    >
+                      {isEvaluating ? (
+                        <span className="flex items-center">
+                          <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Evaluating Your Essay...
+                        </span>
+                      ) : (
+                        <span className="flex items-center">
+                          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+                            🎯
+                          </div>
+                          Evaluate Essay
+                        </span>
+                      )}
+                    </button>
+                    
+                    <div className="mt-6 space-y-3">
+                      <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">📊</span>
+                          </div>
+                          <span>Detailed Analytics</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">🔍</span>
+                          </div>
+                          <span>Professional Scoring</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">⚡</span>
+                          </div>
+                          <span>Instant Results</span>
+                        </div>
+                      </div>
+                      
+                      {promptText.trim() && (
+                        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-2 rounded-full border border-green-200">
+                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">✓</span>
+                          </div>
+                          <span className="text-green-700 font-medium">Writing prompt provided for enhanced evaluation</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -257,22 +319,27 @@ function App() {
                   <button
                     onClick={handleProcessImages}
                     disabled={isProcessingImages}
-                    className={`px-8 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${
+                    className={`group relative px-12 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ${
                       isProcessingImages
                         ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-105'
+                        : 'bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 shadow-2xl hover:shadow-3xl transform hover:scale-105 text-white'
                     }`}
                   >
                     {isProcessingImages ? (
                       <span className="flex items-center">
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         Processing Images...
                       </span>
                     ) : (
-                      '🔍 Process Images'
+                      <span className="flex items-center">
+                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+                          🔍
+                        </div>
+                        Process Images
+                      </span>
                     )}
                   </button>
                   <p className="text-sm text-gray-600 mt-3">
