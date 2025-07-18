@@ -22,9 +22,7 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
   evaluationData,
   essayText,
   prompt,
-  studentInfo,
-  mode = 'screen',
-  onPrint
+  studentInfo
 }) => {
   // Initialize annotation processor
   const annotationProcessor = useMemo(() => new AnnotationProcessor(), []);
@@ -79,64 +77,9 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
     };
   }, [evaluationData, essayText, annotationProcessor]);
 
-  const handlePrint = () => {
-    if (onPrint) {
-      onPrint();
-      return;
-    }
-    window.print();
-  };
-
-  const handleDownloadHTML = () => {
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ISEE Essay Evaluation Report</title>
-        <style>
-          @import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&family=Source+Serif+Pro:wght@400;600&display=swap");
-          /* Include professional report styles here */
-        </style>
-      </head>
-      <body class="professional-report-container">
-        ${document.querySelector('.professional-report-content')?.innerHTML || ''}
-      </body>
-      </html>
-    `;
-
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `isee-essay-report-${new Date().toISOString().split('T')[0]}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="professional-report-container">
-      {/* Action buttons for screen mode */}
-      {mode === 'screen' && (
-        <div className="flex justify-end gap-2 mb-4 px-4">
-          <button
-            onClick={handlePrint}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
-          >
-            🖨️ Print Report
-          </button>
-          <button
-            onClick={handleDownloadHTML}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
-            💾 Download HTML
-          </button>
-        </div>
-      )}
-
       {/* Report Content */}
       <div className="professional-report-content">
         {/* Header */}
