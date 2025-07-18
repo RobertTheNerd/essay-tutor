@@ -179,17 +179,17 @@ function App() {
           />
         ) : (
           <>
-            {/* Modern, Minimal Header - More compact */}
-            <div className="text-center py-8">
-              <h1 className="text-5xl font-semibold text-gray-900 mb-8 tracking-tight">
+            {/* Modern, Minimal Header - Ultra compact */}
+            <div className="text-center py-4">
+              <h1 className="text-5xl font-semibold text-gray-900 mb-4 tracking-tight">
                 Essay Tutor
               </h1>
             </div>
 
-            {/* Main Interface Container - Tighter spacing */}
+            {/* Main Interface Container - Minimal top spacing */}
             <div className="max-w-5xl mx-auto px-6">
-              {/* Modern Tab Design - Closer to content */}
-              <div className="flex justify-center mb-6">
+              {/* Modern Tab Design - Close to header */}
+              <div className="flex justify-center mb-4">
                 <div className="bg-gray-100 p-1 rounded-xl inline-flex">
                   <button
                     onClick={() => handleMethodChange('text')}
