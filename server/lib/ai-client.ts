@@ -8,7 +8,9 @@ function getOpenAIClient(): OpenAI | null {
   if (openai === null) {
     // Initialize OpenAI client with Azure configuration if available
     if (process.env.OPENAI_API_KEY) {
-      openai = new OpenAI({
+      console.log('Initializing OpenAI client with Azure config...');
+      try {
+        openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
         baseURL: process.env.AZURE_OPENAI_ENDPOINT
           ? `${process.env.AZURE_OPENAI_ENDPOINT.replace(
@@ -27,7 +29,14 @@ function getOpenAIClient(): OpenAI | null {
               "api-key": process.env.OPENAI_API_KEY,
             }
           : undefined,
-      });
+        });
+        console.log('OpenAI client initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize OpenAI client:', error);
+        openai = null;
+      }
+    } else {
+      console.log('No OPENAI_API_KEY found, OpenAI client not initialized');
     }
   }
   return openai;
@@ -554,6 +563,19 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
     text: string,
     topic?: string
   ): Promise<EssayAnalysisResult> {
+    // Check if AI client is available
+    console.log('AI Client status:', {
+      client: !!this.client,
+      hasApiKey: !!process.env.OPENAI_API_KEY,
+      hasAzureEndpoint: !!process.env.AZURE_OPENAI_ENDPOINT,
+      model: this.textModel
+    });
+    
+    if (!this.client) {
+      console.log('OpenAI client not available, returning fallback evaluation');
+      return this.getBasicAnalysis(text);
+    }
+
     try {
       const prompt = this.buildISEEEvaluationPrompt(text, topic);
       

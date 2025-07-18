@@ -28,6 +28,7 @@ const server = app.listen(PORT, () => {
   console.log(`📁 API endpoints:`);
   console.log(`   GET  http://localhost:${PORT}/api/hello`);
   console.log(`   POST http://localhost:${PORT}/api/process (unified - text & files)`);
+  console.log(`   POST http://localhost:${PORT}/api/evaluate (essay evaluation)`);
   console.log(`   GET  http://localhost:${PORT}/health`);
   console.log(`🌐 Frontend: http://localhost:${PORT}`);
   console.log(`💡 Environment: ${process.env.NODE_ENV || "development"}`);
