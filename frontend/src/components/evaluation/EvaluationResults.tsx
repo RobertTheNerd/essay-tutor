@@ -3,6 +3,7 @@ import type { EvaluationResponse } from '../../types/evaluation'
 import ScoreSummary from './ScoreSummary'
 import AnnotatedText from './AnnotatedText'
 import FeedbackSection from './FeedbackSection'
+import ParagraphFeedback from './ParagraphFeedback'
 import { ProfessionalReport } from '../report'
 
 interface EvaluationResultsProps {
@@ -112,6 +113,11 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
           <div>
             <strong>Feedback Items:</strong> {evalData.feedback.length}
           </div>
+          {evalData.paragraphFeedback && evalData.paragraphFeedback.length > 0 && (
+            <div>
+              <strong>Paragraph Analysis:</strong> {evalData.paragraphFeedback.length} paragraphs
+            </div>
+          )}
         </div>
       </div>
 
@@ -142,6 +148,13 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
             improvements={evalData.summary.improvements}
             nextSteps={evalData.summary.nextSteps}
           />
+
+          {/* Paragraph Feedback */}
+          {evalData.paragraphFeedback && evalData.paragraphFeedback.length > 0 && (
+            <ParagraphFeedback
+              paragraphFeedback={evalData.paragraphFeedback}
+            />
+          )}
         </>
       ) : (
         /* Professional Report View */

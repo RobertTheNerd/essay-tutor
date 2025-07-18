@@ -93,6 +93,13 @@ export interface EssayAnalysisResult {
     explanation: string;
     suggestedText?: string;
   }[];
+  paragraphFeedback?: {
+    paragraphNumber: number;
+    title: string;
+    content: string;
+    type: 'positive' | 'excellent' | 'needs-improvement';
+    priority: 'high' | 'medium' | 'low';
+  }[];
   nextSteps?: string;
 }
 
@@ -216,10 +223,10 @@ For summarized topics, create a brief description like "Essay about a teacher's 
       });
 
       const content = response.choices[0]?.message?.content || "";
-      
+
       try {
         const aiResult = JSON.parse(content);
-        
+
         // Validate and process AI response
         const orderedPages = (aiResult.pages || []).map((page: any, index: number) => ({
           originalIndex: page.originalIndex || index,
@@ -232,15 +239,15 @@ For summarized topics, create a brief description like "Essay about a teacher's 
         // Sort by correct order and combine text
         const sortedPages = [...orderedPages].sort((a, b) => a.correctOrder - b.correctOrder);
         const fullText = sortedPages.map(page => page.extractedText).join('\n\n');
-        
-        // Extract topic and source from AI response 
+
+        // Extract topic and source from AI response
         let detectedTopic = aiResult.detectedTopic || "";
         let topicSource = aiResult.topicSource || "summarized";
-        
+
         // Get enhanced topic analysis
         const enhancedTopic = await this.detectTopicEnhanced(fullText);
         enhancedTopic.topicSource = topicSource;
-        
+
         // Use enhanced topic if AI didn't provide a good topic
         if (!detectedTopic || detectedTopic.length < 10) {
           detectedTopic = enhancedTopic.detectedTopic;
@@ -260,11 +267,11 @@ For summarized topics, create a brief description like "Essay about a teacher's 
 
       } catch (parseError) {
         console.warn("Failed to parse batch processing response, falling back to individual processing:", parseError);
-        
+
         // Fallback: process images individually
         const fallbackResults = [];
         let combinedText = "";
-        
+
         for (let i = 0; i < imageFiles.length; i++) {
           const file = imageFiles[i];
           try {
@@ -273,7 +280,7 @@ For summarized topics, create a brief description like "Essay about a teacher's 
               file.mimeType,
               file.filename
             );
-            
+
             fallbackResults.push({
               originalIndex: i,
               correctOrder: i + 1,
@@ -281,7 +288,7 @@ For summarized topics, create a brief description like "Essay about a teacher's 
               extractedText: result.extractedText,
               confidence: result.confidence
             });
-            
+
             combinedText += result.extractedText + "\n\n";
           } catch (error) {
             fallbackResults.push({
@@ -293,9 +300,9 @@ For summarized topics, create a brief description like "Essay about a teacher's 
             });
           }
         }
-        
+
         const enhancedTopic = await this.detectTopicEnhanced(combinedText);
-        
+
         return {
           fullText: combinedText,
           detectedTopic: enhancedTopic.detectedTopic,
@@ -309,7 +316,7 @@ For summarized topics, create a brief description like "Essay about a teacher's 
 
     } catch (error) {
       console.error("Batch image processing error:", error);
-      
+
       return {
         fullText: "Batch processing failed",
         detectedTopic: "Topic detection failed",
@@ -526,7 +533,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
 
         // Validate confidence is between 0 and 1
         result.confidence = Math.max(0, Math.min(1, result.confidence || 0.5));
-        
+
         // Ensure topicSource is valid
         result.topicSource = result.topicSource === "extracted" ? "extracted" : "summarized";
 
@@ -572,7 +579,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
     topic?: string
   ): Promise<EssayAnalysisResult> {
     const client = this.getClient();
-    
+
     // Check if AI client is available
     console.log('AI Client status:', {
       client: !!client,
@@ -580,7 +587,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
       hasAzureEndpoint: !!process.env.AZURE_OPENAI_ENDPOINT,
       model: this.textModel
     });
-    
+
     if (!client) {
       console.error('OpenAI client not available - cannot perform AI evaluation');
       throw new Error('AI evaluation service unavailable. Please check API configuration.');
@@ -588,7 +595,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
 
     try {
       const prompt = this.buildISEEEvaluationPrompt(text, topic);
-      
+
       const response = await client.chat.completions.create({
         model: this.textModel,
         messages: [
@@ -597,12 +604,12 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
             content: "You are an expert ISEE writing evaluator for grades 7-8. Provide detailed, constructive feedback based on the ISEE Upper Level rubric."
           },
           {
-            role: "user", 
+            role: "user",
             content: prompt
           }
         ],
-        temperature: 0.3,
-        max_tokens: 2000
+        temperature: 0.4,
+        max_tokens: 3000
       });
 
       const aiResponse = response.choices[0]?.message?.content;
@@ -611,7 +618,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
       }
 
       return this.parseEvaluationResponse(aiResponse);
-      
+
     } catch (error) {
       console.error('Essay analysis failed:', error);
       // Re-throw the error to ensure AI-only evaluation
@@ -624,7 +631,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
    */
   private buildISEEEvaluationPrompt(text: string, topic?: string): string {
     return `
-Please evaluate this ISEE Upper Level (Grades 7-8) essay according to the official rubric. 
+Please evaluate this ISEE Upper Level essay (for admissions to grades 9-12) according to the official rubric. 
 
 ${topic ? `Writing Prompt: ${topic}` : ''}
 
@@ -645,15 +652,24 @@ Please provide a detailed evaluation with:
 
 2. DETAILED FEEDBACK for each category with specific examples from the text
 
-3. SPECIFIC ANNOTATIONS: Identify 3-5 specific text segments that need improvement, with:
-   - Original text excerpt (exact words from the essay, 3-15 words)
-   - Category (grammar/vocabulary/structure/development/clarity/strengths)
-   - Explanation of the issue or strength
-   - Suggested improvement (if applicable)\n   - Focus on both strengths and areas for improvement
+3. PARAGRAPH-BY-PARAGRAPH ANALYSIS: You MUST analyze each paragraph individually. Split the essay into paragraphs and provide feedback for each one:
+   - Paragraph number (1, 2, 3, etc.)
+   - Descriptive title (e.g., "Strong Introduction", "Needs Better Transitions")
+   - Detailed content analysis (2-3 sentences explaining strengths/weaknesses)
+   - Type classification: "excellent", "positive", or "needs-improvement"
+   - Priority level: "high", "medium", or "low"
+   
+   IMPORTANT: Even if the essay is short, you must provide paragraph-by-paragraph feedback. Include this in your JSON response.
 
-4. SUMMARY:
-   - Top 3 strengths
-   - Top 3 areas for improvement
+4. SPECIFIC ANNOTATIONS: Identify all text segments that need improvement, with:
+   - Original text excerpt (exact words from the essay, 3-15 words)
+   - Category (grammar/vocabulary/structure/development/clarity/strengths, etc)
+   - Explanation of the issue or strength
+   - Suggested improvement (if applicable)\n   - Focus on areas for improvement
+
+5. SUMMARY:
+   - Top strengths
+   - Top areas for improvement
    - Next steps for growth
 
 Format your response as valid JSON with this structure:
@@ -668,6 +684,15 @@ Format your response as valid JSON with this structure:
   },
   "overallScore": calculated_average,
   "feedback": ["detailed feedback for each category"],
+  "paragraphFeedback": [
+    {
+      "paragraphNumber": 1,
+      "title": "Strong Introduction",
+      "content": "Detailed analysis of this paragraph's strengths and weaknesses",
+      "type": "excellent|positive|needs-improvement",
+      "priority": "high|medium|low"
+    }
+  ],
   "annotations": [
     {
       "originalText": "exact text from essay",
@@ -681,7 +706,7 @@ Format your response as valid JSON with this structure:
   "nextSteps": "specific guidance for improvement"
 }
 
-Be constructive, specific, and encouraging while maintaining high standards appropriate for grades 7-8.
+Be constructive, specific, and encouraging while maintaining high standards appropriate for this level.
 `;
   }
 
@@ -693,14 +718,21 @@ Be constructive, specific, and encouraging while maintaining high standards appr
       // Clean up the response to extract JSON
       const jsonStart = aiResponse.indexOf('{');
       const jsonEnd = aiResponse.lastIndexOf('}') + 1;
-      
+
       if (jsonStart === -1 || jsonEnd === 0) {
         throw new Error('No JSON found in AI response');
       }
-      
+
       const jsonStr = aiResponse.substring(jsonStart, jsonEnd);
       const parsed = JSON.parse(jsonStr);
       
+      // Debug logging for paragraph feedback
+      if (parsed.paragraphFeedback) {
+        console.log('AI generated paragraph feedback:', parsed.paragraphFeedback.length, 'paragraphs');
+      } else {
+        console.log('No paragraph feedback in AI response');
+      }
+
       return {
         rubricScores: {
           grammarMechanics: parsed.scores?.grammar || 3,
@@ -714,13 +746,14 @@ Be constructive, specific, and encouraging while maintaining high standards appr
         strengths: parsed.strengths || ["Essay demonstrates understanding"],
         areasForImprovement: parsed.areasForImprovement || ["Continue developing skills"],
         annotations: parsed.annotations || [],
+        paragraphFeedback: parsed.paragraphFeedback || [],
         nextSteps: parsed.nextSteps || "Focus on continued improvement"
       };
-      
+
     } catch (error) {
       console.error('Failed to parse AI response:', error);
       console.log('Raw AI response:', aiResponse);
-      
+
       // Return basic analysis if parsing fails
       return this.getBasicAnalysis(aiResponse.substring(0, 500));
     }
@@ -733,10 +766,10 @@ Be constructive, specific, and encouraging while maintaining high standards appr
     const wordCount = text.trim().split(/\s+/).length;
     const sentenceCount = text.split(/[.!?]+/).length - 1;
     const paragraphCount = text.split(/\n\s*\n/).length;
-    
+
     // Basic scoring based on text metrics
     const baseScore = Math.min(5, Math.max(1, Math.floor(wordCount / 50) + 1));
-    
+
     return {
       rubricScores: {
         grammarMechanics: baseScore,
@@ -753,6 +786,7 @@ Be constructive, specific, and encouraging while maintaining high standards appr
       strengths: ["Essay demonstrates effort and understanding"],
       areasForImprovement: ["Continue developing writing skills"],
       annotations: [],
+      paragraphFeedback: [],
       nextSteps: "Focus on expanding ideas with more detail and examples"
     };
   }

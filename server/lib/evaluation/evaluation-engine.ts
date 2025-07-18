@@ -3,7 +3,7 @@
 
 import { aiClient } from '../ai-client'
 import type { StructuredEssay } from '../types'
-import type { EvaluationResult, EvaluationRubric, CategoryScore, AnnotationMarker, FeedbackBlock } from './types'
+import type { EvaluationResult, EvaluationRubric, CategoryScore, AnnotationMarker, FeedbackBlock, ParagraphFeedback } from './types'
 
 export class EvaluationEngine {
   constructor(private rubric: EvaluationRubric) {}
@@ -29,6 +29,9 @@ export class EvaluationEngine {
       
       // Step 6: Generate summary
       const summary = this.generateSummary(aiEvaluation, categoryScores)
+      
+      // Step 7: Generate paragraph feedback
+      const paragraphFeedback = this.generateParagraphFeedback(aiEvaluation)
 
       return {
         rubric: {
@@ -40,6 +43,7 @@ export class EvaluationEngine {
         overall: overallScore,
         annotations,
         feedback,
+        paragraphFeedback,
         summary,
         metadata: {
           processingTime: Date.now() - startTime,
@@ -90,6 +94,7 @@ export class EvaluationEngine {
       scores,
       detailed_feedback: this.generateDetailedFeedback(analysis),
       annotations: aiAnnotations,
+      paragraphFeedback: analysis.paragraphFeedback || [],
       overall_assessment: {
         strengths: analysis.strengths || ["Essay demonstrates effort and understanding"],
         areas_for_improvement: analysis.areasForImprovement || ["Continue developing writing skills"],
@@ -306,6 +311,25 @@ export class EvaluationEngine {
       improvements: aiEvaluation.overall_assessment?.areas_for_improvement || [],
       nextSteps: aiEvaluation.overall_assessment?.next_steps || 'Continue practicing essay writing with focus on organization and development.'
     }
+  }
+
+  private generateParagraphFeedback(aiEvaluation: any): ParagraphFeedback[] {
+    // Extract paragraph feedback from AI evaluation
+    // The AI client now returns paragraph feedback in the analysis
+    const paragraphFeedback = aiEvaluation.paragraphFeedback || []
+    
+    // If no paragraph feedback from AI, return empty array
+    if (!paragraphFeedback || paragraphFeedback.length === 0) {
+      return []
+    }
+    
+    return paragraphFeedback.map((feedback: any) => ({
+      paragraphNumber: feedback.paragraphNumber || 1,
+      title: feedback.title || 'Paragraph Analysis',
+      content: feedback.content || 'Analysis not available',
+      type: feedback.type || 'positive',
+      priority: feedback.priority || 'medium'
+    }))
   }
 
   private formatScores(categoryScores: CategoryScore[]): { [categoryId: string]: number } {

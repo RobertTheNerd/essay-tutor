@@ -75,6 +75,14 @@ export interface FeedbackBlock {
   priority: 'high' | 'medium' | 'low'
 }
 
+export interface ParagraphFeedback {
+  paragraphNumber: number
+  title: string
+  content: string
+  type: 'positive' | 'excellent' | 'needs-improvement'
+  priority: 'high' | 'medium' | 'low'
+}
+
 export interface EvaluationResult {
   rubric: {
     family: string
@@ -87,6 +95,7 @@ export interface EvaluationResult {
   overall: number
   annotations: AnnotationMarker[]
   feedback: FeedbackBlock[]
+  paragraphFeedback?: ParagraphFeedback[]
   summary: {
     strengths: string[]
     improvements: string[]
@@ -97,11 +106,4 @@ export interface EvaluationResult {
     timestamp: string
     confidence: number
   }
-}
-
-// Annotation generation types
-export interface AnnotationConfig {
-  colors: { [categoryId: string]: string }
-  markerStyles: { [categoryId: string]: string }
-  feedbackComplexity: 'elementary' | 'middle' | 'upper' | 'high_school'
 }

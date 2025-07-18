@@ -13,6 +13,7 @@ export interface EvaluationResponse {
     overall: number
     annotations: AnnotationMarker[]
     feedback: FeedbackBlock[]
+    paragraphFeedback?: ParagraphFeedback[]
     summary: {
       strengths: string[]
       improvements: string[]
@@ -50,6 +51,14 @@ export interface FeedbackBlock {
   color: string
   priority: 'high' | 'medium' | 'low'
   relatedAnnotations: string[]
+}
+
+export interface ParagraphFeedback {
+  paragraphNumber: number
+  title: string
+  content: string
+  type: 'positive' | 'excellent' | 'needs-improvement'
+  priority: 'high' | 'medium' | 'low'
 }
 
 export interface AnnotatedText {
