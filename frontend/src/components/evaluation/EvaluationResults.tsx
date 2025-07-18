@@ -34,60 +34,72 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
   const { evaluation: evalData } = evaluation
 
   return (
-    <div className="space-y-6">
-      {/* Header with Actions */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              📝 ISEE Essay Evaluation
-            </h1>
-            <p className="text-gray-600 mt-1">
-              {evalData.rubric.name} • Score: {evalData.overall.toFixed(1)}/5
-            </p>
-          </div>
-          <div className="flex gap-3">
-            {onPrint && (
-              <button
-                onClick={onPrint}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center"
-              >
-                🖨️ Print Report
-              </button>
-            )}
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
-              >
-                ← Back to Editor
-              </button>
-            )}
+    <div className="space-y-6 pt-8">
+      {/* Professional Header with Actions */}
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        {/* Gradient Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                <span className="text-4xl">📝</span>
+                ISEE Essay Evaluation
+              </h1>
+              <p className="text-blue-100 mt-2 text-lg">
+                {evalData.rubric.name} • Score: {evalData.overall.toFixed(1)}/5
+              </p>
+            </div>
+            <div className="flex gap-3">
+              {onPrint && (
+                <button
+                  onClick={onPrint}
+                  className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/30 transition-all duration-200 flex items-center gap-2 font-semibold border border-white/30"
+                >
+                  🖨️ Print Report
+                </button>
+              )}
+              {onClose && (
+                <button
+                  onClick={onClose}
+                  className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/20 transition-all duration-200 flex items-center gap-2 font-semibold border border-white/30"
+                >
+                  ← Back to Editor
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Evaluation Metadata */}
-        <div className="flex flex-wrap gap-6 text-sm text-gray-600 bg-gray-50 rounded-lg p-4">
-          <div>
-            <strong>Processing Time:</strong> {evalData.metadata.processingTime}ms
-          </div>
-          <div>
-            <strong>Confidence:</strong> {(evalData.metadata.confidence * 100).toFixed(1)}%
-          </div>
-          <div>
-            <strong>Generated:</strong> {new Date(evalData.metadata.timestamp).toLocaleString()}
-          </div>
-          <div>
-            <strong>Annotations:</strong> {evalData.annotations.length} found
-          </div>
-          <div>
-            <strong>Feedback Items:</strong> {evalData.feedback.length}
-          </div>
-          {evalData.paragraphFeedback && evalData.paragraphFeedback.length > 0 && (
-            <div>
-              <strong>Paragraph Analysis:</strong> {evalData.paragraphFeedback.length} paragraphs
+        <div className="px-8 py-6 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-200">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
+            <div className="text-center">
+              <div className="font-semibold text-gray-800">Processing Time</div>
+              <div className="text-blue-600 font-bold">{evalData.metadata.processingTime}ms</div>
             </div>
-          )}
+            <div className="text-center">
+              <div className="font-semibold text-gray-800">Confidence</div>
+              <div className="text-green-600 font-bold">{(evalData.metadata.confidence * 100).toFixed(1)}%</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold text-gray-800">Generated</div>
+              <div className="text-gray-600 font-bold">{new Date(evalData.metadata.timestamp).toLocaleString()}</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold text-gray-800">Annotations</div>
+              <div className="text-orange-600 font-bold">{evalData.annotations.length} found</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold text-gray-800">Feedback Items</div>
+              <div className="text-purple-600 font-bold">{evalData.feedback.length}</div>
+            </div>
+            {evalData.paragraphFeedback && evalData.paragraphFeedback.length > 0 && (
+              <div className="text-center">
+                <div className="font-semibold text-gray-800">Paragraph Analysis</div>
+                <div className="text-indigo-600 font-bold">{evalData.paragraphFeedback.length} paragraphs</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -101,9 +113,9 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
       />
 
       {/* Footer with Additional Actions */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 mb-6 text-lg leading-relaxed">
             This evaluation was generated using AI technology. Use this feedback as a guide 
             for improvement and consider seeking additional input from teachers or tutors.
           </p>
@@ -111,7 +123,7 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
             {onClose && (
               <button
                 onClick={onClose}
-                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 Evaluate Another Essay
               </button>
@@ -119,7 +131,7 @@ const EvaluationResults = ({ evaluation, essayText, prompt, onClose, onPrint }: 
             {onPrint && (
               <button
                 onClick={onPrint}
-                className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors"
+                className="bg-gradient-to-r from-green-600 to-teal-600 text-white px-8 py-3 rounded-xl hover:from-green-700 hover:to-teal-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 Save/Print Results
               </button>
