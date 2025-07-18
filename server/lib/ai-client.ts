@@ -101,8 +101,16 @@ export class AIClient {
   private textModel: string
 
   constructor() {
-    this.client = getOpenAIClient()
+    // Don't initialize client in constructor - wait until first use
+    this.client = null
     this.textModel = getTextModel()
+  }
+
+  private getClient() {
+    if (this.client === null) {
+      this.client = getOpenAIClient()
+    }
+    return this.client
   }
 
   /**
@@ -563,15 +571,17 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
     text: string,
     topic?: string
   ): Promise<EssayAnalysisResult> {
+    const client = this.getClient();
+    
     // Check if AI client is available
     console.log('AI Client status:', {
-      client: !!this.client,
+      client: !!client,
       hasApiKey: !!process.env.OPENAI_API_KEY,
       hasAzureEndpoint: !!process.env.AZURE_OPENAI_ENDPOINT,
       model: this.textModel
     });
     
-    if (!this.client) {
+    if (!client) {
       console.error('OpenAI client not available - cannot perform AI evaluation');
       throw new Error('AI evaluation service unavailable. Please check API configuration.');
     }
@@ -579,7 +589,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
     try {
       const prompt = this.buildISEEEvaluationPrompt(text, topic);
       
-      const response = await this.client.chat.completions.create({
+      const response = await client.chat.completions.create({
         model: this.textModel,
         messages: [
           {
