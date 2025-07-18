@@ -158,31 +158,34 @@ Web application for automated ISEE essay evaluation with AI-powered document pro
 ## Phase 6: Professional Report Generation (Weeks 12-13)
 **Status:** 📋 **PLANNED** (Starting: 2025-07-18)  
 **Duration:** 2 weeks  
-**Key Deliverables:** Professional HTML report generation matching sample_output.html design
+**Key Deliverables:** Shared report module and professional frontend reports
 
-### 6.1 Professional Report Template System
-- [ ] Create HTML template engine matching sample_output.html design
-- [ ] Implement sophisticated styling (gradients, custom fonts, print optimization)
-- [ ] Build multi-section layout (header, legend, annotated text, scoring)
-- [ ] Create color-coded annotation system with professional markers
+### 6.1 Shared Report Module
+- [ ] Create `/shared/report-renderer.ts` with platform-agnostic rendering logic
+- [ ] Implement professional styling system matching sample_output.html design
+- [ ] Build color-coded annotation processing with markers (✓1, S1, W1, etc.)
+- [ ] Create print optimization for browser print-to-PDF functionality
 
-### 6.2 Backend Report Generation
-- [ ] Add `/api/generate-report` endpoint for professional report creation
-- [ ] Integrate with existing evaluation pipeline for seamless data flow
-- [ ] Implement enhanced annotation rendering with rich explanations
-- [ ] Create export functionality for HTML/PDF download
+### 6.2 Frontend Professional Reports
+- [ ] Build `ProfessionalReport` component using shared renderer
+- [ ] Implement interactive report display with professional styling
+- [ ] Add browser print optimization for high-quality PDF output
+- [ ] Create export preparation for future PDF service integration
 
-### 6.3 Frontend Integration & Polish
-- [ ] Build professional report viewer component
-- [ ] Add export and print functionality to evaluation workflow
+### 6.3 Integration & Optimization
+- [ ] Integrate professional reports with existing evaluation workflow
 - [ ] Ensure perfect print formatting with color preservation
-- [ ] Test across all browsers and devices for consistency
+- [ ] Test across all browsers for consistent print output
+- [ ] Document architecture for future PDF service integration
 
 **Success Criteria:**
-- Professional reports matching sample_output.html quality and sophistication
-- Print-ready formatting with full color preservation
-- Seamless integration with existing evaluation workflow
-- Export functionality for HTML and PDF formats
+- Shared report module providing consistent rendering logic
+- Professional frontend reports matching sample_output.html quality
+- Excellent browser print-to-PDF output with full color preservation
+- Architecture ready for seamless PDF service integration
+
+**Future Enhancement:**
+- Phase 8: Separate PDF service using Puppeteer/chrome-aws-lambda for professional downloads
 
 ---
 
@@ -217,76 +220,104 @@ Web application for automated ISEE essay evaluation with AI-powered document pro
 
 ---
 
-## Phase 8: Integration & Testing (Weeks 16-17)
+## Phase 8: PDF Service & Advanced Export (Weeks 16-17)
+**Status:** ⏳ **PENDING**  
+**Duration:** 2 weeks  
+**Key Deliverables:** Separate PDF service for professional downloads
+
+### 8.1 PDF Service Architecture
+- [ ] Design and deploy separate PDF microservice (Railway/Render/DigitalOcean)
+- [ ] Implement Puppeteer/chrome-aws-lambda for high-quality PDF generation
+- [ ] Create API integration between main app and PDF service
+- [ ] Add professional PDF download functionality
+
+### 8.2 Enhanced Export Features
+- [ ] Implement one-click PDF downloads with perfect quality
+- [ ] Add batch report generation capabilities
+- [ ] Create PDF customization options (margins, formats, branding)
+- [ ] Optimize PDF service performance and caching
+
+**Success Criteria:**
+- Separate PDF service producing professional-quality downloads
+- Seamless integration with existing evaluation workflow
+- Fast PDF generation (< 3 seconds for typical reports)
+- Scalable architecture supporting high-volume usage
+
+---
+
+## Phase 9: Integration & Testing (Weeks 18-19)
 **Status:** ⏳ **PENDING**  
 **Duration:** 2 weeks  
 **Key Deliverables:** Complete system integration and comprehensive testing
 
-### 8.1 System Integration
-- [ ] Complete end-to-end workflow testing across all implemented features
-- [ ] Integrate professional report generation with evaluation workflow
-- [ ] Optimize performance for large essay processing and report generation
+### 9.1 System Integration
+- [ ] Complete end-to-end workflow testing across all features
+- [ ] Integrate PDF service with evaluation and report workflows
+- [ ] Optimize performance for large essay processing
 - [ ] Implement comprehensive error handling and recovery
 
-### 8.2 Quality Assurance
+### 9.2 Quality Assurance
 - [ ] Automated testing for evaluation engine and report generation
 - [ ] Cross-browser compatibility testing for all interfaces
-- [ ] Print quality validation for professional reports
+- [ ] PDF quality validation across different service configurations
 - [ ] Accessibility compliance verification (WCAG 2.1)
 
 **Success Criteria:**
-- Professional report generation produces consistent, high-quality output
+- Complete workflow from evaluation to professional PDF downloads
 - System handles edge cases and errors gracefully
-- Performance meets requirements (< 3 seconds processing)
+- Performance meets requirements across all components
 - All interfaces work flawlessly across devices and browsers
 
 ---
 
-## Phase 9: User Validation & Refinement (Weeks 18-19)
+## Phase 10: User Validation & Refinement (Weeks 20-21)
 **Status:** ⏳ **PENDING**  
 **Duration:** 2 weeks  
 **Key Deliverables:** User testing and evaluation accuracy validation
 
-### 9.1 Educational Validation
+### 10.1 Educational Validation
 - [ ] Test professional reports with real student essays
 - [ ] Validate report quality and usefulness with educators
 - [ ] Collect feedback from teachers on report clarity and actionability
 - [ ] Refine report formatting and content based on expert input
 
-### 9.2 User Experience Testing
+### 10.2 User Experience Testing
 - [ ] Conduct usability testing with teachers and students
-- [ ] Test complete workflow from input to professional report
-- [ ] Validate print quality and export functionality
+- [ ] Test complete workflow from input to professional PDF downloads
+- [ ] Validate print and PDF quality across different scenarios
 - [ ] Gather feedback on report design and pedagogical value
 
 **Success Criteria:**
 - Professional reports meet educator standards for quality and usefulness
 - User feedback indicates intuitive workflow and valuable insights
-- Print and export quality meets professional standards
+- Print and PDF quality meets professional standards
 - Reports provide actionable feedback for student improvement
 
 ---
 
-## Phase 10: Production Deployment & Documentation (Week 20)
+## Phase 11: Production Deployment & Documentation (Week 22)
 **Status:** ⏳ **PENDING**  
 **Duration:** 1 week  
 **Key Deliverables:** Production-ready deployment and comprehensive documentation
 
-### 10.1 Production Deployment
-- [ ] Deploy to production with complete professional report generation system
-- [ ] Configure AI API rate limiting and monitoring
+### 11.1 Production Deployment
+- [ ] Deploy main application with professional report generation to production
+- [ ] Deploy PDF service to separate infrastructure (Railway/Render)
+- [ ] Configure AI API rate limiting and monitoring across all services
 - [ ] Implement comprehensive logging and error tracking
 - [ ] Complete security hardening and FERPA compliance verification
 
-### 10.2 Documentation & Training Materials
+### 11.2 Documentation & Training Materials
 - [ ] Create user guides for complete evaluation and reporting workflow
+- [ ] Document PDF service architecture and deployment procedures
 - [ ] Build administrator setup and configuration guides
-- [ ] Document complete API including report generation endpoints
 - [ ] Create troubleshooting guides and FAQ for all features
+- [ ] Document future enhancement roadmap
 
 **Success Criteria:**
-- Production application with professional report generation fully operational
-- Complete documentation covering all features and workflows
+- Production application with complete report and PDF generation operational
+- Separate PDF service providing professional downloads
+- Complete documentation covering all features and deployment procedures
 - FERPA compliance fully verified and documented
 - Monitoring and support systems operational for all components
 

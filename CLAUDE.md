@@ -321,34 +321,36 @@ UX Flow
 ## Phase 6: Professional Report Generation (Current)
 
 ### Goals
-- **Professional HTML Reports**: Match sample_output.html design quality and sophistication
+- **Shared Report Module**: Platform-agnostic rendering for consistent output
+- **Professional Frontend Reports**: Match sample_output.html design quality and sophistication
 - **Advanced Styling**: Gradient headers, custom fonts, color-coded annotations
-- **Print Optimization**: Perfect formatting for physical and PDF reports
-- **Export Functionality**: HTML and PDF download capabilities
+- **Print Optimization**: Perfect browser print-to-PDF functionality
+- **Future-Ready Architecture**: Prepare for separate PDF service integration
 
 ### Target Implementation
 ```
-Report Generation Pipeline
-├── Backend Report Engine
-│   ├── HTML Template System
-│   ├── Professional Styling (CSS)
-│   ├── Color-coded Annotations
-│   └── Print Optimization
-├── API Endpoint (/api/generate-report)
-│   ├── Input: Evaluation data + formatting
-│   ├── Output: Professional HTML report
-│   └── Integration: Existing evaluation pipeline
-└── Frontend Integration
-    ├── Report Viewer Component
-    ├── Export Functionality
-    └── Print Optimization
+Shared Report Architecture
+├── /shared/report-renderer.ts
+│   ├── Platform-agnostic rendering logic
+│   ├── Professional styling system
+│   ├── Color-coded annotation processing
+│   └── Print optimization
+├── Frontend Integration
+│   ├── ProfessionalReport component
+│   ├── Interactive report display
+│   ├── Browser print optimization
+│   └── Export preparation
+└── Future: PDF Service
+    ├── Separate microservice (Railway/Render)
+    ├── Puppeteer/chrome-aws-lambda
+    └── Professional PDF downloads
 ```
 
 ### Implementation Focus
 - **Design Quality**: Match professional standard shown in sample_output.html
-- **Technical Excellence**: Robust template engine with sophisticated styling
-- **User Experience**: Seamless integration with existing evaluation workflow
-- **Print Quality**: Perfect color preservation and formatting for physical reports
+- **Shared Logic**: Single source of truth for report rendering
+- **User Experience**: Instant report display with professional print capability
+- **Scalable Architecture**: Easy integration of future PDF service
 
 ### Phase 7: Multi-Level ISEE Support (Next)
 

@@ -14,40 +14,42 @@ The Essay Tutor platform currently has a complete AI-powered evaluation system w
 - **Print Optimization**: Basic print styling and color preservation
 
 ### 🎯 What Needs Implementation
-- **Professional HTML Template Engine**: Generate reports matching sample_output.html design
+- **Shared Report Module**: Platform-agnostic rendering module for consistent output
+- **Professional Frontend Component**: React component matching sample_output.html design
 - **Advanced Styling System**: Sophisticated CSS with gradients, custom fonts, and professional layout
 - **Enhanced Annotation Rendering**: Rich explanations with color-coded markers (✓1, S1, W1, etc.)
-- **Export Functionality**: HTML and PDF download capabilities
-- **Report Generation API**: New `/api/generate-report` endpoint
+- **Browser Print Optimization**: Perfect print-to-PDF functionality
 
 ## Technical Implementation Plan
 
-### Phase 1: Backend Report Engine (Week 1)
+### Phase 1: Shared Report Module (Week 1)
 
-#### 1.1 HTML Template System
-**File**: `/server/lib/report-generator.ts`
+#### 1.1 Platform-Agnostic Renderer
+**File**: `/shared/report-renderer.ts`
 ```typescript
-interface ReportGeneratorOptions {
+interface ReportData {
   evaluationData: EvaluationResult;
-  studentInfo: StudentInfo;
-  formatting: ReportFormatting;
+  essayText: string;
+  prompt?: string;
+  studentInfo?: StudentInfo;
+  options?: ReportOptions;
 }
 
-class ProfessionalReportGenerator {
-  generateHTML(options: ReportGeneratorOptions): string;
-  generatePrintableHTML(options: ReportGeneratorOptions): string;
-  generateAnnotatedText(text: string, annotations: Annotation[]): string;
+class ProfessionalReportRenderer {
+  render(data: ReportData): { html: string; css: string };
+  processAnnotations(annotations: AnnotationMarker[]): ProcessedAnnotation[];
+  generateAnnotatedText(text: string, annotations: ProcessedAnnotation[]): string;
 }
 ```
 
 **Key Features**:
-- Template engine using string interpolation and modular sections
+- Platform-agnostic rendering (works in frontend and future backend)
 - Dynamic annotation marker generation (✓1, S1, W1, etc.)
 - Professional styling with gradient headers and custom fonts
 - Print-optimized layout with forced color printing
 
 #### 1.2 Professional Styling System
-**File**: `/server/lib/report-styles.ts`
+**File**: `/shared/report-styles.ts`
 - Complete CSS matching sample_output.html design
 - Gradient backgrounds and sophisticated color schemes
 - Typography: Inter, Source Serif Pro, Space Mono fonts
@@ -55,9 +57,9 @@ class ProfessionalReportGenerator {
 - Color-coded annotation system (6 categories)
 
 #### 1.3 Enhanced Annotation Processing
-**File**: `/server/lib/annotation-processor.ts`
+**File**: `/shared/annotation-processor.ts`
 ```typescript
-interface EnhancedAnnotation {
+interface ProcessedAnnotation {
   id: string;
   category: AnnotationCategory;
   marker: string; // ✓1, S1, W1, etc.
@@ -68,85 +70,57 @@ interface EnhancedAnnotation {
 }
 
 class AnnotationProcessor {
-  processAnnotations(annotations: Annotation[]): EnhancedAnnotation[];
+  processAnnotations(annotations: Annotation[]): ProcessedAnnotation[];
   generateMarkers(category: string, index: number): string;
-  createColorCodedText(text: string, annotations: EnhancedAnnotation[]): string;
+  createColorCodedText(text: string, annotations: ProcessedAnnotation[]): string;
 }
 ```
 
-### Phase 2: API Integration (Week 1)
+### Phase 2: Frontend Integration (Week 2)
 
-#### 2.1 Report Generation Endpoint
-**File**: `/server/lib/unified-handlers.ts`
+#### 2.1 Professional Report Component
+**File**: `/frontend/src/components/report/ProfessionalReport.tsx`
 ```typescript
-// New endpoint: POST /api/generate-report
-export async function handleReportGeneration(req: any, res: any) {
-  const { evaluationData, studentInfo, options } = req.body;
-  
-  try {
-    const generator = new ProfessionalReportGenerator();
-    const htmlReport = generator.generateHTML({
-      evaluationData,
-      studentInfo,
-      formatting: options
-    });
-    
-    res.json({
-      success: true,
-      html: htmlReport,
-      downloadUrl: generateDownloadUrl(htmlReport)
-    });
-  } catch (error) {
-    // Error handling
-  }
-}
-```
-
-#### 2.2 Integration with Existing Pipeline
-- Seamlessly integrate with current `/api/evaluate` workflow
-- Maintain existing error handling and fallback mechanisms
-- Support both standalone report generation and integrated evaluation+report flow
-
-### Phase 3: Frontend Integration (Week 2)
-
-#### 3.1 Professional Report Viewer Component
-**File**: `/frontend/src/components/report/ProfessionalReportViewer.tsx`
-```typescript
-interface ProfessionalReportViewerProps {
+interface ProfessionalReportProps {
   evaluationData: EvaluationResult;
+  essayText: string;
+  prompt?: string;
   studentInfo?: StudentInfo;
-  onExport?: (format: 'html' | 'pdf') => void;
+  mode?: 'screen' | 'print';
 }
 
-const ProfessionalReportViewer: React.FC<ProfessionalReportViewerProps> = ({
+const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
   evaluationData,
+  essayText,
+  prompt,
   studentInfo,
-  onExport
+  mode = 'screen'
 }) => {
-  // Component implementation
+  // Uses shared renderer to generate report HTML/CSS
+  // Renders professional report matching sample_output.html
 };
 ```
 
 **Features**:
-- Real-time report generation and display
-- Export functionality (HTML/PDF download)
+- Uses shared report renderer for consistent output
+- Interactive display with professional styling
 - Print optimization with perfect formatting
 - Responsive design for all devices
 
-#### 3.2 Enhanced Evaluation Workflow
+#### 2.2 Enhanced Evaluation Workflow
 **File**: `/frontend/src/components/evaluation/EvaluationResults.tsx`
-- Add "Generate Professional Report" button to existing evaluation results
-- Integrate report viewer into current workflow
-- Maintain existing functionality while adding new capabilities
+- Add "View Professional Report" option to existing evaluation results
+- Integrate professional report display into current workflow
+- Maintain existing functionality while adding new report view
 
-#### 3.3 Export and Print Functionality
+#### 2.3 Browser Print Optimization
 **File**: `/frontend/src/services/reportService.ts`
 ```typescript
 export class ReportService {
-  async generateReport(evaluationData: EvaluationResult): Promise<string>;
-  async exportHTML(reportHtml: string): Promise<void>;
-  async exportPDF(reportHtml: string): Promise<void>;
+  generateReportHTML(evaluationData: EvaluationResult, essayText: string): string;
   optimizeForPrint(reportHtml: string): string;
+  handlePrint(): void;
+  exportHTML(reportHtml: string): void;
 }
 ```
 
@@ -179,7 +153,7 @@ export class ReportService {
 - Professional margins and spacing
 - High-quality typography rendering
 
-## API Flow Documentation
+## Architecture Flow
 
 ### Current Evaluation Flow
 ```
@@ -194,7 +168,7 @@ export class ReportService {
 5. Frontend displays results
 ```
 
-### Enhanced Report Generation Flow
+### Enhanced Frontend Report Flow
 ```
 1. User Input (text or images)
    ↓
@@ -204,13 +178,13 @@ export class ReportService {
    ↓
 4. EvaluationResult returned
    ↓
-5. POST /api/generate-report (new)
+5. Frontend uses shared renderer
    ↓
-6. Professional HTML report returned
+6. Professional report displayed instantly
    ↓
-7. Frontend displays professional report
+7. Browser print-to-PDF available
    ↓
-8. Export options (HTML/PDF)
+8. Future: PDF service integration
 ```
 
 ### Data Structures
@@ -226,17 +200,18 @@ interface EvaluationResult {
 }
 ```
 
-#### New ReportGenerationRequest
+#### Frontend Report Data
 ```typescript
-interface ReportGenerationRequest {
+interface ReportData {
   evaluationData: EvaluationResult;
-  studentInfo: {
+  essayText: string;
+  prompt?: string;
+  studentInfo?: {
     name?: string;
     date?: string;
     gradeLevel?: string;
-    prompt?: string;
   };
-  options: {
+  options?: {
     includeAnnotations: boolean;
     includeScore: boolean;
     colorScheme: 'full' | 'print' | 'accessible';
@@ -244,37 +219,39 @@ interface ReportGenerationRequest {
 }
 ```
 
-#### ReportGenerationResponse
+#### Rendered Report Output
 ```typescript
-interface ReportGenerationResponse {
-  success: boolean;
+interface RenderedReport {
   html: string;
-  downloadUrl?: string;
-  error?: string;
+  css: string;
+  metadata: {
+    title: string;
+    filename: string;
+  };
 }
 ```
 
 ## Implementation Timeline
 
-### Week 1: Backend Implementation
-- **Days 1-2**: HTML template engine and styling system
+### Week 1: Shared Module Implementation
+- **Days 1-2**: Shared report renderer and styling system
 - **Days 3-4**: Enhanced annotation processing and marker generation
-- **Days 5-6**: API endpoint implementation and integration
-- **Day 7**: Testing and refinement
+- **Days 5-6**: Print optimization and CSS finalization
+- **Day 7**: Testing and refinement of shared module
 
 ### Week 2: Frontend Integration
-- **Days 1-2**: Professional report viewer component
+- **Days 1-2**: Professional report React component
 - **Days 3-4**: Integration with existing evaluation workflow
-- **Days 5-6**: Export functionality and print optimization
+- **Days 5-6**: Browser print optimization and export preparation
 - **Day 7**: End-to-end testing and polish
 
 ## Success Criteria
 
 ### Technical Requirements
-- ✅ Professional HTML reports matching sample_output.html design quality
-- ✅ Perfect print formatting with color preservation
+- ✅ Shared report module providing consistent rendering across platforms
+- ✅ Professional frontend reports matching sample_output.html design quality
+- ✅ Perfect browser print-to-PDF formatting with color preservation
 - ✅ Seamless integration with existing evaluation workflow
-- ✅ Export functionality for HTML and PDF formats
 - ✅ Responsive design working across all devices
 
 ### Quality Standards
@@ -285,10 +262,10 @@ interface ReportGenerationResponse {
 - ✅ Print quality suitable for formal educational use
 
 ### Performance Requirements
-- ✅ Report generation < 2 seconds for typical essays
+- ✅ Instant report generation (frontend rendering)
 - ✅ Smooth integration with existing 3-second evaluation SLA
-- ✅ Responsive UI with proper loading states
-- ✅ Efficient HTML template rendering
+- ✅ Responsive UI with immediate display
+- ✅ Efficient shared module rendering
 
 ## Risk Mitigation
 
@@ -298,11 +275,16 @@ interface ReportGenerationResponse {
 - **Performance**: Optimize template rendering and minimize HTML size
 
 ### Integration Risks
-- **API Compatibility**: Maintain backward compatibility with existing evaluation API
+- **Component Compatibility**: Ensure new report components integrate smoothly with existing UI
 - **Frontend State**: Careful state management to avoid conflicts with existing components
-- **Error Handling**: Robust fallback mechanisms for report generation failures
+- **Browser Compatibility**: Ensure consistent print behavior across different browsers
 
 ## Future Enhancements
+
+### Phase 8: PDF Service Integration
+- **Separate PDF Service**: Deploy dedicated Puppeteer/chrome-aws-lambda service
+- **One-click Downloads**: Professional PDF downloads using shared renderer
+- **Service Integration**: Seamless proxy from main app to PDF service
 
 ### Phase 7+ Considerations
 - **Multi-Level Support**: Adapt report design for different ISEE levels
