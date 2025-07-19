@@ -86,6 +86,9 @@ All endpoints work identically on both platforms:
   - Text input: JSON with `text` field for direct essay processing
   - File input: FormData with `files` for multi-page image upload
   - Features: AI OCR, topic detection, text analysis, ISEE categorization
+  - Response includes `essay.writingPrompt.source` for intelligent routing:
+    - `'extracted'` - High confidence prompt found in text → Auto-evaluate
+    - `'summarized'` - Prompt inferred from content → Manual review required
 - `POST /api/evaluate` - Full essay evaluation with rubric selection (Phase 3+)
   - Input: `{text: string, prompt?: string, rubric?: {family: string, level: string}}`
   - Output: Complete evaluation with scores, annotations, and feedback
@@ -126,11 +129,41 @@ AZURE_OPENAI_TEXT_MODEL=gpt-4o-mini
 - Support for JPG/PNG files up to 10MB each
 - Temporary file storage with automatic cleanup
 
+### Three-Stage Image Processing Flow
+1. **Stage 1: Upload Staging**
+   - Multiple image selection with drag-and-drop interface
+   - Client-side file validation and preview generation
+   - No backend API calls during upload staging
+   - User can review, reorder, or remove images before processing
+
+2. **Stage 2: Batch Processing**
+   - Single `/api/process` call handles all uploaded images
+   - AI-powered OCR extraction with automatic page ordering
+   - Text analysis, topic detection, and prompt extraction
+   - Returns structured essay data with confidence indicators
+
+3. **Stage 3: Smart Routing**
+   - **High Confidence Path**: `writingPrompt.source === 'extracted'`
+     - Automatically proceed to `/api/evaluate`
+     - Skip manual review for clear prompt extractions
+   - **Low Confidence Path**: `writingPrompt.source === 'summarized'`
+     - Display ProcessingReview component
+     - Allow manual editing of prompt and essay text
+     - User confirms before proceeding to evaluation
+
 ### Frontend Architecture
 - **Enhanced Input Methods**: 
   - Text: Separate prompt and essay fields for better context
-  - Image: Smart processing with conditional evaluation flow
+  - Image: Three-stage processing with intelligent routing
 - **Intelligent UX Flow**: Auto-evaluate vs manual review based on AI confidence
+- **ProcessingReview Component**: Manual editing interface for extracted content
+  - Editable writing prompt and essay text fields
+  - Visual confidence indicators (extracted vs summarized)
+  - Validation and error handling for OCR corrections
+  - Seamless transition to evaluation workflow
+- **Smart Routing Logic**: 
+  - `topicSource === 'extracted'` → Auto-evaluate immediately
+  - `topicSource === 'summarized'` → Show ProcessingReview for manual editing
 - **Real-time Statistics**: Word/character count and validation
 - **React Query**: API state management for seamless evaluation
 - **Responsive Design**: TailwindCSS with mobile-friendly interface
@@ -171,7 +204,7 @@ This policy ensures a clean, maintainable codebase and prevents cluttering the f
 **Phase 2.5 (Complete)**: Unified processing architecture refactor
 **Phase 3 (Complete)**: Real AI-powered ISEE evaluation system with full backend integration
 **Phase 4 (Complete)**: Complete frontend evaluation interface with professional UI
-**Phase 5 (Complete)**: Enhanced UX flow with dual input fields and smart image processing
+**Phase 5 (Complete)**: Enhanced UX flow with intelligent image processing and manual review capabilities
 **Phase 6 (Current)**: Professional report generation matching sample_output.html design
 
 ## Phase 2 Achievements (Recently Completed)
@@ -240,11 +273,20 @@ This policy ensures a clean, maintainable codebase and prevents cluttering the f
 
 ## Phase 5 Achievements (Recently Completed)
 
-### Enhanced UX Flow with Professional Reports
+### Enhanced UX Flow with Intelligent Image Processing
 - **Improved Text Input**: Separate writing prompt and essay text fields implemented
-- **Smart Image Processing**: Auto-evaluate when prompt is extracted, manual review when not
-- **Unified Evaluation Flow**: Both text and image routes converge to same evaluation
-- **Professional Report System**: Basic professional report implementation with frontend integration
+- **Three-Stage Image Processing**: Upload staging → Process batch → Smart routing based on AI confidence
+- **Intelligent Prompt Detection**: Distinguishes between extracted prompts vs inferred/summarized prompts
+- **Manual Review Interface**: ProcessingReview component for editing extracted text and prompts
+- **Unified Evaluation Flow**: Both text and image routes converge to same evaluation endpoint
+
+### Smart Image Processing Features
+- **Confidence-Based Routing**: 
+  - High confidence (extracted prompt) → Auto-evaluate immediately
+  - Low confidence (summarized prompt) → Manual review with editable fields
+- **ProcessingReview Component**: Full editing interface for both writing prompt and essay text
+- **Batch Processing**: Single API call processes multiple images with automatic page ordering
+- **Visual Feedback**: Clear status indicators showing extraction confidence and next steps
 
 ### Professional Report Features
 - **ProfessionalReport React Component**: Embedded professional styling with gradient headers

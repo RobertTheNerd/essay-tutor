@@ -3,7 +3,7 @@ import { useState } from 'react'
 interface ProcessingReviewProps {
   extractedPrompt: string
   extractedEssay: string
-  promptSource: 'extracted' | 'summarized'
+  promptSource: 'extracted' | 'summarized' | 'user_provided'
   onConfirm: (prompt: string, essay: string) => void
   onCancel: () => void
 }
@@ -23,6 +23,7 @@ export default function ProcessingReview({
   }
 
   const isExtracted = promptSource === 'extracted'
+  const isUserProvided = promptSource === 'user_provided'
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
@@ -31,6 +32,8 @@ export default function ProcessingReview({
         <p className="text-gray-600">
           {isExtracted
             ? 'AI successfully extracted the writing prompt and essay from your images.'
+            : isUserProvided
+            ? 'Please review the extracted essay text and ensure the writing prompt is correct.'
             : 'AI could only infer the writing prompt. Please review and edit before evaluation.'}
         </p>
       </div>
@@ -47,11 +50,13 @@ export default function ProcessingReview({
           </span>
           <div>
             <p className={`font-medium ${isExtracted ? 'text-green-800' : 'text-yellow-800'}`}>
-              {isExtracted ? 'Writing Prompt: Extracted' : 'Writing Prompt: Summarized'}
+              {isExtracted ? 'Writing Prompt: Extracted' : isUserProvided ? 'Writing Prompt: User Provided' : 'Writing Prompt: Summarized'}
             </p>
             <p className={`text-sm ${isExtracted ? 'text-green-600' : 'text-yellow-600'}`}>
               {isExtracted
                 ? 'High confidence - ready for evaluation'
+                : isUserProvided
+                ? 'Please verify the prompt is correct'
                 : 'Please review and edit the prompt for better evaluation'}
             </p>
           </div>

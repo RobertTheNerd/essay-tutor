@@ -1,98 +1,74 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
+import ImageCarousel from './ImageCarousel'
 
 interface FileUploadProps {
   onUpload?: (files: File[]) => void
   maxFiles?: number
+  initialFiles?: File[]
 }
 
-interface UploadResponse {
-  success: boolean
-  files?: Array<{
-    name: string
-    type: string
-    size: number
-    processed: boolean
-    pageNumber?: number
-  }>
-  processing?: {
-    extractedText: string
-    detectedTopic?: string
-    processingTime: number
-    confidence: number
-    totalPages: number
-    pageOrder: number[]
-    aiProcessed: boolean
-  }
-  message?: string
-  error?: string
-}
 
-export default function FileUpload({ onUpload, maxFiles = 10 }: FileUploadProps) {
-  const [uploading, setUploading] = useState(false)
-  const [response, setResponse] = useState<UploadResponse | null>(null)
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+export default function FileUpload({ onUpload, maxFiles = 10, initialFiles = [] }: FileUploadProps) {
+  const [selectedFiles, setSelectedFiles] = useState<File[]>(initialFiles)
+  const [isCarouselOpen, setIsCarouselOpen] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+  // Update selectedFiles when initialFiles changes
+  useEffect(() => {
+    setSelectedFiles(initialFiles)
+  }, [initialFiles])
 
   const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
+    (acceptedFiles: File[]) => {
       if (acceptedFiles.length === 0) return
 
-      // Update selected files for preview
-      setSelectedFiles(acceptedFiles)
-      setUploading(true)
-      setResponse(null)
-
-      try {
-        const formData = new FormData()
-
-        // Add all files to form data
-        acceptedFiles.forEach(file => {
-          formData.append(`files`, file)
-        })
-
-        const uploadResponse = await fetch('/api/process', {
-          method: 'POST',
-          body: formData,
-        })
-
-        // Check if response is ok
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text()
-          setResponse({
-            success: false,
-            error: `HTTP Error ${uploadResponse.status}: ${errorText.substring(0, 500)}`,
-          })
-          return
+      // Update selected files for preview (no API call yet)
+      setSelectedFiles(prev => {
+        const combined = [...prev, ...acceptedFiles]
+        // Limit to maxFiles
+        const limited = combined.slice(0, maxFiles)
+        
+        // Notify parent of file selection
+        if (onUpload) {
+          onUpload(limited)
         }
-
-        // Check content type
-        const contentType = uploadResponse.headers.get('content-type')
-        if (!contentType || !contentType.includes('application/json')) {
-          const responseText = await uploadResponse.text()
-          setResponse({
-            success: false,
-            error: `Invalid content type: ${contentType}\nResponse: ${responseText.substring(0, 500)}`,
-          })
-          return
-        }
-
-        const result: UploadResponse = await uploadResponse.json()
-        setResponse(result)
-
-        if (result.success && onUpload) {
-          onUpload(acceptedFiles)
-        }
-      } catch (error) {
-        setResponse({
-          success: false,
-          error: error instanceof Error ? error.message : 'Upload failed',
-        })
-      } finally {
-        setUploading(false)
-      }
+        
+        return limited
+      })
     },
-    [onUpload]
+    [onUpload, maxFiles]
   )
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => {
+      const updated = prev.filter((_, i) => i !== index)
+      if (onUpload) {
+        onUpload(updated)
+      }
+      return updated
+    })
+  }
+
+  const clearAllFiles = () => {
+    setSelectedFiles([])
+    if (onUpload) {
+      onUpload([])
+    }
+  }
+
+  const openCarousel = (index: number) => {
+    setCurrentImageIndex(index)
+    setIsCarouselOpen(true)
+  }
+
+  const closeCarousel = () => {
+    setIsCarouselOpen(false)
+  }
+
+  const navigateCarousel = (index: number) => {
+    setCurrentImageIndex(index)
+  }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -128,26 +104,14 @@ export default function FileUpload({ onUpload, maxFiles = 10 }: FileUploadProps)
                 ? 'border-blue-500 bg-gradient-to-b from-blue-50 to-blue-100 shadow-inner'
                 : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
             }
-            ${uploading ? 'pointer-events-none opacity-50' : ''}
           `}
         >
           <input {...getInputProps()} />
 
           <div className="space-y-4">
-            <div className="text-6xl">{uploading ? '⏳' : isDragActive ? '📥' : '📸'}</div>
+            <div className="text-6xl">{isDragActive ? '📥' : '📸'}</div>
 
-            {uploading ? (
-              <div>
-                <div className="text-xl font-bold text-gray-900">Processing Images...</div>
-                <div className="text-sm text-gray-600 mt-2">
-                  Uploading {selectedFiles.length} page{selectedFiles.length !== 1 ? 's' : ''} and
-                  extracting text with AI
-                </div>
-                <div className="mt-4">
-                  <div className="animate-pulse bg-blue-200 rounded-full h-2 w-48 mx-auto"></div>
-                </div>
-              </div>
-            ) : isDragActive ? (
+            {isDragActive ? (
               <div>
                 <div className="text-xl font-bold text-blue-900">Drop your images here!</div>
                 <div className="text-sm text-blue-600 mt-2">Release to start processing</div>
@@ -169,97 +133,51 @@ export default function FileUpload({ onUpload, maxFiles = 10 }: FileUploadProps)
       </div>
 
       {/* File Preview */}
-      {selectedFiles.length > 0 && !uploading && (
-        <div className="mt-4">
-          <h3 className="font-medium text-gray-900 mb-2">
-            Selected Files ({selectedFiles.length} page{selectedFiles.length !== 1 ? 's' : ''})
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+      {selectedFiles.length > 0 && (
+        <div className="mt-6 border-t border-gray-200 pt-6">
+          <div className="flex items-center justify-between mb-4 gap-4">
+            <h3 className="font-medium text-gray-900 flex-1">
+              Selected Files ({selectedFiles.length} page{selectedFiles.length !== 1 ? 's' : ''})
+            </h3>
+            <button
+              onClick={clearAllFiles}
+              className="text-sm text-red-600 hover:text-red-700 font-medium whitespace-nowrap px-2 py-1 rounded hover:bg-red-50 transition-colors"
+            >
+              Clear All
+            </button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {selectedFiles.map((file, index) => (
-              <div key={index} className="relative">
+              <div key={index} className="relative group">
                 <img
                   src={URL.createObjectURL(file)}
                   alt={`Page ${index + 1}`}
-                  className="w-full h-20 object-cover rounded border"
+                  className="w-full h-auto max-h-32 object-contain bg-gray-50 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-blue-300 hover:scale-105 transition-all duration-200"
+                  onClick={() => openCarousel(index)}
                 />
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs p-2 rounded-b-lg">
                   Page {index + 1}
                 </div>
+                <button
+                  onClick={() => removeFile(index)}
+                  className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  ×
+                </button>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {response && (
-        <div className="mt-4 space-y-4">
-          <div
-            className={`
-            p-4 rounded-md border
-            ${response.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}
-          `}
-          >
-            {response.success ? (
-              <div>
-                <div className="font-medium text-green-900">Upload Successful!</div>
-                <div className="text-sm text-green-700 mt-1">
-                  {response.files?.length || 0} page{(response.files?.length || 0) !== 1 ? 's' : ''}{' '}
-                  processed
-                </div>
-                <div className="text-sm text-green-600 mt-1">{response.message}</div>
-              </div>
-            ) : (
-              <div>
-                <div className="font-medium text-red-900">Upload Failed</div>
-                <div className="text-sm text-red-700 mt-1">{response.error}</div>
-              </div>
-            )}
-          </div>
-
-          {response.processing && (
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-              <h3 className="font-medium text-blue-900 mb-3">AI Processing Results</h3>
-
-              <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                <div>
-                  <span className="font-medium text-blue-800">Total Pages:</span>
-                  <span className="ml-2 text-blue-700">{response.processing.totalPages}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-blue-800">Processing Time:</span>
-                  <span className="ml-2 text-blue-700">{response.processing.processingTime}ms</span>
-                </div>
-                <div>
-                  <span className="font-medium text-blue-800">Confidence:</span>
-                  <span className="ml-2 text-blue-700">
-                    {(response.processing.confidence * 100).toFixed(1)}%
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-blue-800">Page Order:</span>
-                  <span className="ml-2 text-blue-700">
-                    {response.processing.pageOrder.join(' → ')}
-                  </span>
-                </div>
-              </div>
-
-              {response.processing.detectedTopic && (
-                <div className="mb-4">
-                  <span className="font-medium text-blue-800">Detected Topic:</span>
-                  <p className="text-blue-700 mt-1">{response.processing.detectedTopic}</p>
-                </div>
-              )}
-
-              <div>
-                <span className="font-medium text-blue-800">Extracted Text Preview:</span>
-                <div className="mt-2 p-3 bg-white rounded border text-sm text-gray-700 font-mono">
-                  {response.processing.extractedText}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Image Carousel Modal */}
+      <ImageCarousel
+        files={selectedFiles}
+        isOpen={isCarouselOpen}
+        currentIndex={currentImageIndex}
+        onClose={closeCarousel}
+        onNavigate={navigateCarousel}
+      />
     </div>
   )
 }

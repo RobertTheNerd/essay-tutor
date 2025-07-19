@@ -17,21 +17,23 @@ function App() {
   const [isProcessingImages, setIsProcessingImages] = useState<boolean>(false)
   const [processingResult, setProcessingResult] = useState<{
     success: boolean
-    files?: Array<{
-      name: string
-      type: string
-      size: number
-      processed: boolean
-      pageNumber?: number
-    }>
-    processing?: {
-      extractedText: string
-      detectedTopic?: string
-      processingTime: number
-      confidence: number
-      totalPages: number
-      pageOrder: number[]
-      aiProcessed: boolean
+    document?: {
+      metadata: {
+        totalPages: number
+        processingTime: number
+        confidence: number
+        aiProcessed: boolean
+      }
+    }
+    essay?: {
+      writingPrompt: {
+        text: string
+        source: 'extracted' | 'summarized' | 'user_provided'
+        confidence: number
+      }
+      studentEssay: {
+        fullText: string
+      }
     }
     message?: string
     error?: string
@@ -123,7 +125,25 @@ function App() {
         // Auto-evaluate: high confidence prompt extraction
         setPromptText(result.essay.writingPrompt.text)
         setEssayText(result.essay.studentEssay.fullText)
-        await handleEvaluateEssay()
+        // Call evaluation directly here since we have the text set
+        setIsEvaluating(true)
+        try {
+          const evalResult = await evaluationService.evaluateEssay({
+            text: result.essay.studentEssay.fullText,
+            prompt: result.essay.writingPrompt.text,
+            rubric: {
+              family: 'isee',
+              level: 'upper',
+            },
+          })
+          setEvaluationResult(evalResult)
+          setCurrentView('results')
+        } catch (error) {
+          console.error('Auto-evaluation failed:', error)
+          alert(`Auto-evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        } finally {
+          setIsEvaluating(false)
+        }
       } else {
         // Show review: prompt was summarized/inferred
         setCurrentView('review')
@@ -139,9 +159,27 @@ function App() {
   const handleReviewConfirm = async (prompt: string, essay: string) => {
     setPromptText(prompt)
     setEssayText(essay)
-    setCurrentView('editor')
-    // Auto-evaluate after review
-    await handleEvaluateEssay()
+    
+    // Evaluate immediately after review confirmation
+    setIsEvaluating(true)
+    try {
+      const result = await evaluationService.evaluateEssay({
+        text: essay,
+        prompt: prompt,
+        rubric: {
+          family: 'isee',
+          level: 'upper',
+        },
+      })
+      setEvaluationResult(result)
+      setCurrentView('results')
+    } catch (error) {
+      console.error('Evaluation failed:', error)
+      alert(`Evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      setCurrentView('editor')
+    } finally {
+      setIsEvaluating(false)
+    }
   }
 
   const handleReviewCancel = () => {
@@ -171,9 +209,9 @@ function App() {
           />
         ) : currentView === 'review' && processingResult ? (
           <ProcessingReview
-            extractedPrompt={''}
-            extractedEssay={processingResult.processing?.extractedText || ''}
-            promptSource={'extracted'}
+            extractedPrompt={processingResult.essay?.writingPrompt?.text || ''}
+            extractedEssay={processingResult.essay?.studentEssay?.fullText || ''}
+            promptSource={processingResult.essay?.writingPrompt?.source || 'summarized'}
             onConfirm={handleReviewConfirm}
             onCancel={handleReviewCancel}
           />
@@ -229,7 +267,11 @@ function App() {
                   </div>
                 ) : (
                   <div className="p-6">
-                    <FileUpload onUpload={handleFileUpload} maxFiles={10} />
+                    <FileUpload 
+                      onUpload={handleFileUpload} 
+                      maxFiles={10} 
+                      initialFiles={uploadedFiles}
+                    />
                   </div>
                 )}
 
