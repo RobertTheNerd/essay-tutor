@@ -1,45 +1,45 @@
-import React, { useMemo } from 'react';
-import { AnnotationProcessor } from './AnnotationProcessor';
-import './professional-report-styles.css';
+import React, { useMemo } from 'react'
+import { AnnotationProcessor } from './AnnotationProcessor'
+import './professional-report-styles.css'
 
 interface StudentInfo {
-  name?: string;
-  date?: string;
-  gradeLevel?: string;
-  score?: string;
+  name?: string
+  date?: string
+  gradeLevel?: string
+  score?: string
 }
 
 interface ProfessionalReportProps {
-  evaluationData: any; // EvaluationResult from evaluation types
-  essayText: string;
-  prompt?: string;
-  studentInfo?: StudentInfo;
-  mode?: 'screen' | 'print';
-  onPrint?: () => void;
+  evaluationData: any // EvaluationResult from evaluation types
+  essayText: string
+  prompt?: string
+  studentInfo?: StudentInfo
+  mode?: 'screen' | 'print'
+  onPrint?: () => void
 }
 
 const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
   evaluationData,
   essayText,
   prompt,
-  studentInfo
+  studentInfo,
 }) => {
   // Initialize annotation processor
-  const annotationProcessor = useMemo(() => new AnnotationProcessor(), []);
+  const annotationProcessor = useMemo(() => new AnnotationProcessor(), [])
 
   // Generate report content with real API annotations
   const reportContent = useMemo(() => {
-    const score = evaluationData.overall || evaluationData.scores?.overall || 'N/A';
-    const scores = evaluationData.scores || {};
-    
+    const score = evaluationData.overall || evaluationData.scores?.overall || 'N/A'
+    const scores = evaluationData.scores || {}
+
     const categories = [
       { name: 'Grammar & Mechanics', key: 'grammar', score: scores.grammar || 0 },
       { name: 'Vocabulary', key: 'vocabulary', score: scores.vocabulary || 0 },
       { name: 'Structure', key: 'structure', score: scores.structure || 0 },
       { name: 'Development', key: 'development', score: scores.development || 0 },
       { name: 'Clarity', key: 'clarity', score: scores.clarity || 0 },
-      { name: 'Strengths', key: 'strengths', score: scores.strengths || 0 }
-    ];
+      { name: 'Strengths', key: 'strengths', score: scores.strengths || 0 },
+    ]
 
     const legendItems = [
       { category: 'grammar', label: 'Grammar', color: 'grammar-mark' },
@@ -47,23 +47,24 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       { category: 'structure', label: 'Sophisticated Structure', color: 'structure-mark' },
       { category: 'development', label: 'Rich Development', color: 'development-mark' },
       { category: 'clarity', label: 'Complex Ideas', color: 'clarity-mark' },
-      { category: 'strengths', label: 'Exceptional Techniques', color: 'positive-mark' }
-    ];
+      { category: 'strengths', label: 'Exceptional Techniques', color: 'positive-mark' },
+    ]
 
     // Use real API annotations or fallback to empty array
-    const apiAnnotations = evaluationData.annotations || [];
-    const annotations = apiAnnotations.length > 0 
-      ? annotationProcessor.convertApiAnnotationsToProcessed(apiAnnotations)
-      : annotationProcessor.generateMockAnnotations(essayText); // Fallback only when no API data
-    
+    const apiAnnotations = evaluationData.annotations || []
+    const annotations =
+      apiAnnotations.length > 0
+        ? annotationProcessor.convertApiAnnotationsToProcessed(apiAnnotations)
+        : annotationProcessor.generateMockAnnotations(essayText) // Fallback only when no API data
+
     // Split essay into text blocks
-    const textBlocks = annotationProcessor.splitIntoTextBlocks(essayText);
-    
+    const textBlocks = annotationProcessor.splitIntoTextBlocks(essayText)
+
     // Generate annotation blocks for detailed explanations
-    const annotationBlocks = annotationProcessor.generateAnnotationBlocks(annotations);
+    const annotationBlocks = annotationProcessor.generateAnnotationBlocks(annotations)
 
     // Get paragraph feedback from evaluation data
-    const paragraphFeedback = evaluationData.paragraphFeedback || [];
+    const paragraphFeedback = evaluationData.paragraphFeedback || []
 
     return {
       score,
@@ -73,10 +74,9 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       textBlocks,
       annotationBlocks,
       paragraphFeedback,
-      feedback: evaluationData.feedback || []
-    };
-  }, [evaluationData, essayText, annotationProcessor]);
-
+      feedback: evaluationData.feedback || [],
+    }
+  }, [evaluationData, essayText, annotationProcessor])
 
   return (
     <div className="professional-report-container">
@@ -84,19 +84,31 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       <div className="professional-report-content">
         {/* Header */}
         <div className="header">
-          <h1>🏆 ISEE Essay - Score {reportContent.score}/5 Example</h1>
+          <h1>
+            🏆 {evaluationData.rubric?.name || 'Essay Evaluation'} - Score {reportContent.score}/5
+          </h1>
           {prompt && (
             <div className="prompt">
               <strong>Prompt:</strong> {prompt}
             </div>
           )}
-          
+
           {/* Student Info */}
           <div className="student-info">
-            {studentInfo?.name && <div><strong>Student:</strong> {studentInfo.name}</div>}
-            <div><strong>Date:</strong> {studentInfo?.date || new Date().toLocaleDateString()}</div>
-            <div><strong>Test:</strong> ISEE Essay</div>
-            <div><strong>Level:</strong> {studentInfo?.gradeLevel || 'Upper Level'}</div>
+            {studentInfo?.name && (
+              <div>
+                <strong>Student:</strong> {studentInfo.name}
+              </div>
+            )}
+            <div>
+              <strong>Date:</strong> {studentInfo?.date || new Date().toLocaleDateString()}
+            </div>
+            <div>
+              <strong>Test:</strong> {evaluationData.rubric?.name || 'Essay Evaluation'}
+            </div>
+            <div>
+              <strong>Level:</strong> {studentInfo?.gradeLevel || 'Upper Level'}
+            </div>
           </div>
         </div>
 
@@ -113,46 +125,52 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
         {/* Essay Container with Annotated Text Blocks */}
         <div className="essay-container">
           <h2 className="essay-title">Student Essay</h2>
-          
+
           {reportContent.textBlocks.map((block, blockIndex) => {
             // Find annotations for this block and adjust indices
-            const blockAnnotations = reportContent.annotations.filter(annotation => {
-              return block.includes(annotation.originalText);
-            }).map(annotation => {
-              // Adjust indices to be relative to the block, not the full text
-              const blockStartIndex = block.indexOf(annotation.originalText);
-              if (blockStartIndex !== -1) {
-                return {
-                  ...annotation,
-                  startIndex: blockStartIndex,
-                  endIndex: blockStartIndex + annotation.originalText.length
-                };
-              }
-              return annotation;
-            });
+            const blockAnnotations = reportContent.annotations
+              .filter(annotation => {
+                return block.includes(annotation.originalText)
+              })
+              .map(annotation => {
+                // Adjust indices to be relative to the block, not the full text
+                const blockStartIndex = block.indexOf(annotation.originalText)
+                if (blockStartIndex !== -1) {
+                  return {
+                    ...annotation,
+                    startIndex: blockStartIndex,
+                    endIndex: blockStartIndex + annotation.originalText.length,
+                  }
+                }
+                return annotation
+              })
 
             // Apply annotations to the text block with corrected indices
-            const annotatedBlockText = annotationProcessor.applyAnnotationsToText(block, blockAnnotations);
+            const annotatedBlockText = annotationProcessor.applyAnnotationsToText(
+              block,
+              blockAnnotations
+            )
 
             // Get annotation blocks for this text block
-            const relatedAnnotationBlocks = annotationProcessor.generateAnnotationBlocks(blockAnnotations);
+            const relatedAnnotationBlocks =
+              annotationProcessor.generateAnnotationBlocks(blockAnnotations)
 
             // Find paragraph feedback for this block (paragraph number = blockIndex + 1)
             const paragraphFeedback = reportContent.paragraphFeedback.find(
               (feedback: any) => feedback.paragraphNumber === blockIndex + 1
-            );
+            )
 
             return (
               <div key={blockIndex} className="text-block">
                 <div className="text-line essay-text">
                   <div dangerouslySetInnerHTML={{ __html: annotatedBlockText }} />
                 </div>
-                
+
                 {/* Annotation blocks for this text section */}
                 {relatedAnnotationBlocks.length > 0 && (
                   <div className="annotation-section">
                     {relatedAnnotationBlocks.map((annotationBlock, annotationIndex) => (
-                      <div 
+                      <div
                         key={annotationIndex}
                         className={`annotation-block ${annotationBlock.blockClass} ${annotationBlock.isWide ? 'wide' : ''}`}
                       >
@@ -167,14 +185,18 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
                 {paragraphFeedback && (
                   <div className={`paragraph-feedback ${paragraphFeedback.type}`}>
                     <strong>
-                      {paragraphFeedback.type === 'excellent' ? '🏆' : 
-                       paragraphFeedback.type === 'positive' ? '👍' : '📝'} 
+                      {paragraphFeedback.type === 'excellent'
+                        ? '🏆'
+                        : paragraphFeedback.type === 'positive'
+                          ? '👍'
+                          : '📝'}
                       {paragraphFeedback.title}:
-                    </strong> {paragraphFeedback.content}
+                    </strong>{' '}
+                    {paragraphFeedback.content}
                   </div>
                 )}
               </div>
-            );
+            )
           })}
         </div>
 
@@ -195,7 +217,7 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProfessionalReport;
+export default ProfessionalReport
