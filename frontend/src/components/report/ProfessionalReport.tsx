@@ -93,21 +93,23 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
             </div>
           )}
 
-          {/* Student Info */}
-          <div className="student-info">
+          {/* Streamlined Info Bar */}
+          <div className="info-bar">
+            <div className="info-item">
+              <span className="info-label">Date:</span>
+              <span className="info-value">
+                {studentInfo?.date || new Date().toLocaleDateString()}
+              </span>
+            </div>
             {studentInfo?.name && (
-              <div>
-                <strong>Student:</strong> {studentInfo.name}
+              <div className="info-item">
+                <span className="info-label">Student:</span>
+                <span className="info-value">{studentInfo.name}</span>
               </div>
             )}
-            <div>
-              <strong>Date:</strong> {studentInfo?.date || new Date().toLocaleDateString()}
-            </div>
-            <div>
-              <strong>Test:</strong> {evaluationData.rubric?.name || 'Essay Evaluation'}
-            </div>
-            <div>
-              <strong>Level:</strong> {studentInfo?.gradeLevel || 'Upper Level'}
+            <div className="info-item">
+              <span className="info-label">Level:</span>
+              <span className="info-value">{studentInfo?.gradeLevel || 'Upper Level'}</span>
             </div>
           </div>
         </div>
