@@ -6,6 +6,7 @@ interface ProcessingReviewProps {
   promptSource: 'extracted' | 'summarized' | 'user_provided'
   onConfirm: (prompt: string, essay: string) => void
   onCancel: () => void
+  isEvaluating?: boolean
 }
 
 export default function ProcessingReview({
@@ -14,6 +15,7 @@ export default function ProcessingReview({
   promptSource,
   onConfirm,
   onCancel,
+  isEvaluating = false,
 }: ProcessingReviewProps) {
   const [promptText, setPromptText] = useState(extractedPrompt)
   const [essayText, setEssayText] = useState(extractedEssay)
@@ -26,48 +28,23 @@ export default function ProcessingReview({
   const isUserProvided = promptSource === 'user_provided'
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-blue-100 p-6 space-y-6 mt-6">
       <div className="text-center">
-        <h2 className="text-2xl font-semibold mb-2">📋 Review Extracted Content</h2>
+        <h2 className="text-2xl font-semibold mb-2">✨ Review Your Essay</h2>
         <p className="text-gray-600">
           {isExtracted
             ? 'AI successfully extracted the writing prompt and essay from your images.'
             : isUserProvided
             ? 'Please review the extracted essay text and ensure the writing prompt is correct.'
-            : 'AI could only infer the writing prompt. Please review and edit before evaluation.'}
+            : 'We\'ve analyzed your essay and suggested a writing prompt based on the content. You can edit it or leave it blank - both work great for evaluation!'}
         </p>
       </div>
 
-      {/* Status Indicator */}
-      <div
-        className={`p-4 rounded-lg border ${
-          isExtracted ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'
-        }`}
-      >
-        <div className="flex items-center">
-          <span className={`text-2xl mr-3 ${isExtracted ? 'text-green-600' : 'text-yellow-600'}`}>
-            {isExtracted ? '✅' : '⚠️'}
-          </span>
-          <div>
-            <p className={`font-medium ${isExtracted ? 'text-green-800' : 'text-yellow-800'}`}>
-              {isExtracted ? 'Writing Prompt: Extracted' : isUserProvided ? 'Writing Prompt: User Provided' : 'Writing Prompt: Summarized'}
-            </p>
-            <p className={`text-sm ${isExtracted ? 'text-green-600' : 'text-yellow-600'}`}>
-              {isExtracted
-                ? 'High confidence - ready for evaluation'
-                : isUserProvided
-                ? 'Please verify the prompt is correct'
-                : 'Please review and edit the prompt for better evaluation'}
-            </p>
-          </div>
-        </div>
-      </div>
 
       {/* Writing Prompt Field */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Writing Prompt
-          {!isExtracted && <span className="text-red-500 ml-1">*</span>}
+          Writing Prompt (Optional)
         </label>
         <textarea
           value={promptText}
@@ -76,11 +53,6 @@ export default function ProcessingReview({
           className="w-full h-24 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
           rows={3}
         />
-        {!isExtracted && (
-          <p className="text-xs text-red-600">
-            The prompt was inferred from context. Please edit for accuracy.
-          </p>
-        )}
       </div>
 
       {/* Essay Text Field */}
@@ -108,14 +80,21 @@ export default function ProcessingReview({
         </button>
         <button
           onClick={handleConfirm}
-          disabled={!promptText.trim() || !essayText.trim()}
+          disabled={!essayText.trim() || isEvaluating}
           className={`px-6 py-2 rounded-md font-medium transition-colors ${
-            promptText.trim() && essayText.trim()
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            !essayText.trim() || isEvaluating
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
-          {isExtracted ? '🎯 Evaluate Essay' : '📝 Proceed to Evaluation'}
+          {isEvaluating ? (
+            <span className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-gray-400 border-t-gray-600 rounded-full animate-spin"></div>
+              Evaluating...
+            </span>
+          ) : (
+            isExtracted ? '🎯 Evaluate Essay' : '📝 Proceed to Evaluation'
+          )}
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import FileUpload from './components/FileUpload'
 import ProcessingReview from './components/ProcessingReview'
 import TextEditor from './components/TextEditor'
@@ -9,7 +9,9 @@ export type InputMethod = 'text' | 'images'
 
 function App() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const [processedFiles, setProcessedFiles] = useState<File[]>([])
   const [inputMethod, setInputMethod] = useState<InputMethod>('text')
+  const reviewSectionRef = useRef<HTMLDivElement>(null)
   const [promptText, setPromptText] = useState<string>('')
   const [essayText, setEssayText] = useState<string>('')
   const [evaluationResult, setEvaluationResult] = useState<EvaluationResponse | null>(null)
@@ -40,6 +42,34 @@ function App() {
   } | null>(null)
   const [currentView, setCurrentView] = useState<'editor' | 'review' | 'results'>('editor')
 
+  // Clear processing results when files change
+  useEffect(() => {
+    // If we have processing results but files have changed, clear them
+    if (processingResult && uploadedFiles !== processedFiles) {
+      // Check if the file arrays are actually different
+      const filesChanged = uploadedFiles.length !== processedFiles.length ||
+        uploadedFiles.some((file, index) => file !== processedFiles[index])
+      
+      if (filesChanged) {
+        setProcessingResult(null)
+      }
+    }
+  }, [uploadedFiles, processedFiles, processingResult])
+
+  // Scroll to review section when it appears
+  useEffect(() => {
+    if (processingResult && processingResult.essay?.writingPrompt?.source === 'summarized' && reviewSectionRef.current) {
+      // Small delay to ensure the element is rendered
+      setTimeout(() => {
+        reviewSectionRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        })
+      }, 100)
+    }
+  }, [processingResult])
+
   const handleFileUpload = (files: File[]) => {
     setUploadedFiles(files)
   }
@@ -54,11 +84,8 @@ function App() {
 
   const handleMethodChange = (method: InputMethod) => {
     setInputMethod(method)
-    // Clear previous data when switching methods
-    setUploadedFiles([])
-    setPromptText('')
-    setEssayText('')
-    setProcessingResult(null)
+    // Simply switch tabs without clearing any data
+    // Users can manually clear if they want to start fresh
     setCurrentView('editor')
   }
 
@@ -119,6 +146,7 @@ function App() {
 
       const result = await response.json()
       setProcessingResult(result)
+      setProcessedFiles([...uploadedFiles]) // Store the files that were processed
 
       // Check if we should auto-evaluate or show review
       if (result.essay?.writingPrompt?.source === 'extracted') {
@@ -183,8 +211,8 @@ function App() {
   }
 
   const handleReviewCancel = () => {
-    setCurrentView('editor')
     setProcessingResult(null)
+    setProcessedFiles([])
   }
 
   const handlePrintReport = () => {
@@ -206,14 +234,6 @@ function App() {
             prompt={promptText}
             onClose={handleBackToEditor}
             onPrint={handlePrintReport}
-          />
-        ) : currentView === 'review' && processingResult ? (
-          <ProcessingReview
-            extractedPrompt={processingResult.essay?.writingPrompt?.text || ''}
-            extractedEssay={processingResult.essay?.studentEssay?.fullText || ''}
-            promptSource={processingResult.essay?.writingPrompt?.source || 'summarized'}
-            onConfirm={handleReviewConfirm}
-            onCancel={handleReviewCancel}
           />
         ) : (
           <>
@@ -332,29 +352,51 @@ function App() {
                           )}
                         </button>
                       ) : (
-                        <button
-                          onClick={handleProcessImages}
-                          disabled={isProcessingImages || uploadedFiles.length === 0}
-                          className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
-                            isProcessingImages || uploadedFiles.length === 0
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transform hover:scale-105'
-                          }`}
-                        >
-                          {isProcessingImages ? (
-                            <span className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-400 rounded-full animate-spin"></div>
-                              Processing...
-                            </span>
-                          ) : (
-                            'Process images'
-                          )}
-                        </button>
+                        // Show different content based on processing state
+                        processingResult && processingResult.essay?.writingPrompt?.source === 'summarized' ? (
+                          <div className="flex items-center gap-2 text-green-600 font-medium">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            ✅ Images processed - review below
+                          </div>
+                        ) : (
+                          <button
+                            onClick={handleProcessImages}
+                            disabled={isProcessingImages || uploadedFiles.length === 0}
+                            className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                              isProcessingImages || uploadedFiles.length === 0
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transform hover:scale-105'
+                            }`}
+                          >
+                            {isProcessingImages ? (
+                              <span className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-400 rounded-full animate-spin"></div>
+                                Processing...
+                              </span>
+                            ) : (
+                              'Process images'
+                            )}
+                          </button>
+                        )
                       )}
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* Processing Review Section - Show below complete upload interface */}
+              {inputMethod === 'images' && processingResult && processingResult.essay?.writingPrompt?.source === 'summarized' && (
+                <div ref={reviewSectionRef} className="max-w-5xl mx-auto px-6 mt-6">
+                  <ProcessingReview
+                    extractedPrompt={processingResult.essay?.writingPrompt?.text || ''}
+                    extractedEssay={processingResult.essay?.studentEssay?.fullText || ''}
+                    promptSource={processingResult.essay?.writingPrompt?.source || 'summarized'}
+                    onConfirm={handleReviewConfirm}
+                    onCancel={handleReviewCancel}
+                    isEvaluating={isEvaluating}
+                  />
+                </div>
+              )}
             </div>
           </>
         )}
