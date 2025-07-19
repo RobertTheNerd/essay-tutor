@@ -84,30 +84,35 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       <div className="professional-report-content">
         {/* Header */}
         <div className="header">
-          <h1>
-            🏆 {evaluationData.rubric?.name || 'Essay Evaluation'} - Score {reportContent.score}/5
-          </h1>
+          {/* Main Title and Score Section */}
+          <div className="title-score-section">
+            <div className="test-info">
+              <h1 className="test-name">{evaluationData.rubric?.name || 'Essay Evaluation'}</h1>
+              <div className="metadata-inline">
+                <span className="date-info">
+                  {studentInfo?.date || new Date().toLocaleDateString()}
+                </span>
+                {studentInfo?.name && (
+                  <>
+                    <span className="separator">•</span>
+                    <span className="student-info">{studentInfo.name}</span>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="score-display">
+              <div className="score-number">{reportContent.score}</div>
+              <div className="score-label">/ 5</div>
+            </div>
+          </div>
+
+          {/* Prompt Section */}
           {prompt && (
-            <div className="prompt">
-              <strong>Prompt:</strong> {prompt}
+            <div className="prompt-section">
+              <div className="prompt-label">Prompt</div>
+              <div className="prompt-text">{prompt}</div>
             </div>
           )}
-
-          {/* Streamlined Info Bar */}
-          <div className="info-bar">
-            <div className="info-item">
-              <span className="info-label">Date:</span>
-              <span className="info-value">
-                {studentInfo?.date || new Date().toLocaleDateString()}
-              </span>
-            </div>
-            {studentInfo?.name && (
-              <div className="info-item">
-                <span className="info-label">Student:</span>
-                <span className="info-value">{studentInfo.name}</span>
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Legend */}
