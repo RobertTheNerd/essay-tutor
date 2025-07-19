@@ -92,7 +92,12 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
               <div className="test-date">
                 {studentInfo?.date || new Date().toLocaleDateString()}
               </div>
-              {prompt && <div className="prompt-text">{prompt}</div>}
+              {prompt && (
+                <div className="prompt-section">
+                  <div className="prompt-label">Essay Prompt</div>
+                  <div className="prompt-text">{prompt}</div>
+                </div>
+              )}
             </div>
 
             {/* Right Column: Score */}
