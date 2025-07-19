@@ -5,6 +5,8 @@ interface TextEditorProps {
   onEssayChange?: (essay: string) => void
   promptPlaceholder?: string
   essayPlaceholder?: string
+  initialPrompt?: string
+  initialEssay?: string
 }
 
 export default function TextEditor({
@@ -12,9 +14,20 @@ export default function TextEditor({
   onEssayChange,
   promptPlaceholder,
   essayPlaceholder,
+  initialPrompt = '',
+  initialEssay = '',
 }: TextEditorProps) {
-  const [promptText, setPromptText] = useState('')
-  const [essayText, setEssayText] = useState('')
+  const [promptText, setPromptText] = useState(initialPrompt)
+  const [essayText, setEssayText] = useState(initialEssay)
+
+  // Update state when initial values change
+  useEffect(() => {
+    setPromptText(initialPrompt)
+  }, [initialPrompt])
+
+  useEffect(() => {
+    setEssayText(initialEssay)
+  }, [initialEssay])
 
   useEffect(() => {
     if (onPromptChange) {

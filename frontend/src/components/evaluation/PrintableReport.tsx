@@ -27,8 +27,9 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
 
   return (
     <div className="print-report bg-white">
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
           @media print {
             .print-report {
               font-size: 12px !important;
@@ -60,25 +61,30 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
               print-color-adjust: exact !important;
             }
           }
-        `
-      }} />
+        `,
+        }}
+      />
 
       {/* Header */}
       <div className="text-center mb-8 pb-4 border-b-2 border-gray-300">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          📝 ISEE Essay Evaluation Report
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">📝 ISEE Essay Evaluation Report</h1>
         <h2 className="text-xl text-gray-700 mb-4">
           Score: {evalData.overall.toFixed(1)}/5 ({getScoreLabel(evalData.overall)})
         </h2>
-        
+
         {/* Student Information */}
         <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
-          <div><strong>Student:</strong> {studentInfo?.name || 'Anonymous'}</div>
-          <div><strong>Date:</strong> {studentInfo?.date || new Date().toLocaleDateString()}</div>
-          <div><strong>Grade Level:</strong> {studentInfo?.grade || '7th-8th Grade'}</div>
+          <div>
+            <strong>Student:</strong> {studentInfo?.name || 'Anonymous'}
+          </div>
+          <div>
+            <strong>Date:</strong> {studentInfo?.date || new Date().toLocaleDateString()}
+          </div>
+          <div>
+            <strong>Grade Level:</strong> {studentInfo?.grade || 'Upper Level'}
+          </div>
         </div>
-        
+
         <div className="mt-2 text-sm text-gray-600">
           <strong>Rubric:</strong> {evalData.rubric.name}
         </div>
@@ -89,14 +95,16 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
         <h3 className="text-xl font-bold mb-4">📊 Score Breakdown</h3>
         <div className="grid grid-cols-2 gap-4">
           {Object.entries(evalData.scores).map(([categoryId, score]) => {
-            const categoryName = CATEGORY_NAMES[categoryId as keyof typeof CATEGORY_NAMES] || categoryId
-            const categoryColor = CATEGORY_COLORS[categoryId as keyof typeof CATEGORY_COLORS] || '#6b7280'
-            
+            const categoryName =
+              CATEGORY_NAMES[categoryId as keyof typeof CATEGORY_NAMES] || categoryId
+            const categoryColor =
+              CATEGORY_COLORS[categoryId as keyof typeof CATEGORY_COLORS] || '#6b7280'
+
             return (
               <div key={categoryId} className="flex justify-between items-center border-b pb-2">
                 <div className="flex items-center">
-                  <div 
-                    className="w-4 h-4 rounded-full mr-3" 
+                  <div
+                    className="w-4 h-4 rounded-full mr-3"
                     style={{ backgroundColor: categoryColor }}
                   ></div>
                   <span className="font-medium">{categoryName}</span>
@@ -119,10 +127,10 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
       <div className="mb-6">
         <h3 className="text-lg font-bold mb-3">🎨 Annotation Legend</h3>
         <div className="grid grid-cols-2 gap-2 text-sm">
-          {annotatedText?.legend.map((category) => (
+          {annotatedText?.legend.map(category => (
             <div key={category.id} className="flex items-center">
-              <div 
-                className="w-4 h-4 rounded-full mr-2" 
+              <div
+                className="w-4 h-4 rounded-full mr-2"
                 style={{ backgroundColor: category.color }}
               ></div>
               <span>{category.name}</span>
@@ -140,7 +148,7 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
               return <span key={index}>{segment.text}</span>
             }
 
-            return segment.annotations.map((annotationId) => {
+            return segment.annotations.map(annotationId => {
               const annotation = annotatedText.annotations.find(a => a.id === annotationId)
               if (!annotation) return <span key={`${index}-${annotationId}`}>{segment.text}</span>
 
@@ -148,13 +156,13 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
                 <span
                   key={`${index}-${annotationId}`}
                   className="annotation-highlight"
-                  style={{ 
+                  style={{
                     backgroundColor: `${annotation.color}40`,
-                    borderBottom: `2px solid ${annotation.color}`
+                    borderBottom: `2px solid ${annotation.color}`,
                   }}
                 >
                   {segment.text}
-                  <span 
+                  <span
                     className="ml-1 px-1 text-xs font-bold text-white rounded"
                     style={{ backgroundColor: annotation.color }}
                   >
@@ -170,23 +178,27 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
       {/* Detailed Feedback */}
       <div className="page-break">
         <h3 className="text-xl font-bold mb-4">💡 Detailed Feedback</h3>
-        
+
         {/* Strengths and Improvements */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           <div className="border border-green-300 bg-green-50 p-4 rounded">
             <h4 className="font-bold text-green-800 mb-2">🌟 Key Strengths</h4>
             <ul className="text-sm space-y-1">
               {evalData.summary.strengths.map((strength, index) => (
-                <li key={index} className="text-green-700">• {strength}</li>
+                <li key={index} className="text-green-700">
+                  • {strength}
+                </li>
               ))}
             </ul>
           </div>
-          
+
           <div className="border border-blue-300 bg-blue-50 p-4 rounded">
             <h4 className="font-bold text-blue-800 mb-2">📈 Areas for Growth</h4>
             <ul className="text-sm space-y-1">
               {evalData.summary.improvements.map((improvement, index) => (
-                <li key={index} className="text-blue-700">• {improvement}</li>
+                <li key={index} className="text-blue-700">
+                  • {improvement}
+                </li>
               ))}
             </ul>
           </div>
@@ -202,20 +214,26 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
         <div className="mb-6">
           <h4 className="font-bold mb-3">📝 Annotation Details</h4>
           <div className="space-y-3">
-            {evalData.annotations.slice(0, 10).map((annotation) => (
+            {evalData.annotations.slice(0, 10).map(annotation => (
               <div key={annotation.id} className="border p-3 rounded text-sm">
                 <div className="flex items-center mb-1">
-                  <span 
+                  <span
                     className="inline-block w-6 h-6 text-xs text-white rounded text-center leading-6 mr-2"
                     style={{ backgroundColor: annotation.color }}
                   >
                     {annotation.markerId}
                   </span>
-                  <strong>{annotation.category} - {annotation.severity}</strong>
+                  <strong>
+                    {annotation.category} - {annotation.severity}
+                  </strong>
                 </div>
-                <p><strong>Text:</strong> "{annotation.originalText}"</p>
+                <p>
+                  <strong>Text:</strong> "{annotation.originalText}"
+                </p>
                 {annotation.suggestedText && (
-                  <p><strong>Suggestion:</strong> "{annotation.suggestedText}"</p>
+                  <p>
+                    <strong>Suggestion:</strong> "{annotation.suggestedText}"
+                  </p>
                 )}
                 <p className="text-gray-600">{annotation.explanation}</p>
               </div>
@@ -225,8 +243,14 @@ const PrintableReport = ({ evaluation, studentInfo }: PrintableReportProps) => {
 
         {/* Footer */}
         <div className="mt-8 pt-4 border-t text-center text-sm text-gray-600">
-          <p>This evaluation was generated using AI technology on {new Date(evalData.metadata.timestamp).toLocaleDateString()}.</p>
-          <p>Processing time: {evalData.metadata.processingTime}ms | Confidence: {(evalData.metadata.confidence * 100).toFixed(1)}%</p>
+          <p>
+            This evaluation was generated using AI technology on{' '}
+            {new Date(evalData.metadata.timestamp).toLocaleDateString()}.
+          </p>
+          <p>
+            Processing time: {evalData.metadata.processingTime}ms | Confidence:{' '}
+            {(evalData.metadata.confidence * 100).toFixed(1)}%
+          </p>
         </div>
       </div>
     </div>

@@ -223,6 +223,8 @@ function App() {
                       onEssayChange={handleEssayChange}
                       promptPlaceholder="Enter writing prompt (optional)..."
                       essayPlaceholder="Start writing your essay here..."
+                      initialPrompt={promptText}
+                      initialEssay={essayText}
                     />
                   </div>
                 ) : (
