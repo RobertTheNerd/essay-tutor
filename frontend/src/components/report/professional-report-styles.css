@@ -80,7 +80,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   gap: 3rem;
   min-height: 120px;
 }
@@ -92,7 +92,7 @@
     align-items: center;
     gap: 1.5rem;
     min-height: auto;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     text-align: center;
   }
 
@@ -124,9 +124,9 @@
   }
 
   .prompt-section {
-    max-width: 90% !important;
+    max-width: 95% !important;
     padding: 1.5rem !important;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
   }
 
   .prompt-text {
@@ -139,6 +139,7 @@
 @media (max-width: 1024px) and (min-width: 769px) {
   .title-score-section {
     gap: 2rem;
+    margin-bottom: 1.25rem;
   }
 
   .test-name {
@@ -154,7 +155,7 @@
   }
 
   .prompt-section {
-    max-width: 85%;
+    max-width: 90%;
   }
 }
 
@@ -220,9 +221,9 @@
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(8px);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 2rem 2.5rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  max-width: 70%;
+  max-width: 85%;
   margin: 0 auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
