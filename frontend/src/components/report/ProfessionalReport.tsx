@@ -107,10 +107,6 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
                 <span className="info-value">{studentInfo.name}</span>
               </div>
             )}
-            <div className="info-item">
-              <span className="info-label">Level:</span>
-              <span className="info-value">{studentInfo?.gradeLevel || 'Upper Level'}</span>
-            </div>
           </div>
         </div>
 
