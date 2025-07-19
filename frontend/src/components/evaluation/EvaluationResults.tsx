@@ -51,16 +51,13 @@ const EvaluationResults = ({
   return (
     <div className="space-y-6 pt-8">
       {/* Clean, Professional Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden print:hidden">
         {/* Header Content */}
         <div className="px-8 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Essay Evaluation Results</h1>
-              <p className="text-lg text-gray-600">
-                {evalData.rubric.name} • Overall Score:{' '}
-                <span className="font-semibold text-blue-600">{evalData.overall.toFixed(1)}/5</span>
-              </p>
+              <p className="text-lg text-gray-600">{evalData.rubric.name}</p>
             </div>
             <div className="flex gap-3">
               {onPrint && (
