@@ -98,7 +98,7 @@ export default function FileUpload({ onUpload, maxFiles = 10, initialFiles = [] 
         <div
           {...getRootProps()}
           className={`
-            border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200
+            border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all duration-200
             ${
               isDragActive
                 ? 'border-blue-500 bg-gradient-to-b from-blue-50 to-blue-100 shadow-inner'
@@ -108,23 +108,23 @@ export default function FileUpload({ onUpload, maxFiles = 10, initialFiles = [] 
         >
           <input {...getInputProps()} />
 
-          <div className="space-y-4">
-            <div className="text-6xl">{isDragActive ? '📥' : '📸'}</div>
+          <div className="space-y-2">
+            <div className="text-4xl">{isDragActive ? '📥' : '📸'}</div>
 
             {isDragActive ? (
               <div>
-                <div className="text-xl font-bold text-blue-900">Drop your images here!</div>
-                <div className="text-sm text-blue-600 mt-2">Release to start processing</div>
+                <div className="text-lg font-bold text-blue-900">Drop your images here!</div>
+                <div className="text-sm text-blue-600 mt-1">Release to start processing</div>
               </div>
             ) : (
               <div>
-                <div className="text-xl font-bold text-gray-900">📤 Drag & Drop Essay Images</div>
-                <div className="text-sm text-gray-600 mt-2">
+                <div className="text-lg font-bold text-gray-900">📤 Drag & Drop Essay Images</div>
+                <div className="text-sm text-gray-600 mt-1">
                   or click to browse and select multiple images
                 </div>
-                <div className="mt-4 inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm">
+                <div className="mt-2 inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded text-xs">
                   <span className="text-blue-500">📋</span>
-                  Supports: JPG, PNG • Max {maxFiles} pages • 10MB each
+                  JPG, PNG • Max {maxFiles} pages • 10MB each
                 </div>
               </div>
             )}
@@ -134,9 +134,9 @@ export default function FileUpload({ onUpload, maxFiles = 10, initialFiles = [] 
 
       {/* File Preview */}
       {selectedFiles.length > 0 && (
-        <div className="mt-6 border-t border-gray-200 pt-6">
-          <div className="flex items-center justify-between mb-4 gap-4">
-            <h3 className="font-medium text-gray-900 flex-1">
+        <div className="mt-6 border-t border-gray-200 pt-6 bg-gray-50/30 -mx-6 px-6 pb-6 rounded-b-xl">
+          <div className="flex items-center justify-between mb-6 gap-4">
+            <h3 className="font-semibold text-gray-900 flex-1 text-lg">
               Selected Files ({selectedFiles.length} page{selectedFiles.length !== 1 ? 's' : ''})
             </h3>
             <button
@@ -146,13 +146,13 @@ export default function FileUpload({ onUpload, maxFiles = 10, initialFiles = [] 
               Clear All
             </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {selectedFiles.map((file, index) => (
               <div key={index} className="relative group">
                 <img
                   src={URL.createObjectURL(file)}
                   alt={`Page ${index + 1}`}
-                  className="w-full h-auto max-h-32 object-contain bg-gray-50 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-blue-300 hover:scale-105 transition-all duration-200"
+                  className="w-full h-auto max-h-48 object-contain bg-gray-50 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-blue-300 hover:scale-105 transition-all duration-200 shadow-sm"
                   onClick={() => openCarousel(index)}
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs p-2 rounded-b-lg">
