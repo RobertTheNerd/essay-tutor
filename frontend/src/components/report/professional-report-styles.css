@@ -164,6 +164,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  text-align: left;
 }
 
 .test-name {
@@ -174,6 +175,7 @@
   margin: 0 0 0.75rem 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   line-height: 1.1;
+  text-align: left;
 }
 
 .metadata-inline {
@@ -183,6 +185,7 @@
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
+  text-align: left;
 }
 
 .separator {
@@ -224,7 +227,7 @@
   padding: 2rem 2.5rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   max-width: 85%;
-  margin: 0 auto;
+  margin: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -235,7 +238,7 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.75rem;
-  text-align: center;
+  text-align: left;
 }
 
 .prompt-text {
@@ -244,7 +247,7 @@
   color: white;
   line-height: 1.5;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  text-align: center;
+  text-align: left;
 }
 
 .student-info {
