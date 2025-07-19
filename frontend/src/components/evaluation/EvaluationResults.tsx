@@ -53,17 +53,16 @@ const EvaluationResults = ({
       {/* Clean, Professional Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden print:hidden">
         {/* Header Content */}
-        <div className="px-8 py-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="px-6 py-5">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Essay Evaluation Results</h1>
-              <p className="text-lg text-gray-600">{evalData.rubric.name}</p>
+              <h1 className="text-2xl font-bold text-gray-900">Essay Evaluation Results</h1>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               {onPrint && (
                 <button
                   onClick={onPrint}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl transition-colors duration-200 flex items-center gap-2 font-medium"
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl transition-colors duration-200 flex items-center gap-2 text-sm font-medium"
                 >
                   🖨️ Print Report
                 </button>
@@ -71,7 +70,7 @@ const EvaluationResults = ({
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl transition-colors duration-200 flex items-center gap-2 font-medium"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl transition-colors duration-200 flex items-center gap-2 text-sm font-medium"
                 >
                   ← Back to Editor
                 </button>
@@ -80,8 +79,8 @@ const EvaluationResults = ({
           </div>
 
           {/* Disclaimer */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p className="text-sm text-blue-800 leading-relaxed">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+            <p className="text-xs text-blue-800 leading-relaxed">
               This evaluation was generated using AI technology. Use this feedback as a guide for
               improvement and consider seeking additional input from teachers or tutors.
             </p>

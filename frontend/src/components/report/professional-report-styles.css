@@ -75,185 +75,198 @@
   font-weight: 400;
 }
 
-/* Clean two-column header layout */
-.header-columns {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 3rem;
-  padding: 1.5rem 2rem;
+/* Header with separate blocks */
+.header {
   position: relative;
+  padding: 0.75rem;
+  background: none !important; /* Remove the purple gradient from entire header */
+  box-shadow: none !important; /* Remove shadow from header container */
+}
+
+/* Main content block - left column with its own background */
+.main-content-block {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  margin-right: 110px; /* Space for separate score block */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .info-column {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  max-width: calc(100% - 200px); /* Ensure separation from score */
+  gap: 0.15rem;
 }
 
 .test-name {
-  font-size: 2rem;
+  font-size: 0.75rem;
   font-weight: 700;
   font-family: 'Source Serif Pro', serif;
   color: white;
   margin: 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  line-height: 1.2;
-  text-align: left;
+  line-height: 1.1;
+  text-align: center;
 }
 
 .test-date {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
   margin: 0;
-  text-align: left;
+  text-align: center;
 }
 
 .prompt-section {
-  margin-top: 0.5rem;
+  margin-top: 0.2rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .prompt-label {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.5rem;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 0.5rem 0;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.15rem 0;
   text-align: left;
 }
 
 .prompt-text {
-  font-size: 1rem;
+  font-size: 0.6rem;
   font-style: italic;
   color: rgba(255, 255, 255, 0.95);
-  line-height: 1.4;
+  line-height: 1.2;
   margin: 0;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   text-align: left;
 }
 
-.score-column {
-  flex-shrink: 0;
-  display: flex;
-  align-items: flex-start;
+/* Completely separate score block */
+.score-block {
   position: absolute;
-  right: 2rem;
-  top: 1.5rem;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
 }
 
 .score-display {
   display: flex;
   align-items: baseline;
-  background: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   backdrop-filter: blur(10px);
   border-radius: 12px;
-  padding: 1rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(102, 126, 234, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.1);
   min-width: 120px;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.score-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #22d3ee 0%, #06b6d4 100%);
 }
 
 .score-number {
   font-size: 2.5rem;
-  font-weight: 800;
-  color: white;
+  font-weight: 900;
+  color: #ffffff;
   line-height: 1;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .score-label {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
-  margin-left: 0.2rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #cbd5e1;
+  margin-left: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 /* Mobile responsive design */
 @media (max-width: 768px) {
-  .header-columns {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1.5rem;
-    padding: 1rem;
-    position: static;
+  .header {
+    padding: 0.5rem;
   }
 
-  .info-column {
-    max-width: 100%;
-    align-items: flex-start;
-    text-align: left;
+  .main-content-block {
+    margin-right: 0;
+    margin-bottom: 1rem;
+    padding: 1rem;
   }
 
   .test-name {
-    font-size: 1.75rem;
-    text-align: left;
+    font-size: 1.1rem;
   }
 
   .test-date {
-    font-size: 0.85rem;
-    text-align: left;
-  }
-
-  .prompt-label {
-    text-align: left;
+    font-size: 0.75rem;
   }
 
   .prompt-text {
-    font-size: 0.95rem;
-    text-align: left;
+    font-size: 0.8rem;
   }
 
-  .score-column {
+  .score-block {
     position: static;
-    align-self: center;
-    right: auto;
-    top: auto;
+    display: flex;
+    justify-content: center;
   }
 
   .score-display {
-    padding: 0.875rem 1.25rem;
+    padding: 0.75rem 1rem;
   }
 
   .score-number {
-    font-size: 2.25rem;
+    font-size: 1.75rem;
   }
 
   .score-label {
-    font-size: 1.25rem;
+    font-size: 1rem;
   }
 }
 
 /* Tablet adjustments */
 @media (max-width: 1024px) and (min-width: 769px) {
-  .header-columns {
-    padding: 1.25rem 1.5rem;
-    gap: 2.5rem;
+  .header {
+    padding: 0.75rem;
   }
 
-  .info-column {
-    max-width: calc(100% - 180px);
+  .main-content-block {
+    margin-right: 110px;
+    padding: 1rem 1.25rem;
   }
 
   .test-name {
-    font-size: 1.875rem;
+    font-size: 1.2rem;
   }
 
-  .score-column {
-    right: 1.5rem;
-    top: 1.25rem;
+  .score-block {
+    top: 0.75rem;
+    right: 0.75rem;
   }
 
   .score-number {
-    font-size: 2.375rem;
+    font-size: 1.875rem;
   }
 
   .score-label {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 }
 
@@ -262,17 +275,6 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  text-align: left;
-}
-
-.test-name {
-  font-size: 2.5rem;
-  font-weight: 700;
-  font-family: 'Source Serif Pro', serif;
-  color: white;
-  margin: 0 0 0.25rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  line-height: 1.1;
   text-align: left;
 }
 
@@ -289,34 +291,6 @@
 .separator {
   color: rgba(255, 255, 255, 0.5);
   font-weight: 300;
-}
-
-.score-display {
-  display: flex;
-  align-items: baseline;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  flex-shrink: 0;
-  align-self: flex-start;
-}
-
-.score-number {
-  font-size: 3.75rem;
-  font-weight: 800;
-  color: white;
-  line-height: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.score-label {
-  font-size: 1.9rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
-  margin-left: 0.25rem;
 }
 
 .prompt-section {
@@ -343,7 +317,6 @@
 
 .prompt-text {
   font-size: 1.05rem;
-  font-style: italic;
   color: white;
   line-height: 1.4;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);

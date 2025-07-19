@@ -84,9 +84,8 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       <div className="professional-report-content">
         {/* Header */}
         <div className="header">
-          {/* Two-column layout: Info column + Score column */}
-          <div className="header-columns">
-            {/* Left Column: Test info, date, prompt */}
+          {/* Main content block - left column only */}
+          <div className="main-content-block">
             <div className="info-column">
               <div className="test-name">{evaluationData.rubric?.name || 'Essay Evaluation'}</div>
               <div className="test-date">
@@ -99,13 +98,13 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Right Column: Score */}
-            <div className="score-column">
-              <div className="score-display">
-                <div className="score-number">{reportContent.score}</div>
-                <div className="score-label">/ 5</div>
-              </div>
+          {/* Separate score block - completely independent */}
+          <div className="score-block">
+            <div className="score-display">
+              <div className="score-number">{reportContent.score}</div>
+              <div className="score-label">/ 5</div>
             </div>
           </div>
         </div>
