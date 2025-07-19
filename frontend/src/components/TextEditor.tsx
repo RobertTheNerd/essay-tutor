@@ -74,11 +74,6 @@ export default function TextEditor({
               lineHeight: '1.7',
             }}
           />
-
-          {/* Focus indicator */}
-          {essayText.trim() && (
-            <div className="absolute bottom-3 right-3 w-2 h-2 bg-green-500 rounded-full"></div>
-          )}
         </div>
       </div>
     </div>

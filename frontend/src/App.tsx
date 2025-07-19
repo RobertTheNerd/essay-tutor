@@ -311,16 +311,6 @@ function App() {
                   </div>
                 </div>
               </div>
-
-              {/* Enhanced positive feedback - More compact */}
-              {essayText.trim() && !isEvaluating && inputMethod === 'text' && (
-                <div className="text-center py-3">
-                  <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-sm text-green-700">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                    Essay ready for AI analysis
-                  </div>
-                </div>
-              )}
             </div>
           </>
         )}
