@@ -75,101 +75,141 @@
   font-weight: 400;
 }
 
-/* New organized header layout */
-.title-score-section {
+/* Clean two-column header layout */
+.header-columns {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
   gap: 2rem;
-  min-height: 80px;
-  padding: 0 2rem;
+  padding: 1.5rem 2rem;
+}
+
+.info-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.test-name {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'Source Serif Pro', serif;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1.2;
+}
+
+.test-date {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  margin: 0;
+}
+
+.prompt-text {
+  font-size: 1rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.4;
+  margin: 0.25rem 0 0 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.score-column {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.score-display {
+  display: flex;
+  align-items: baseline;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.score-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.score-label {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin-left: 0.2rem;
 }
 
 /* Mobile responsive design */
 @media (max-width: 768px) {
-  .title-score-section {
+  .header-columns {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: 1rem;
-    min-height: auto;
-    margin-bottom: 0.75rem;
+    padding: 1rem;
     text-align: center;
-    padding: 0 1rem;
   }
 
-  .test-info {
-    width: 100%;
+  .info-column {
+    align-items: center;
     text-align: center;
   }
 
   .test-name {
-    font-size: 2rem !important;
-    margin-bottom: 0.25rem !important;
+    font-size: 1.75rem;
   }
 
-  .metadata-inline {
-    justify-content: center;
+  .test-date {
     font-size: 0.85rem;
   }
 
+  .prompt-text {
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .score-column {
+    align-self: center;
+  }
+
   .score-display {
-    padding: 1rem 1.5rem !important;
+    padding: 0.875rem 1.25rem;
   }
 
   .score-number {
-    font-size: 3rem !important;
+    font-size: 2.25rem;
   }
 
   .score-label {
-    font-size: 1.5rem !important;
-  }
-
-  .prompt-section {
-    max-width: 95% !important;
-    margin-top: 0.75rem;
-    margin-left: 0 !important;
-  }
-
-  .prompt-label {
-    padding: 0.75rem 1.5rem 0.25rem 1.5rem !important;
-  }
-
-  .prompt-text {
-    font-size: 0.95rem !important;
-    line-height: 1.3 !important;
-    padding: 0 1.5rem 1rem 1.5rem !important;
+    font-size: 1.25rem;
   }
 }
 
 /* Tablet adjustments */
 @media (max-width: 1024px) and (min-width: 769px) {
-  .title-score-section {
-    gap: 1.5rem;
-    margin-bottom: 0.875rem;
-    padding: 0 1.5rem;
-    min-height: 70px;
+  .header-columns {
+    padding: 1.25rem 1.5rem;
   }
 
   .test-name {
-    font-size: 2.25rem;
-  }
-
-  .score-display {
-    padding: 1.25rem 1.75rem;
+    font-size: 1.875rem;
   }
 
   .score-number {
-    font-size: 3.5rem;
+    font-size: 2.375rem;
   }
 
   .score-label {
-    font-size: 1.75rem;
-  }
-
-  .prompt-section {
-    max-width: 90%;
-    margin-left: 0;
+    font-size: 1.3rem;
   }
 }
 

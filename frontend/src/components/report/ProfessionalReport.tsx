@@ -84,35 +84,25 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       <div className="professional-report-content">
         {/* Header */}
         <div className="header">
-          {/* Main Title and Score Section */}
-          <div className="title-score-section">
-            <div className="test-info">
-              <h1 className="test-name">{evaluationData.rubric?.name || 'Essay Evaluation'}</h1>
-              <div className="metadata-inline">
-                <span className="date-info">
-                  {studentInfo?.date || new Date().toLocaleDateString()}
-                </span>
-                {studentInfo?.name && (
-                  <>
-                    <span className="separator">•</span>
-                    <span className="student-info">{studentInfo.name}</span>
-                  </>
-                )}
+          {/* Two-column layout: Info column + Score column */}
+          <div className="header-columns">
+            {/* Left Column: Test info, date, prompt */}
+            <div className="info-column">
+              <div className="test-name">{evaluationData.rubric?.name || 'Essay Evaluation'}</div>
+              <div className="test-date">
+                {studentInfo?.date || new Date().toLocaleDateString()}
+              </div>
+              {prompt && <div className="prompt-text">{prompt}</div>}
+            </div>
+
+            {/* Right Column: Score */}
+            <div className="score-column">
+              <div className="score-display">
+                <div className="score-number">{reportContent.score}</div>
+                <div className="score-label">/ 5</div>
               </div>
             </div>
-            <div className="score-display">
-              <div className="score-number">{reportContent.score}</div>
-              <div className="score-label">/ 5</div>
-            </div>
           </div>
-
-          {/* Prompt Section */}
-          {prompt && (
-            <div className="prompt-section">
-              <div className="prompt-label">Prompt</div>
-              <div className="prompt-text">{prompt}</div>
-            </div>
-          )}
         </div>
 
         {/* Legend */}
