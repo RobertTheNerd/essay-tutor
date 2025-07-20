@@ -25,7 +25,6 @@ export interface EvaluationResponse {
       confidence: number
     }
   }
-  annotatedText?: AnnotatedText
   error?: string
 }
 
@@ -61,26 +60,11 @@ export interface ParagraphFeedback {
   priority: 'high' | 'medium' | 'low'
 }
 
-export interface AnnotatedText {
-  segments: TextSegment[]
-  annotations: AnnotationMarker[]
-  feedbackBlocks: FeedbackBlock[]
-  legend: CategoryLegend[]
-}
-
-export interface TextSegment {
-  text: string
-  startIndex: number
-  endIndex: number
-  annotations: string[] // Array of annotation IDs
-  isAnnotated: boolean
-}
-
 export interface CategoryLegend {
   id: string
   name: string
   color: string
-  description: string
+  description?: string
 }
 
 export interface CategoryColors {

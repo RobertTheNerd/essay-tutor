@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import { AnnotationProcessor } from './AnnotationProcessor'
 import './professional-report-styles.css'
 

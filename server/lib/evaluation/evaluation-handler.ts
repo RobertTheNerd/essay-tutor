@@ -6,7 +6,6 @@ import type {
   PlatformResponse,
   StructuredEssay,
 } from "../types";
-import { AnnotationGenerator } from "./annotation-generator";
 import { EvaluationEngine } from "./evaluation-engine";
 import { iseeUpperLevelRubric } from "./rubrics/isee/upper-level";
 
@@ -46,7 +45,6 @@ export interface EvaluationResponse {
       confidence: number;
     };
   };
-  annotatedText?: any;
   error?: string;
 }
 
@@ -149,18 +147,10 @@ export async function handleEvaluation(
     // Perform evaluation
     const evaluation = await evaluationEngine.evaluateEssay(structuredEssay);
 
-    // Generate annotated text for frontend consumption
-    const annotationGenerator = new AnnotationGenerator();
-    const annotatedText = annotationGenerator.generateAnnotatedText(
-      structuredEssay,
-      evaluation
-    );
-
     // Prepare clean response
     const response: EvaluationResponse = {
       success: true,
       evaluation,
-      annotatedText,
     };
 
     return res.status(200).json(response);
