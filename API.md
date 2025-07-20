@@ -185,7 +185,7 @@ Full essay evaluation with rubric selection.
     "rubric": {
       "family": "isee",
       "level": "upper",
-      "name": "ISEE Upper Level (Grades 7-8)"
+      "name": "ISEE Upper Level"
     },
     "scores": {
       "grammar": 4,

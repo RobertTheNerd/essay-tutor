@@ -15,7 +15,7 @@ export default function FileUpload({ onUpload, maxFiles = 10, initialFiles = [],
   const [selectedFiles, setSelectedFiles] = useState<File[]>(initialFiles)
   const [isCarouselOpen, setIsCarouselOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(true)
 
   // Update selectedFiles when initialFiles changes and auto-expand if files exist
   useEffect(() => {
