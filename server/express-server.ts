@@ -5,11 +5,7 @@ dotenv.config({ path: ".env.local" });
 // Express.js server for self-hosted deployment
 // Uses shared app factory to eliminate code duplication
 
-import path from "path";
 import { createApp } from "./lib/app-factory";
-
-// Define __dirname for ES modules
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const PORT = process.env.PORT || 3001;
 
