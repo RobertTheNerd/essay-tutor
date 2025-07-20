@@ -33,13 +33,13 @@ export default function TextEditor({
     if (onPromptChange) {
       onPromptChange(promptText)
     }
-  }, [promptText, onPromptChange])
+  }, [promptText]) // Remove onPromptChange from deps to prevent circular updates
 
   useEffect(() => {
     if (onEssayChange) {
       onEssayChange(essayText)
     }
-  }, [essayText, onEssayChange])
+  }, [essayText]) // Remove onEssayChange from deps to prevent circular updates
 
   return (
     <div className="space-y-5">

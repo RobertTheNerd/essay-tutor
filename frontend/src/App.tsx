@@ -1,17 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import FileUpload from './components/FileUpload'
-import ProcessingReview from './components/ProcessingReview'
 import TextEditor from './components/TextEditor'
 import EvaluationResults from './components/evaluation/EvaluationResults'
 import { evaluationService } from './services/evaluationService'
 import type { EvaluationResponse } from './types/evaluation'
-export type InputMethod = 'text' | 'images'
-
 function App() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [processedFiles, setProcessedFiles] = useState<File[]>([])
-  const [inputMethod, setInputMethod] = useState<InputMethod>('text')
-  const reviewSectionRef = useRef<HTMLDivElement>(null)
   const [promptText, setPromptText] = useState<string>('')
   const [essayText, setEssayText] = useState<string>('')
   const [evaluationResult, setEvaluationResult] = useState<EvaluationResponse | null>(null)
@@ -40,7 +35,7 @@ function App() {
     message?: string
     error?: string
   } | null>(null)
-  const [currentView, setCurrentView] = useState<'editor' | 'review' | 'results'>('editor')
+  const [currentView, setCurrentView] = useState<'editor' | 'results'>('editor')
 
   // Clear processing results when files change
   useEffect(() => {
@@ -56,19 +51,6 @@ function App() {
     }
   }, [uploadedFiles, processedFiles, processingResult])
 
-  // Scroll to review section when it appears
-  useEffect(() => {
-    if (processingResult && processingResult.essay?.writingPrompt?.source === 'summarized' && reviewSectionRef.current) {
-      // Small delay to ensure the element is rendered
-      setTimeout(() => {
-        reviewSectionRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start',
-          inline: 'nearest'
-        })
-      }, 100)
-    }
-  }, [processingResult])
 
   const handleFileUpload = (files: File[]) => {
     setUploadedFiles(files)
@@ -82,12 +64,6 @@ function App() {
     setEssayText(essay)
   }
 
-  const handleMethodChange = (method: InputMethod) => {
-    setInputMethod(method)
-    // Simply switch tabs without clearing any data
-    // Users can manually clear if they want to start fresh
-    setCurrentView('editor')
-  }
 
   const handleEvaluateEssay = async () => {
     if (!essayText.trim()) {
@@ -148,33 +124,12 @@ function App() {
       setProcessingResult(result)
       setProcessedFiles([...uploadedFiles]) // Store the files that were processed
 
-      // Check if we should auto-evaluate or show review
-      if (result.essay?.writingPrompt?.source === 'extracted') {
-        // Auto-evaluate: high confidence prompt extraction
-        setPromptText(result.essay.writingPrompt.text)
-        setEssayText(result.essay.studentEssay.fullText)
-        // Call evaluation directly here since we have the text set
-        setIsEvaluating(true)
-        try {
-          const evalResult = await evaluationService.evaluateEssay({
-            text: result.essay.studentEssay.fullText,
-            prompt: result.essay.writingPrompt.text,
-            rubric: {
-              family: 'isee',
-              level: 'upper',
-            },
-          })
-          setEvaluationResult(evalResult)
-          setCurrentView('results')
-        } catch (error) {
-          console.error('Auto-evaluation failed:', error)
-          alert(`Auto-evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
-        } finally {
-          setIsEvaluating(false)
-        }
-      } else {
-        // Show review: prompt was summarized/inferred
-        setCurrentView('review')
+      // Always overwrite text fields with extracted content
+      if (result.essay) {
+        setPromptText(result.essay.writingPrompt?.text || '')
+        setEssayText(result.essay.studentEssay?.fullText || '')
+        // Clear any previous evaluation since content has changed
+        setEvaluationResult(null)
       }
     } catch (error) {
       console.error('Image processing failed:', error)
@@ -184,36 +139,6 @@ function App() {
     }
   }
 
-  const handleReviewConfirm = async (prompt: string, essay: string) => {
-    setPromptText(prompt)
-    setEssayText(essay)
-    
-    // Evaluate immediately after review confirmation
-    setIsEvaluating(true)
-    try {
-      const result = await evaluationService.evaluateEssay({
-        text: essay,
-        prompt: prompt,
-        rubric: {
-          family: 'isee',
-          level: 'upper',
-        },
-      })
-      setEvaluationResult(result)
-      setCurrentView('results')
-    } catch (error) {
-      console.error('Evaluation failed:', error)
-      alert(`Evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
-      setCurrentView('editor')
-    } finally {
-      setIsEvaluating(false)
-    }
-  }
-
-  const handleReviewCancel = () => {
-    setProcessingResult(null)
-    setProcessedFiles([])
-  }
 
   const handlePrintReport = () => {
     window.print()
@@ -246,157 +171,83 @@ function App() {
 
             {/* Main Interface Container - Minimal top spacing */}
             <div className="max-w-5xl mx-auto px-6">
-              {/* Modern Tab Design - Close to header */}
-              <div className="flex justify-center mb-4">
-                <div className="bg-gray-100 p-1 rounded-xl inline-flex">
-                  <button
-                    onClick={() => handleMethodChange('text')}
-                    className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                      inputMethod === 'text'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Write
-                  </button>
-                  <button
-                    onClick={() => handleMethodChange('images')}
-                    className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                      inputMethod === 'images'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Upload
-                  </button>
+              {/* Image Upload Section - Optional helper at top */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
+                <div className="p-6">
+                  <FileUpload 
+                    onUpload={handleFileUpload} 
+                    maxFiles={10} 
+                    initialFiles={uploadedFiles}
+                    onProcess={handleProcessImages}
+                    isProcessing={isProcessingImages}
+                  />
                 </div>
               </div>
 
-              {/* Main Content Card - Reduced padding */}
+              {/* Text Input Section - Main content */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
-                {inputMethod === 'text' ? (
-                  <div className="p-6">
-                    <TextEditor
-                      onPromptChange={handlePromptChange}
-                      onEssayChange={handleEssayChange}
-                      promptPlaceholder="Enter writing prompt (optional)..."
-                      essayPlaceholder="Start writing your essay here..."
-                      initialPrompt={promptText}
-                      initialEssay={essayText}
-                    />
-                  </div>
-                ) : (
-                  <div className="p-6">
-                    <FileUpload 
-                      onUpload={handleFileUpload} 
-                      maxFiles={10} 
-                      initialFiles={uploadedFiles}
-                    />
-                  </div>
-                )}
+                <div className="p-6">
+                  <TextEditor
+                    onPromptChange={handlePromptChange}
+                    onEssayChange={handleEssayChange}
+                    promptPlaceholder="Enter writing prompt (optional)..."
+                    essayPlaceholder="Write your essay here..."
+                    initialPrompt={promptText}
+                    initialEssay={essayText}
+                  />
+                </div>
 
-                {/* Enhanced Action Bar - Reduced padding */}
+                {/* Action Bar - Unified for all input methods */}
                 <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                      {inputMethod === 'text' ? (
-                        <>
-                          {essayText.trim() ? (
-                            <span className="flex items-center gap-2">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              Ready for analysis
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-2">
-                              <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              Start writing to continue
-                            </span>
-                          )}
-                        </>
+                      {essayText.trim() ? (
+                        <span className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          Ready for analysis
+                        </span>
                       ) : (
-                        <>
-                          {uploadedFiles.length > 0 ? (
-                            <span className="flex items-center gap-2">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                              {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''}{' '}
-                              ready
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-2">
-                              <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              Upload files to continue
-                            </span>
-                          )}
-                        </>
+                        <span className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                          Enter essay text to continue
+                        </span>
                       )}
                     </div>
 
-                    <div>
-                      {inputMethod === 'text' ? (
+                    <div className="flex items-center gap-3">
+                      {/* Show View Report button if we have a previous evaluation */}
+                      {evaluationResult && (
                         <button
-                          onClick={handleEvaluateEssay}
-                          disabled={isEvaluating || !essayText.trim()}
-                          className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
-                            isEvaluating || !essayText.trim()
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transform hover:scale-105'
-                          }`}
+                          onClick={() => setCurrentView('results')}
+                          className="px-4 py-2.5 rounded-lg font-medium transition-all duration-200 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
                         >
-                          {isEvaluating ? (
-                            <span className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-400 rounded-full animate-spin"></div>
-                              Analyzing...
-                            </span>
-                          ) : (
-                            'Get feedback'
-                          )}
+                          📄 View Report
                         </button>
-                      ) : (
-                        // Show different content based on processing state
-                        processingResult && processingResult.essay?.writingPrompt?.source === 'summarized' ? (
-                          <div className="flex items-center gap-2 text-green-600 font-medium">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            ✅ Images processed - review below
-                          </div>
-                        ) : (
-                          <button
-                            onClick={handleProcessImages}
-                            disabled={isProcessingImages || uploadedFiles.length === 0}
-                            className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
-                              isProcessingImages || uploadedFiles.length === 0
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transform hover:scale-105'
-                            }`}
-                          >
-                            {isProcessingImages ? (
-                              <span className="flex items-center gap-2">
-                                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-400 rounded-full animate-spin"></div>
-                                Processing...
-                              </span>
-                            ) : (
-                              'Process images'
-                            )}
-                          </button>
-                        )
                       )}
+                      
+                      <button
+                        onClick={handleEvaluateEssay}
+                        disabled={isEvaluating || !essayText.trim()}
+                        className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                          isEvaluating || !essayText.trim()
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transform hover:scale-105'
+                        }`}
+                      >
+                        {isEvaluating ? (
+                          <span className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-400 rounded-full animate-spin"></div>
+                            Analyzing...
+                          </span>
+                        ) : (
+                          evaluationResult ? 'Re-evaluate' : 'Get feedback'
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Processing Review Section - Show below complete upload interface */}
-              {inputMethod === 'images' && processingResult && processingResult.essay?.writingPrompt?.source === 'summarized' && (
-                <div ref={reviewSectionRef} className="max-w-5xl mx-auto px-6 mt-6">
-                  <ProcessingReview
-                    extractedPrompt={processingResult.essay?.writingPrompt?.text || ''}
-                    extractedEssay={processingResult.essay?.studentEssay?.fullText || ''}
-                    promptSource={processingResult.essay?.writingPrompt?.source || 'summarized'}
-                    onConfirm={handleReviewConfirm}
-                    onCancel={handleReviewCancel}
-                    isEvaluating={isEvaluating}
-                  />
-                </div>
-              )}
             </div>
           </>
         )}
