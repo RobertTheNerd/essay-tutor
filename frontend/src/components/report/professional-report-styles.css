@@ -413,7 +413,6 @@
 
 .essay-container {
   width: 100%;
-  max-width: 8in;
   margin: 0 auto;
   background: var(--essay-bg);
   border-radius: 12px;
@@ -1110,5 +1109,67 @@
   * {
     print-color-adjust: exact !important;
     -webkit-print-color-adjust: exact !important;
+  }
+}
+
+/* Print-specific overrides for responsive breakpoints */
+/* Ensure score stays positioned correctly in print regardless of viewport width */
+@media print and (max-width: 768px) {
+  .score-block {
+    position: absolute !important;
+    top: 0.2rem !important;
+    right: 0.2rem !important;
+    display: block !important;
+  }
+  
+  .main-content-block {
+    margin-right: 70px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+  
+  .info-column {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    flex-direction: row !important;
+  }
+  
+  .test-name {
+    font-size: 12px !important;
+    margin: 0 !important;
+  }
+  
+  .test-date {
+    font-size: 9px !important;
+    margin: 0 !important;
+  }
+  
+  .score-display {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    border-radius: 3px !important;
+    padding: 0.3rem 0.5rem !important;
+    min-width: 50px !important;
+    box-shadow: none !important;
+  }
+}
+
+@media print and (max-width: 1024px) and (min-width: 769px) {
+  .score-block {
+    position: absolute !important;
+    top: 0.2rem !important;
+    right: 0.2rem !important;
+  }
+  
+  .main-content-block {
+    margin-right: 70px !important;
+  }
+  
+  .info-column {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
   }
 }
