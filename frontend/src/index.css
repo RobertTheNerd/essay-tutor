@@ -129,3 +129,10 @@
     display: none;
   }
 }
+
+/* Print styles */
+@media print {
+  body, .result-container {
+    background-color: white;
+  }
+}
