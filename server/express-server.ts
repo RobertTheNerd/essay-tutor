@@ -13,11 +13,8 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const PORT = process.env.PORT || 3001;
 
-// Create Express app using shared factory
-const frontendPath = path.join(__dirname, "../frontend/dist");
 const app = createApp({ 
   isServerless: false,
-  staticPath: frontendPath 
 });
 
 // Start server

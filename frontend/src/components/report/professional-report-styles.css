@@ -918,7 +918,6 @@
   /* Compact essay container */
   .essay-container {
     box-shadow: none !important;
-    border: 1px solid #666 !important;
     border-radius: 4px !important;
     padding: 0.6rem !important;
     margin-bottom: 0.5rem !important;
@@ -936,11 +935,8 @@
     margin-bottom: 0.2in !important;
     padding: 0.1in !important;
     border-radius: 0 !important;
-    border-left: 1px solid #666 !important;
     box-shadow: none !important;
     background: white !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
   .essay-text {
@@ -1124,7 +1120,6 @@
   
   .main-content-block {
     margin-right: 70px !important;
-    display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
   }
@@ -1133,7 +1128,7 @@
     display: flex !important;
     align-items: center !important;
     gap: 0.3rem !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
   }
   
   .test-name {

@@ -14,11 +14,10 @@ import { adaptExpressRequest, ResponseAdapter } from "./types"
 
 export interface AppOptions {
   isServerless?: boolean
-  staticPath?: string
 }
 
 export function createApp(options: AppOptions = {}) {
-  const { isServerless = false, staticPath } = options
+  const { isServerless = false } = options
   const app = express()
 
   // Middleware
@@ -46,11 +45,6 @@ export function createApp(options: AppOptions = {}) {
       }
     },
   })
-
-  // Serve static files from frontend (if path provided)
-  if (staticPath) {
-    app.use(express.static(staticPath))
-  }
 
   // API Routes
   app.get("/api/hello", async (req, res) => {
@@ -98,13 +92,6 @@ export function createApp(options: AppOptions = {}) {
       version: "2.0.0",
     })
   })
-
-  // Serve frontend for all other routes (SPA fallback) - only if static path provided
-  if (staticPath) {
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(staticPath, "index.html"))
-    })
-  }
 
   // Error handling middleware
   app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
