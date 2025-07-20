@@ -760,31 +760,295 @@
   color: #059669;
 }
 
-/* Print optimization */
+/* Print optimization - Simple, clean approach */
 @media print {
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+  
   .professional-report-container {
     background: white !important;
     color: black !important;
-    font-size: 12px !important;
+    font-size: 10px !important;
+    line-height: 1.4 !important;
     padding: 0 !important;
     margin: 0 !important;
+    min-height: auto !important;
   }
 
-  .header,
-  .legend,
-  .essay-container,
+  /* Hide screen-only elements */
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Hide footer buttons and other UI elements */
+  .bg-white.rounded-2xl.shadow-sm.border.border-gray-100.p-8,
+  .bg-white.rounded-2xl.shadow-sm.border.border-gray-100.px-6.py-5 {
+    display: none !important;
+  }
+
+  /* Hide any buttons in print */
+  button {
+    display: none !important;
+  }
+
+  /* Hide navigation and UI elements */
+  .space-y-6.pt-8 > .bg-white.rounded-2xl:first-child,
+  .space-y-6.pt-8 > .bg-white.rounded-2xl:last-child {
+    display: none !important;
+  }
+
+  /* Plain professional header */
+  .header {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #333 !important;
+    border-radius: 0 !important;
+    margin-bottom: 0.3rem !important;
+    padding: 0.4rem !important;
+    position: relative !important;
+  }
+
+  .header::before {
+    display: none !important;
+  }
+
+  .main-content-block {
+    background: white !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin-right: 50px !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .test-name {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: black !important;
+    margin: 0 !important;
+    text-shadow: none !important;
+    text-align: left !important;
+  }
+
+  .test-date {
+    font-size: 9px !important;
+    color: #666 !important;
+    margin: 0 !important;
+    text-align: left !important;
+  }
+
+  .prompt-section {
+    background: #f8f8f8 !important;
+    border: 1px solid #ccc !important;
+    border-radius: 0 !important;
+    margin-top: 0.2rem !important;
+    padding: 0.3rem !important;
+  }
+
+  .prompt-label {
+    font-size: 8px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    text-transform: uppercase !important;
+    margin: 0 0 0.1rem 0 !important;
+  }
+
+  .prompt-text {
+    font-size: 9px !important;
+    color: black !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+    font-style: italic !important;
+    text-shadow: none !important;
+  }
+
+  .score-block {
+    top: 0.4rem !important;
+    right: 0.4rem !important;
+  }
+
+  .score-display {
+    background: white !important;
+    border: 2px solid #333 !important;
+    border-radius: 0 !important;
+    padding: 0.3rem 0.5rem !important;
+    min-width: 50px !important;
+    box-shadow: none !important;
+  }
+
+  .score-display::before {
+    display: none !important;
+  }
+
+  .score-number {
+    font-size: 14px !important;
+    color: black !important;
+    text-shadow: none !important;
+  }
+
+  .score-label {
+    font-size: 9px !important;
+    color: #666 !important;
+    margin-left: 0.1rem !important;
+    margin-bottom: 0.1rem !important;
+  }
+
+  /* Compact legend */
+  .legend {
+    box-shadow: none !important;
+    border: 1px solid #666 !important;
+    border-radius: 3px !important;
+    padding: 0.4rem !important;
+    margin-bottom: 0.5rem !important;
+    gap: 0.3rem !important;
+    font-size: 7px !important;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
+  }
+
+  .legend-item {
+    gap: 0.2rem !important;
+  }
+
+  .legend-color {
+    width: 8px !important;
+    height: 6px !important;
+  }
+
+  /* Compact essay container */
+  .essay-container {
+    box-shadow: none !important;
+    border: 1px solid #666 !important;
+    border-radius: 4px !important;
+    padding: 0.6rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .essay-title {
+    font-size: 12px !important;
+    margin-bottom: 0.5rem !important;
+    padding-bottom: 0.3rem !important;
+    border-bottom: 1px solid #666 !important;
+  }
+
+  /* Simple text block spacing */
+  .text-block {
+    margin-bottom: 0.2in !important;
+    padding: 0.1in !important;
+    border-radius: 0 !important;
+    border-left: 1px solid #666 !important;
+    box-shadow: none !important;
+    background: white !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .essay-text {
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+  }
+
+  .text-line {
+    margin-bottom: 0.1rem !important;
+    padding: 0 !important;
+  }
+
+  /* Simple annotation spacing */
+  .annotation-section {
+    margin-bottom: 0.1in !important;
+    gap: 0.05in !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .annotation-block {
+    box-shadow: none !important;
+    border: 1px solid #666 !important;
+    border-radius: 3px !important;
+    padding: 0.4rem !important;
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+    min-width: 180px !important;
+  }
+
+  .annotation-block * {
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+  }
+
+  .annotation-header {
+    font-size: 7px !important;
+    margin-bottom: 0.3rem !important;
+    padding-bottom: 0.2rem !important;
+  }
+
+  .original-text,
+  .suggested-text {
+    font-size: 8px !important;
+    padding: 2px 4px !important;
+    margin: 1px 0 !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Compact annotation markers */
+  .annotation-marker {
+    font-size: 6px !important;
+    padding: 1px 3px !important;
+    margin-left: 1px !important;
+  }
+
+  /* Simple paragraph feedback spacing */
+  .paragraph-feedback {
+    margin-bottom: 0.1in !important;
+    padding: 0.05in !important;
+    border-radius: 0 !important;
+    border-left: 1px solid !important;
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Compact score summary */
   .score-summary {
     box-shadow: none !important;
-    border: 1px solid #ccc !important;
+    border: 1px solid #666 !important;
+    border-radius: 4px !important;
+    padding: 0.6rem !important;
+    margin-top: 0.5rem !important;
   }
 
+  .score-summary h3 {
+    margin: 0 0 0.4rem 0 !important;
+    font-size: 10px !important;
+  }
+
+  .score-grid {
+    gap: 0.2rem !important;
+    font-size: 8px !important;
+  }
+
+  .score-item {
+    padding: 0.3rem 0 !important;
+    border-bottom: 1px solid #ccc !important;
+  }
+
+  .score-badge {
+    font-size: 7px !important;
+    padding: 0.1rem 0.4rem !important;
+    min-width: 30px !important;
+  }
+
+  .average-score {
+    margin-top: 0.4rem !important;
+    padding-top: 0.4rem !important;
+    border-top: 1px solid #666 !important;
+    font-size: 9px !important;
+  }
+
+  /* Ensure color preservation */
   .annotation-marker,
   .suggested-text,
-  .original-text {
-    print-color-adjust: exact !important;
-    -webkit-print-color-adjust: exact !important;
-  }
-
+  .original-text,
   .grammar-mark,
   .word-mark,
   .structure-mark,
@@ -795,23 +1059,56 @@
     -webkit-print-color-adjust: exact !important;
   }
 
-  .text-block {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .annotation-section {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
+  /* Force all colors to print */
   * {
     print-color-adjust: exact !important;
     -webkit-print-color-adjust: exact !important;
   }
 
+  /* Optimize page layout */
   @page {
-    margin: 0.75in;
-    size: letter;
+    margin: 0.5in !important;
+    size: letter !important;
+  }
+
+  /* Minimize spacing between sections for continuity */
+  .professional-report-content > * {
+    margin-bottom: 0.1rem !important;
+  }
+
+  /* Remove extra spacing from essay container */
+  .essay-container {
+    margin-bottom: 0.1rem !important;
+  }
+
+  /* Minimize spacing between all sections - force override */
+  .professional-report-container .header,
+  .professional-report-container .legend,
+  .professional-report-container .essay-container,
+  .professional-report-container .score-summary,
+  .header,
+  .legend,
+  .essay-container,
+  .score-summary {
+    margin-top: 0 !important;
+    margin-bottom: 0.1rem !important;
+  }
+
+  /* Force override for essay container specifically */
+  .professional-report-container .essay-container {
+    padding: 0.6rem !important;
+    margin-bottom: 0.1rem !important;
+  }
+
+  /* Optimize page layout */
+  @page {
+    margin: 0.5in !important;
+    size: letter !important;
+  }
+
+  /* Force all colors to print */
+  * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }

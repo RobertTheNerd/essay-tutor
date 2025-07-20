@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import { AnnotationProcessor } from './AnnotationProcessor'
 import './professional-report-styles.css'
 
@@ -77,6 +77,7 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       feedback: evaluationData.feedback || [],
     }
   }, [evaluationData, essayText, annotationProcessor])
+
 
   return (
     <div className="professional-report-container">

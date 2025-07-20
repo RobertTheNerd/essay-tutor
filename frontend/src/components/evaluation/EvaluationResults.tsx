@@ -33,6 +33,15 @@ const EvaluationResults = ({
 
   const evalData = evaluation.evaluation
 
+  // Simple print function
+  const handlePrint = () => {
+    if (onPrint) {
+      onPrint();
+    } else {
+      window.print();
+    }
+  };
+
   // Additional safety check
   if (!evalData || !evalData.overall) {
     return (
@@ -61,7 +70,7 @@ const EvaluationResults = ({
             <div className="flex gap-2">
               {onPrint && (
                 <button
-                  onClick={onPrint}
+                  onClick={handlePrint}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl transition-colors duration-200 flex items-center gap-2 text-sm font-medium"
                 >
                   🖨️ Print Report
@@ -94,7 +103,7 @@ const EvaluationResults = ({
         essayText={essayText}
         prompt={prompt}
         mode="screen"
-        onPrint={onPrint}
+        onPrint={handlePrint}
       />
 
       {/* Simplified Footer */}

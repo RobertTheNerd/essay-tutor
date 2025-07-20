@@ -19,6 +19,8 @@ tests/
 │   ├── test-enhanced-ux.js      # Enhanced UX flow comprehensive test
 │   ├── quick-ux-test.js         # Quick UX functionality test
 │   └── simple-test.js           # Simple functionality verification
+├── debug-print.js         # Print CSS spacing diagnostics
+├── print-test.js          # Automated print CSS testing
 ├── screenshots/           # Test output screenshots
 │   ├── test-failure-screenshot.png
 │   ├── final-state.png
@@ -66,6 +68,15 @@ node tests/puppeteer/debug-evaluation.js
 node tests/puppeteer/test-evaluation-workflow.js
 node tests/puppeteer/quick-test.js
 # ... etc
+```
+
+### Print Tests
+```bash
+# Debug print spacing issues
+npm run test:print-debug
+
+# Test CSS fixes for print layouts
+npm run test:print
 ```
 
 ## Test Dependencies
