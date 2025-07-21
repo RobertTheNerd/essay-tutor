@@ -106,29 +106,6 @@ const EvaluationResults = ({
         onPrint={handlePrint}
       />
 
-      {/* Simplified Footer */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <div className="text-center">
-          <div className="flex justify-center gap-4">
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl transition-colors duration-200 font-medium"
-              >
-                Evaluate Another Essay
-              </button>
-            )}
-            {onPrint && (
-              <button
-                onClick={onPrint}
-                className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl transition-colors duration-200 font-medium"
-              >
-                Save/Print Results
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
