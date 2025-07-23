@@ -926,6 +926,26 @@
   background: linear-gradient(135deg, #10b981, #059669);
 }
 
+/* 6+1 Trait Markers */
+.marker-conventions {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+.marker-word-choice {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+.marker-organization {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+.marker-ideas {
+  background: linear-gradient(135deg, #9333ea, #7c3aed);
+}
+.marker-voice {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+}
+.marker-fluency {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
 .annotation-section {
   margin-top: 1rem;
   margin-bottom: 1.5rem;
@@ -1057,6 +1077,49 @@
   background: rgba(240, 253, 250, 0.3);
 }
 .positive-block .annotation-header {
+  color: #059669;
+}
+
+/* 6+1 Trait Blocks */
+.conventions-block {
+  border-left: 3px solid #ef4444;
+}
+.conventions-block .annotation-header {
+  color: #dc2626;
+}
+
+.word-choice-block {
+  border-left: 3px solid #3b82f6;
+}
+.word-choice-block .annotation-header {
+  color: #2563eb;
+}
+
+.organization-block {
+  border-left: 3px solid #22c55e;
+}
+.organization-block .annotation-header {
+  color: #16a34a;
+}
+
+.ideas-block {
+  border-left: 3px solid #9333ea;
+}
+.ideas-block .annotation-header {
+  color: #7c3aed;
+}
+
+.voice-block {
+  border-left: 3px solid #f97316;
+}
+.voice-block .annotation-header {
+  color: #ea580c;
+}
+
+.fluency-block {
+  border-left: 3px solid #10b981;
+}
+.fluency-block .annotation-header {
   color: #059669;
 }
 

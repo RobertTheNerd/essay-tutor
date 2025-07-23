@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import FileUpload from './components/FileUpload'
 import TextEditor from './components/TextEditor'
 import EvaluationResults from './components/evaluation/EvaluationResults'
+import TestProfessionalReport from './components/TestProfessionalReport'
 import { evaluationService } from './services/evaluationService'
 import type { EvaluationResponse } from './types/evaluation'
 function App() {
@@ -35,7 +36,7 @@ function App() {
     message?: string
     error?: string
   } | null>(null)
-  const [currentView, setCurrentView] = useState<'editor' | 'results'>('editor')
+  const [currentView, setCurrentView] = useState<'editor' | 'results' | 'test'>('editor')
 
   // Clear processing results when files change
   useEffect(() => {
@@ -160,13 +161,33 @@ function App() {
             onClose={handleBackToEditor}
             onPrint={handlePrintReport}
           />
+        ) : currentView === 'test' ? (
+          <div>
+            <div className="mb-4 p-4 bg-white rounded-lg shadow-sm">
+              <button
+                onClick={() => setCurrentView('editor')}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              >
+                ← Back to Main App
+              </button>
+            </div>
+            <TestProfessionalReport />
+          </div>
         ) : (
           <>
             {/* Modern, Minimal Header - Ultra compact */}
-            <div className="text-center py-4">
+            <div className="text-center py-4 relative">
               <h1 className="text-5xl font-semibold text-gray-900 mb-4 tracking-tight">
                 Essay Tutor
               </h1>
+              {/* Development Test Button */}
+              <button
+                onClick={() => setCurrentView('test')}
+                className="absolute top-4 right-4 px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 border border-yellow-300"
+                title="View Professional Report Test Page"
+              >
+                🧪 Test Report
+              </button>
             </div>
 
             {/* Main Interface Container - Minimal top spacing */}

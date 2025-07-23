@@ -1,16 +1,12 @@
 import React, { useMemo } from 'react'
 import { AnnotationProcessor } from './AnnotationProcessor'
 import {
-  getPerformanceLevel,
-  getPerformanceLevelClass,
   getISEELevelFromRubric,
-  getLevelPerformanceExpectation,
-  getLevelCategoryDescription,
-  ISEE_LEVELS,
   type EvaluationData,
 } from '../../types/evaluation'
 import ISEELevelProgression from './ISEELevelProgression'
 import EnhancedPerformanceMeter from './EnhancedPerformanceMeter'
+import CategoryFeedbackSummary from './CategoryFeedbackSummary'
 import './professional-report-styles.css'
 
 interface StudentInfo {
@@ -132,9 +128,15 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
         
         {/* Enhanced Performance Meter */}
         <EnhancedPerformanceMeter 
-          score={reportContent.score}
+          score={typeof reportContent.score === 'string' ? parseFloat(reportContent.score) : reportContent.score}
           level={iseeLevel}
           className="mb-6"
+        />
+        {/* Category Feedback Summary */}
+        <CategoryFeedbackSummary 
+          categories={reportContent.categories}
+          iseeLevel={iseeLevel}
+          categoryFeedback={reportContent.categoryFeedback}
         />
 
         {/* Legend */}
@@ -225,44 +227,6 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
           })}
         </div>
 
-        {/* Category Feedback Summary */}
-        <div className="category-feedback-summary">
-          <h3>📝 Writing Assessment Feedback</h3>
-          <div className="category-feedback-grid">
-            {reportContent.categories.map(category => {
-              const levelCategoryDescription = getLevelCategoryDescription(iseeLevel, category.name)
-              const levelPerformanceExpectation = getLevelPerformanceExpectation(iseeLevel, category.score)
-              const customFeedback = (reportContent.categoryFeedback as { [key: string]: string })[category.key]
-              
-              const feedback = customFeedback || 
-                `${levelPerformanceExpectation} Focus area: ${levelCategoryDescription}.`
-              
-              return (
-                <div key={category.key} className="category-feedback-item">
-                  <div className="category-header">
-                    <h4>{category.name}</h4>
-                    <div className="category-level-info">
-                      <span className="level-focus-badge" style={{ 
-                        backgroundColor: `${ISEE_LEVELS[iseeLevel].color}20`,
-                        color: ISEE_LEVELS[iseeLevel].color,
-                        borderColor: `${ISEE_LEVELS[iseeLevel].color}40`
-                      }}>
-                        {ISEE_LEVELS[iseeLevel].grades}
-                      </span>
-                      <span className={`performance-badge ${getPerformanceLevelClass(category.score)}`}>
-                        {getPerformanceLevel(category.score)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="category-focus-description">
-                    <strong>Level Focus:</strong> {levelCategoryDescription}
-                  </div>
-                  <p className="category-feedback-text">{feedback}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
       </div>
     </div>
   )

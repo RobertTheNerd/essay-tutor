@@ -5,7 +5,7 @@
   "type": "commonjs",
   "main": "dist/express-server.js",
   "scripts": {
-    "dev": "tsx express-server.ts",
+    "dev": "tsx watch express-server.ts",
     "build": "tsc",
     "start": "node dist/express-server.js",
     "start:dev": "tsx express-server.ts"

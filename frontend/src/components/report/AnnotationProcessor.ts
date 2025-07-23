@@ -29,6 +29,7 @@ export interface AnnotationBlock {
 
 // Category color mappings for annotations
 export const ANNOTATION_COLORS = {
+  // Legacy naming (for backward compatibility)
   grammar: {
     background: 'grammar-mark',
     marker: 'marker-grammar',
@@ -65,6 +66,44 @@ export const ANNOTATION_COLORS = {
     block: 'positive-block',
     color: '#10b981',
   },
+  
+  // 6+1 Trait naming
+  conventions: {
+    background: 'conventions-mark',
+    marker: 'marker-conventions',
+    block: 'conventions-block',
+    color: '#ef4444',
+  },
+  wordChoice: {
+    background: 'word-choice-mark',
+    marker: 'marker-word-choice',
+    block: 'word-choice-block',
+    color: '#3b82f6',
+  },
+  organization: {
+    background: 'organization-mark',
+    marker: 'marker-organization',
+    block: 'organization-block',
+    color: '#22c55e',
+  },
+  ideas: {
+    background: 'ideas-mark',
+    marker: 'marker-ideas',
+    block: 'ideas-block',
+    color: '#9333ea',
+  },
+  voice: {
+    background: 'voice-mark',
+    marker: 'marker-voice',
+    block: 'voice-block',
+    color: '#f97316',
+  },
+  fluency: {
+    background: 'fluency-mark',
+    marker: 'marker-fluency',
+    block: 'fluency-block',
+    color: '#10b981',
+  },
 }
 
 export class AnnotationProcessor {
@@ -86,11 +125,64 @@ export class AnnotationProcessor {
   }
 
   /**
+   * Map specific annotation categories to broad categories for consistent marking
+   */
+  private mapToBroadCategory(category: string): string {
+    const categoryMapping: { [key: string]: string } = {
+      // Grammar & Mechanics
+      'grammar': 'grammar',
+      'spelling': 'grammar',
+      'punctuation': 'grammar',
+      'capitalization': 'grammar',
+      'sentence-structure': 'grammar',
+      'sentence-boundary': 'grammar',
+      'conventions': 'grammar',
+      
+      // Content & Development
+      'clarify-idea': 'development',
+      'add-support': 'development',
+      'stay-focused': 'development',
+      'strengthen-example': 'development',
+      'expand-idea': 'development',
+      'ideas': 'development',
+      
+      // Organization & Structure
+      'add-transition': 'structure',
+      'strengthen-topic-sentence': 'structure',
+      'improve-flow': 'structure',
+      'clarify-thesis': 'structure',
+      'strengthen-conclusion': 'structure',
+      'organization': 'structure',
+      
+      // Style & Clarity
+      'precise-word': 'vocabulary',
+      'smooth-phrasing': 'clarity',
+      'formal-tone': 'clarity',
+      'concise-expression': 'clarity',
+      'enhance-clarity': 'clarity',
+      'wordChoice': 'vocabulary',
+      'voice': 'clarity',
+      
+      // Sentence Fluency
+      'vary-sentences': 'fluency',
+      'combine-sentences': 'fluency',
+      'simplify-structure': 'fluency',
+      'fluency': 'fluency',
+      
+      // Positive/Strengths
+      'strengths': 'strengths',
+    }
+    
+    return categoryMapping[category] || 'grammar'
+  }
+
+  /**
    * Generate marker string for annotation (✓1, S1, W1, etc.)
    */
   private generateMarker(category: string): string {
-    const counter = this.markerCounters[category] || 1
-    this.markerCounters[category] = counter + 1
+    const broadCategory = this.mapToBroadCategory(category)
+    const counter = this.markerCounters[broadCategory] || 1
+    this.markerCounters[broadCategory] = counter + 1
 
     const markerPrefixes: { [key: string]: string } = {
       grammar: 'G',
@@ -98,10 +190,11 @@ export class AnnotationProcessor {
       structure: 'S',
       development: 'D',
       clarity: 'C',
+      fluency: 'F',
       strengths: '✓',
     }
 
-    const prefix = markerPrefixes[category] || 'A'
+    const prefix = markerPrefixes[broadCategory] || 'A'
     return `${prefix}${counter}`
   }
 
@@ -113,8 +206,20 @@ export class AnnotationProcessor {
 
     return apiAnnotations.map((annotation, index) => {
       const category = annotation.category || 'grammar'
-      const colorConfig =
-        ANNOTATION_COLORS[category as keyof typeof ANNOTATION_COLORS] || ANNOTATION_COLORS.grammar
+      const broadCategory = this.mapToBroadCategory(category)
+      
+      // Updated color mapping for broader categories
+      const colorMapping: { [key: string]: any } = {
+        grammar: ANNOTATION_COLORS.conventions || ANNOTATION_COLORS.grammar,
+        vocabulary: ANNOTATION_COLORS.wordChoice || ANNOTATION_COLORS.vocabulary,
+        structure: ANNOTATION_COLORS.organization || ANNOTATION_COLORS.structure,
+        development: ANNOTATION_COLORS.ideas || ANNOTATION_COLORS.development,
+        clarity: ANNOTATION_COLORS.voice || ANNOTATION_COLORS.clarity,
+        fluency: ANNOTATION_COLORS.fluency || ANNOTATION_COLORS.fluency,
+        strengths: ANNOTATION_COLORS.strengths || { background: 'positive-mark', marker: 'marker-positive', block: 'positive-block' }
+      }
+      
+      const colorConfig = colorMapping[broadCategory] || ANNOTATION_COLORS.conventions || ANNOTATION_COLORS.grammar
 
       return {
         id: `api-annotation-${index}`,
@@ -128,7 +233,7 @@ export class AnnotationProcessor {
         blockClass: colorConfig.block,
         startIndex: annotation.startIndex || 0,
         endIndex: annotation.endIndex || annotation.originalText?.length || 0,
-        severity: annotation.severity || (category === 'strengths' ? 'positive' : 'moderate'),
+        severity: annotation.severity || (broadCategory === 'strengths' ? 'positive' : 'moderate'),
       }
     })
   }
@@ -389,15 +494,69 @@ export class AnnotationProcessor {
     return `${headerName} (${annotation.marker})`
   }
 
+  /**
+   * Generate contextual label based on annotation category and severity
+   */
+  private generateAnnotationLabel(category: string, severity: string): string {
+    const labels: { [key: string]: { [key: string]: string } } = {
+      'strengths': {
+        'positive': 'Advanced technique:',
+        'major': 'Exceptional technique:',
+        'moderate': 'Strong technique:',
+        'minor': 'Good technique:'
+      },
+      'structure': {
+        'positive': 'Sophisticated organization:',
+        'major': 'Strong organization:',
+        'moderate': 'Organization improvement:',
+        'minor': 'Structure note:'
+      },
+      'development': {
+        'positive': 'Rich development:',
+        'major': 'Strong development:',
+        'moderate': 'Development opportunity:',
+        'minor': 'Development note:'
+      },
+      'vocabulary': {
+        'positive': 'Advanced vocabulary:',
+        'major': 'Strong word choice:',
+        'moderate': 'Word choice improvement:',
+        'minor': 'Word choice note:'
+      },
+      'clarity': {
+        'positive': 'Clear expression:',
+        'major': 'Strong clarity:',
+        'moderate': 'Clarity improvement:',
+        'minor': 'Clarity note:'
+      },
+      'grammar': {
+        'positive': 'Strong mechanics:',
+        'major': 'Mechanics correction:',
+        'moderate': 'Grammar improvement:',
+        'minor': 'Grammar note:'
+      },
+      'fluency': {
+        'positive': 'Smooth fluency:',
+        'major': 'Strong fluency:',
+        'moderate': 'Fluency improvement:',
+        'minor': 'Fluency note:'
+      }
+    }
+
+    const broadCategory = this.mapToBroadCategory(category)
+    const categoryLabels = labels[broadCategory] || labels['grammar']
+    return categoryLabels[severity] || categoryLabels['moderate'] || 'Improvement opportunity:'
+  }
+
   private generateBlockContent(annotation: ProcessedAnnotation): string {
     let content = ''
 
     if (annotation.originalText && annotation.suggestion) {
       content += `
-        <div class="annotation-label">Advanced technique:</div>
-        <span class="suggested-text">${this.escapeHtml(annotation.suggestion)}</span><br>
         <div class="annotation-label">Highlighted text:</div>
         <span class="original-text">${this.escapeHtml(annotation.originalText)}</span><br>
+        <div class="annotation-label">Improvement:</div>
+        <span class="suggested-text">${this.escapeHtml(annotation.suggestion)}</span><br>
       `
     }
 

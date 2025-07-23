@@ -18,7 +18,7 @@ const EnhancedPerformanceMeter: React.FC<EnhancedPerformanceMeterProps> = ({
 }) => {
   const levelInfo = ISEE_LEVELS[level]
   const currentLevel = Math.round(score)
-  const description = getPerformanceDescription(score, level)
+  const description = getPerformanceDescription(score)
   
   // Calculate position for the score indicator (0-100%)
   const scorePosition = ((score - 1) / 3) * 100
@@ -72,10 +72,8 @@ const EnhancedPerformanceMeter: React.FC<EnhancedPerformanceMeterProps> = ({
 
       {/* Modern Performance Meter */}
       <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-
-        
         {/* Gradient Progress Bar */}
-        <div style={{ position: 'relative', marginBottom: '2rem' }}>
+        <div style={{ position: 'relative', marginBottom: '.5rem' }}>
           {/* Background track */}
           <div style={{ 
             height: '24px', 
@@ -127,59 +125,59 @@ const EnhancedPerformanceMeter: React.FC<EnhancedPerformanceMeterProps> = ({
               })}
             </div>
           </div>
-          
-          {/* Floating score indicator */}
-          <div style={{
-            position: 'absolute',
-            top: '-8px',
-            left: `${Math.max(2, Math.min(98, scorePosition))}%`,
-            transform: 'translateX(-50%)',
-            width: '40px',
-            height: '40px',
-            background: `linear-gradient(135deg, ${levelInfo.color}, ${levelInfo.color}dd)`,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: '0.875rem',
-            fontWeight: '700',
-            boxShadow: `0 6px 20px ${levelInfo.color}60, 0 0 0 4px white`,
-            border: '2px solid white',
-            zIndex: 10
-          }}>
-          </div>
         </div>
         
         {/* Level Labels */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-around', 
+          alignItems: 'flex-start', 
+          marginBottom: '2rem',
+          position: 'relative' 
+        }}>
           {performanceLevels.map((perfLevel) => (
             <div 
               key={perfLevel.id}
               style={{ 
                 textAlign: 'center',
                 opacity: perfLevel.id <= currentLevel ? 1 : 0.6,
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
               }}
             >
-              <div style={{
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: perfLevel.id <= currentLevel ? perfLevel.gradient : '#e5e7eb',
-                margin: '0 auto 0.5rem auto',
-                boxShadow: perfLevel.id <= currentLevel ? `0 3px 8px ${perfLevel.glowColor}` : 'none',
-                transition: 'all 0.3s ease'
-              }} />
+              {/* Text label first */}
               <div style={{ 
                 fontSize: '0.75rem', 
                 fontWeight: perfLevel.id === currentLevel ? '700' : '500',
-                color: perfLevel.id === currentLevel ? perfLevel.color : '#6b7280',
+                color: perfLevel.color,
                 textTransform: 'uppercase',
-                letterSpacing: '0.5px'
+                marginBottom: '8px'
               }}>
                 {perfLevel.name}
               </div>
+              
+              {/* Triangle indicator below text for current level */}
+              {perfLevel.id === currentLevel && (
+                <div 
+                  style={{
+                    width: '0',
+                    height: '0',
+                    borderLeft: '8px solid transparent',
+                    borderRight: '8px solid transparent',
+                    borderBottom: `12px solid ${perfLevel.color}`,
+                    filter: `drop-shadow(0 2px 4px ${perfLevel.glowColor})`,
+                    transition: 'all 0.3s ease'
+                  }} 
+                />
+              )}
+              
+              {/* Empty space for non-current levels to maintain alignment */}
+              {perfLevel.id !== currentLevel && (
+                <div style={{ height: '12px' }} />
+              )}
             </div>
           ))}
         </div>

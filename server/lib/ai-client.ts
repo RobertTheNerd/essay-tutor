@@ -652,6 +652,28 @@ Please provide a detailed evaluation with:
    - Conventions (grammar, spelling, punctuation, capitalization, mechanics)
 
 2. DETAILED FEEDBACK for each category with specific examples from the text
+   IMPORTANT: Do NOT start feedback with the category name (e.g., don't write "Ideas & Content:" at the beginning). 
+   The feedback will be displayed in a UI where the category is already clearly labeled.
+   
+   Provide substantive, specific feedback for each category:
+   
+   • Ideas & Content: Comment on topic development, use of supporting details, depth of analysis, 
+     creativity, and how well the essay addresses the prompt. Quote specific examples from the text.
+     
+   • Organization: Analyze the essay's structure, logical flow, use of transitions, effectiveness of 
+     introduction and conclusion. Point out specific organizational strengths or areas needing improvement.
+     
+   • Voice & Focus: Evaluate the writer's personality coming through, appropriateness of tone for the 
+     audience, clarity of the main message, and consistent focus throughout. Reference specific passages.
+     
+   • Word Choice: Assess vocabulary precision, variety, grade-appropriate language, and impact. 
+     Highlight effective word choices and suggest improvements for unclear or imprecise language.
+     
+   • Sentence Fluency: Examine sentence variety, rhythm, flow, and readability. Comment on sentence 
+     structure patterns, transitions between sentences, and overall reading flow.
+     
+   • Conventions: Identify patterns in grammar, spelling, punctuation, and capitalization errors. 
+     Note what the student does well and what mechanics need the most attention.
 
 3. PARAGRAPH-BY-PARAGRAPH ANALYSIS: You MUST analyze each paragraph individually. Split the essay into paragraphs and provide feedback for each one:
    - Paragraph number (1, 2, 3, etc.)
@@ -664,10 +686,45 @@ Please provide a detailed evaluation with:
 
 4. SPECIFIC ANNOTATIONS: Identify all text segments that need improvement, with:
    - Original text excerpt (exact words from the essay, 3-15 words)
-   - Category (ideas/organization/voice/wordChoice/fluency/conventions)
-   - Explanation of the issue or strength
-   - Suggested improvement (if applicable)
-   - Focus on areas for improvement
+   - Category: Use specific annotation types for precise teacher-like feedback:
+     
+     Grammar & Mechanics:
+     • "grammar" - Subject-verb agreement, verb tense, pronoun usage
+     • "spelling" - Spelling correction needed
+     • "punctuation" - Punctuation adjustment needed
+     • "capitalization" - Capitalization correction
+     • "sentence-structure" - Sentence structure improvement
+     • "sentence-boundary" - Sentence boundary clarification
+     
+     Content & Development:
+     • "clarify-idea" - Clarify this idea for better understanding
+     • "add-support" - Add evidence or examples to strengthen this point
+     • "stay-focused" - Return focus to the main topic
+     • "strengthen-example" - Develop this example more effectively
+     • "expand-idea" - Develop this idea further
+     
+     Organization & Structure:
+     • "add-transition" - Add connecting words to link ideas
+     • "strengthen-topic-sentence" - Develop a clearer topic sentence
+     • "improve-flow" - Improve paragraph organization
+     • "clarify-thesis" - Clarify your main argument
+     • "strengthen-conclusion" - Develop a stronger ending
+     
+     Style & Clarity:
+     • "precise-word" - Choose a more precise word
+     • "smooth-phrasing" - Rephrase for clarity and flow
+     • "formal-tone" - Use more formal academic language
+     • "concise-expression" - Express this more concisely
+     • "enhance-clarity" - Make this clearer for the reader
+     
+     Sentence Fluency:
+     • "vary-sentences" - Add sentence variety for better flow
+     • "combine-sentences" - Consider combining for smoother reading
+     • "simplify-structure" - Simplify complex sentence structure
+
+   - Explanation of the specific improvement opportunity
+   - Suggested improvement (when applicable)
+   - Focus primarily on growth opportunities, but include positive annotations for strengths
 
 5. SUMMARY:
    - Top strengths
@@ -685,7 +742,14 @@ Format your response as valid JSON with this structure:
     "conventions": 1-4
   },
   "overallScore": calculated_average,
-  "feedback": ["detailed feedback for each category"],
+  "feedback": [
+    "Detailed feedback about ideas and content without category prefix",
+    "Detailed feedback about organization without category prefix", 
+    "Detailed feedback about voice and focus without category prefix",
+    "Detailed feedback about word choice without category prefix",
+    "Detailed feedback about sentence fluency without category prefix",
+    "Detailed feedback about conventions without category prefix"
+  ],
   "paragraphFeedback": [
     {
       "paragraphNumber": 1,
@@ -698,8 +762,8 @@ Format your response as valid JSON with this structure:
   "annotations": [
     {
       "originalText": "exact text from essay",
-      "category": "ideas|organization|voice|wordChoice|fluency|conventions",
-      "explanation": "specific issue explanation",
+      "category": "grammar|spelling|punctuation|capitalization|sentence-structure|sentence-boundary|clarify-idea|add-support|stay-focused|strengthen-example|expand-idea|add-transition|strengthen-topic-sentence|improve-flow|clarify-thesis|strengthen-conclusion|precise-word|smooth-phrasing|formal-tone|concise-expression|enhance-clarity|vary-sentences|combine-sentences|simplify-structure",
+      "explanation": "specific improvement opportunity",
       "suggestedText": "suggested improvement"
     }
   ],
@@ -709,6 +773,7 @@ Format your response as valid JSON with this structure:
 }
 
 Be constructive, specific, and encouraging while maintaining high standards appropriate for this level.
+The feedback array should contain exactly 6 items in this order: Ideas & Content, Organization, Voice & Focus, Word Choice, Sentence Fluency, Conventions.
 `;
   }
 
