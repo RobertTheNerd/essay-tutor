@@ -199,12 +199,61 @@ export class AnnotationProcessor {
   }
 
   /**
-   * Convert API annotations to processed format
+   * Generate sequential marker string for annotation based on text position (C1, W1, W2, etc.)
    */
-  convertApiAnnotationsToProcessed(apiAnnotations: any[]): ProcessedAnnotation[] {
-    this.resetMarkerCounters()
+  private generateSequentialMarker(category: string, sequentialNumber: number): string {
+    const broadCategory = this.mapToBroadCategory(category)
+    
+    const markerPrefixes: { [key: string]: string } = {
+      grammar: 'G',
+      vocabulary: 'W',
+      structure: 'S',
+      development: 'D',
+      clarity: 'C',
+      fluency: 'F',
+      strengths: '✓',
+    }
 
-    return apiAnnotations.map((annotation, index) => {
+    const prefix = markerPrefixes[broadCategory] || 'A'
+    return `${prefix}${sequentialNumber}`
+  }
+
+  /**
+   * Convert API annotations to processed format with proper ordering and sequential numbering
+   */
+  convertApiAnnotationsToProcessed(apiAnnotations: any[], essayText: string): ProcessedAnnotation[] {
+    if (!apiAnnotations || apiAnnotations.length === 0) {
+      return []
+    }
+
+    // Step 1: Calculate text positions for annotations that don't have them
+    const annotationsWithPositions = apiAnnotations.map((annotation, index) => {
+      let startIndex = annotation.startIndex
+      let endIndex = annotation.endIndex
+      const originalText = annotation.originalText || annotation.text || ''
+
+      // If no position data, find it in the text
+      if ((startIndex === undefined || startIndex === null) && originalText && essayText) {
+        startIndex = essayText.indexOf(originalText)
+        endIndex = startIndex !== -1 ? startIndex + originalText.length : 0
+      }
+
+      return {
+        ...annotation,
+        originalText,
+        startIndex: startIndex || 0,
+        endIndex: endIndex || originalText.length || 0,
+        originalIndex: index // Keep track of original order for ID generation
+      }
+    })
+
+    // Step 2: Sort annotations by their position in the text
+    const sortedAnnotations = annotationsWithPositions
+      .filter(annotation => annotation.startIndex !== -1) // Remove annotations not found in text
+      .sort((a, b) => a.startIndex - b.startIndex)
+
+    // Step 3: Process annotations with sequential numbering based on text order
+    return sortedAnnotations.map((annotation, sequentialIndex) => {
       const category = annotation.category || 'grammar'
       const broadCategory = this.mapToBroadCategory(category)
       
@@ -222,17 +271,17 @@ export class AnnotationProcessor {
       const colorConfig = colorMapping[broadCategory] || ANNOTATION_COLORS.conventions || ANNOTATION_COLORS.grammar
 
       return {
-        id: `api-annotation-${index}`,
+        id: `api-annotation-${annotation.originalIndex}`,
         category,
-        marker: this.generateMarker(category),
-        originalText: annotation.originalText || annotation.text || '',
+        marker: this.generateSequentialMarker(category, sequentialIndex + 1), // Sequential numbering starting from 1
+        originalText: annotation.originalText,
         explanation: annotation.explanation || 'AI-generated annotation',
         suggestion: annotation.suggestedText || annotation.suggestion,
         colorClass: colorConfig.background,
         markerClass: colorConfig.marker,
         blockClass: colorConfig.block,
-        startIndex: annotation.startIndex || 0,
-        endIndex: annotation.endIndex || annotation.originalText?.length || 0,
+        startIndex: annotation.startIndex,
+        endIndex: annotation.endIndex,
         severity: annotation.severity || (broadCategory === 'strengths' ? 'positive' : 'moderate'),
       }
     })

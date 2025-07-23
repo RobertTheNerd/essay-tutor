@@ -65,7 +65,7 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
     const apiAnnotations = evaluationData.annotations || []
     const annotations =
       apiAnnotations.length > 0
-        ? annotationProcessor.convertApiAnnotationsToProcessed(apiAnnotations)
+        ? annotationProcessor.convertApiAnnotationsToProcessed(apiAnnotations, essayText)
         : annotationProcessor.generateMockAnnotations(essayText) // Fallback only when no API data
 
     // Split essay into text blocks

@@ -43,6 +43,23 @@ export class AnnotationProcessor {
   }
 
   /**
+   * Generate sequential marker string for annotation based on text position (C1, W1, W2, etc.)
+   */
+  private generateSequentialMarker(category: string, sequentialNumber: number): string {
+    const markerPrefixes: { [key: string]: string } = {
+      grammar: 'G',
+      vocabulary: 'W',
+      structure: 'S', 
+      development: 'D',
+      clarity: 'C',
+      strengths: '✓'
+    };
+
+    const prefix = markerPrefixes[category] || 'A';
+    return `${prefix}${sequentialNumber}`;
+  }
+
+  /**
    * Process annotations into enhanced format with markers and styling
    */
   processAnnotations(annotations: any[]): ProcessedAnnotation[] {
@@ -64,6 +81,62 @@ export class AnnotationProcessor {
         blockClass: colorConfig.block,
         startIndex: annotation.startIndex || 0,
         endIndex: annotation.endIndex || 0,
+        severity: annotation.severity || 'moderate'
+      };
+    });
+  }
+
+  /**
+   * Process annotations with proper ordering and sequential numbering
+   */
+  processAnnotationsSequential(annotations: any[], essayText: string): ProcessedAnnotation[] {
+    if (!annotations || annotations.length === 0) {
+      return [];
+    }
+
+    // Step 1: Calculate text positions for annotations that don't have them
+    const annotationsWithPositions = annotations.map((annotation, index) => {
+      let startIndex = annotation.startIndex;
+      let endIndex = annotation.endIndex;
+      const originalText = annotation.originalText || annotation.text || '';
+
+      // If no position data, find it in the text
+      if ((startIndex === undefined || startIndex === null) && originalText && essayText) {
+        startIndex = essayText.indexOf(originalText);
+        endIndex = startIndex !== -1 ? startIndex + originalText.length : 0;
+      }
+
+      return {
+        ...annotation,
+        originalText,
+        startIndex: startIndex || 0,
+        endIndex: endIndex || originalText.length || 0,
+        originalIndex: index
+      };
+    });
+
+    // Step 2: Sort annotations by their position in the text
+    const sortedAnnotations = annotationsWithPositions
+      .filter(annotation => annotation.startIndex !== -1)
+      .sort((a, b) => a.startIndex - b.startIndex);
+
+    // Step 3: Process annotations with sequential numbering based on text order
+    return sortedAnnotations.map((annotation, sequentialIndex) => {
+      const category = this.normalizeCategoryName(annotation.category || annotation.type);
+      const colorConfig = ANNOTATION_COLORS[category] || ANNOTATION_COLORS.grammar;
+      
+      return {
+        id: annotation.id || `annotation-${annotation.originalIndex}`,
+        category,
+        marker: this.generateSequentialMarker(category, sequentialIndex + 1),
+        originalText: annotation.originalText,
+        explanation: annotation.explanation || annotation.feedback || '',
+        suggestion: annotation.suggestedText || annotation.suggestion,
+        colorClass: colorConfig.background,
+        markerClass: colorConfig.marker,
+        blockClass: colorConfig.block,
+        startIndex: annotation.startIndex,
+        endIndex: annotation.endIndex,
         severity: annotation.severity || 'moderate'
       };
     });
