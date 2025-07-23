@@ -27,7 +27,7 @@ const CategoryFeedbackSummary: React.FC<CategoryFeedbackSummaryProps> = ({
 }) => {
   return (
     <div className="category-feedback-summary">
-      <h3>📝 Writing Assessment Feedback</h3>
+      <h3>Writing Assessment Feedback</h3>
       <div className="category-feedback-grid">
         {categories.map(category => {
           const levelCategoryDescription = getLevelCategoryDescription(iseeLevel, category.name)

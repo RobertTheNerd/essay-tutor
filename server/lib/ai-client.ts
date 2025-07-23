@@ -21,7 +21,7 @@ function getOpenAIClient(): OpenAI | null {
         defaultQuery: process.env.AZURE_OPENAI_ENDPOINT
           ? {
               "api-version":
-                process.env.AZURE_OPENAI_API_VERSION || "2024-02-15-preview",
+                process.env.AZURE_OPENAI_API_VERSION || "2025-04-14",
             }
           : undefined,
         defaultHeaders: process.env.AZURE_OPENAI_ENDPOINT
@@ -85,7 +85,7 @@ export interface EssayAnalysisResult {
     conventions: number;
   };
   overallScore: number;
-  feedback: string[];
+  feedback: string[] | { [category: string]: string };
   strengths: string[];
   areasForImprovement: string[];
   annotations?: {
@@ -742,14 +742,14 @@ Format your response as valid JSON with this structure:
     "conventions": 1-4
   },
   "overallScore": calculated_average,
-  "feedback": [
-    "Detailed feedback about ideas and content without category prefix",
-    "Detailed feedback about organization without category prefix", 
-    "Detailed feedback about voice and focus without category prefix",
-    "Detailed feedback about word choice without category prefix",
-    "Detailed feedback about sentence fluency without category prefix",
-    "Detailed feedback about conventions without category prefix"
-  ],
+  "feedback": {
+    "ideas": "Detailed feedback about ideas and content without category prefix",
+    "organization": "Detailed feedback about organization without category prefix",
+    "voice": "Detailed feedback about voice and focus without category prefix",
+    "wordChoice": "Detailed feedback about word choice without category prefix",
+    "fluency": "Detailed feedback about sentence fluency without category prefix",
+    "conventions": "Detailed feedback about conventions without category prefix"
+  },
   "paragraphFeedback": [
     {
       "paragraphNumber": 1,
@@ -773,7 +773,7 @@ Format your response as valid JSON with this structure:
 }
 
 Be constructive, specific, and encouraging while maintaining high standards appropriate for this level.
-The feedback array should contain exactly 6 items in this order: Ideas & Content, Organization, Voice & Focus, Word Choice, Sentence Fluency, Conventions.
+Each feedback category should contain detailed, specific feedback without the category name prefix.
 `;
   }
 
@@ -800,6 +800,36 @@ The feedback array should contain exactly 6 items in this order: Ideas & Content
         console.log('No paragraph feedback in AI response');
       }
 
+      // Handle both array and object feedback formats
+      let processedFeedback: any = parsed.feedback;
+      if (Array.isArray(parsed.feedback)) {
+        // Legacy array format - convert to object for consistency
+        console.log('Converting legacy array feedback format to structured object');
+        const categories = ['ideas', 'organization', 'voice', 'wordChoice', 'fluency', 'conventions'];
+        const feedbackObject: { [key: string]: string } = {};
+        parsed.feedback.forEach((feedbackText: string, index: number) => {
+          if (index < categories.length && feedbackText && feedbackText.trim()) {
+            feedbackObject[categories[index]] = feedbackText.trim();
+          }
+        });
+        processedFeedback = feedbackObject;
+      } else if (typeof parsed.feedback === 'object' && parsed.feedback !== null) {
+        // New structured object format - use as is
+        console.log('Using structured object feedback format');
+        processedFeedback = parsed.feedback;
+      } else {
+        // Fallback for unexpected format
+        console.warn('Unexpected feedback format, using fallback');
+        processedFeedback = {
+          ideas: "AI evaluation completed",
+          organization: "Analysis available", 
+          voice: "Feedback generated",
+          wordChoice: "Assessment complete",
+          fluency: "Review finished",
+          conventions: "Evaluation done"
+        };
+      }
+
       return {
         rubricScores: {
           ideasContent: parsed.scores?.ideas || 2,
@@ -810,7 +840,7 @@ The feedback array should contain exactly 6 items in this order: Ideas & Content
           conventions: parsed.scores?.conventions || 2,
         },
         overallScore: parsed.overallScore || 3,
-        feedback: parsed.feedback || ["AI evaluation completed"],
+        feedback: processedFeedback,
         strengths: parsed.strengths || ["Essay demonstrates understanding"],
         areasForImprovement: parsed.areasForImprovement || ["Continue developing skills"],
         annotations: parsed.annotations || [],

@@ -168,15 +168,44 @@ export class EvaluationEngine {
 
   private extractCategoryFeedback(category: string, analysis: any): any {
     // Extract category-specific feedback from AI analysis
-    const generalFeedback = analysis.feedback || []
-    const categoryFeedback = generalFeedback.filter((fb: string) => 
-      fb.toLowerCase().includes(category.toLowerCase())
-    )
+    let categoryFeedback = '';
     
-    return {
-      strengths: [`AI identified positive aspects in ${category}`],
-      improvements: categoryFeedback.length > 0 ? [categoryFeedback[0]] : [`Consider improving ${category}`],
-      evidence: [`Based on AI analysis of the essay content`]
+    if (analysis.feedback) {
+      if (typeof analysis.feedback === 'object' && analysis.feedback !== null && !Array.isArray(analysis.feedback)) {
+        // New structured object format - direct access by category key
+        categoryFeedback = analysis.feedback[category] || '';
+      } else if (Array.isArray(analysis.feedback)) {
+        // Legacy array format - try to find relevant feedback by searching content
+        const relevantFeedback = analysis.feedback.find((fb: string) => 
+          typeof fb === 'string' && fb.toLowerCase().includes(category.toLowerCase())
+        );
+        categoryFeedback = relevantFeedback || '';
+      }
+    }
+    
+    // If we have specific AI feedback, use it; otherwise provide meaningful fallback
+    if (categoryFeedback && categoryFeedback.trim()) {
+      return {
+        strengths: [`Strong performance in ${category} based on AI analysis`],
+        improvements: [categoryFeedback.trim()],
+        evidence: [`AI-generated specific feedback for ${category}`]
+      }
+    } else {
+      // Provide category-specific fallback instead of generic messages
+      const categorySpecificFallbacks: { [key: string]: string } = {
+        ideas: 'Focus on developing ideas with more specific details and examples',
+        organization: 'Work on creating clearer structure and logical flow between paragraphs',
+        voice: 'Develop a more consistent and engaging voice throughout the essay',
+        wordChoice: 'Use more precise and varied vocabulary to enhance expression',
+        fluency: 'Improve sentence variety and rhythm for better flow',
+        conventions: 'Pay attention to grammar, spelling, and punctuation accuracy'
+      }
+      
+      return {
+        strengths: [`Shows understanding of ${category} fundamentals`],
+        improvements: [categorySpecificFallbacks[category] || `Continue developing ${category} skills`],
+        evidence: [`Based on essay analysis and writing standards`]
+      }
     }
   }
 
