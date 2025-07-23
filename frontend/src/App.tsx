@@ -180,14 +180,16 @@ function App() {
               <h1 className="text-5xl font-semibold text-gray-900 mb-4 tracking-tight">
                 Essay Tutor
               </h1>
-              {/* Development Test Button */}
-              <button
-                onClick={() => setCurrentView('test')}
-                className="absolute top-4 right-4 px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 border border-yellow-300"
-                title="View Professional Report Test Page"
-              >
-                🧪 Test Report
-              </button>
+              {/* Development Test Button - Only show in development or when explicitly enabled */}
+              {(import.meta.env.VITE_SHOW_TEST_BUTTON === 'true' || import.meta.env.DEV) && (
+                <button
+                  onClick={() => setCurrentView('test')}
+                  className="absolute top-4 right-4 px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 border border-yellow-300"
+                  title="View Professional Report Test Page"
+                >
+                  🧪 Test Report
+                </button>
+              )}
             </div>
 
             {/* Main Interface Container - Minimal top spacing */}

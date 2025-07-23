@@ -67,3 +67,27 @@ export default tseslint.config([
   },
 ])
 ```
+
+## Environment Variables
+
+This project uses environment variables for configuration. Copy `.env.example` to `.env.local` and configure as needed:
+
+```bash
+cp .env.example .env.local
+```
+
+### Available Variables
+
+- `VITE_SHOW_TEST_BUTTON`: Set to `'true'` to show the test button in production builds
+  - Default: Only shows in development mode
+  - Production: Set to `'false'` or omit to hide the test button
+
+### Test Button
+
+The 🧪 Test Report button provides access to a test page for the professional report component. It is:
+
+- **Automatically visible** in development mode (`npm run dev`)
+- **Hidden by default** in production builds (`npm run build`)
+- **Can be enabled in production** by setting `VITE_SHOW_TEST_BUTTON=true`
+
+This ensures development tools don't appear in production deployments unless explicitly enabled.
