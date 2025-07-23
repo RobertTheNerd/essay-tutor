@@ -1,5 +1,16 @@
 import React, { useMemo } from 'react'
 import { AnnotationProcessor } from './AnnotationProcessor'
+import {
+  getPerformanceLevel,
+  getPerformanceLevelClass,
+  getISEELevelFromRubric,
+  getLevelPerformanceExpectation,
+  getLevelCategoryDescription,
+  ISEE_LEVELS,
+  type EvaluationData,
+} from '../../types/evaluation'
+import ISEELevelProgression from './ISEELevelProgression'
+import EnhancedPerformanceMeter from './EnhancedPerformanceMeter'
 import './professional-report-styles.css'
 
 interface StudentInfo {
@@ -10,7 +21,7 @@ interface StudentInfo {
 }
 
 interface ProfessionalReportProps {
-  evaluationData: any // EvaluationResult from evaluation types
+  evaluationData: EvaluationData // EvaluationResult from evaluation types
   essayText: string
   prompt?: string
   studentInfo?: StudentInfo
@@ -26,6 +37,11 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
 }) => {
   // Initialize annotation processor
   const annotationProcessor = useMemo(() => new AnnotationProcessor(), [])
+  
+  // Determine ISEE level from evaluation data
+  const iseeLevel = useMemo(() => 
+    getISEELevelFromRubric(evaluationData.rubric), [evaluationData.rubric]
+  )
 
   // Generate report content with real API annotations
   const reportContent = useMemo(() => {
@@ -33,21 +49,21 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
     const scores = evaluationData.scores || {}
 
     const categories = [
-      { name: 'Grammar & Mechanics', key: 'grammar', score: scores.grammar || 0 },
-      { name: 'Vocabulary', key: 'vocabulary', score: scores.vocabulary || 0 },
-      { name: 'Structure', key: 'structure', score: scores.structure || 0 },
-      { name: 'Development', key: 'development', score: scores.development || 0 },
-      { name: 'Clarity', key: 'clarity', score: scores.clarity || 0 },
-      { name: 'Strengths', key: 'strengths', score: scores.strengths || 0 },
+      { name: 'Ideas & Content', key: 'ideas', score: scores.ideas || 2 },
+      { name: 'Organization', key: 'organization', score: scores.organization || 2 },
+      { name: 'Voice & Focus', key: 'voice', score: scores.voice || 2 },
+      { name: 'Word Choice', key: 'wordChoice', score: scores.wordChoice || 2 },
+      { name: 'Sentence Fluency', key: 'fluency', score: scores.fluency || 2 },
+      { name: 'Conventions', key: 'conventions', score: scores.conventions || 2 },
     ]
 
     const legendItems = [
-      { category: 'grammar', label: 'Grammar', color: 'grammar-mark' },
-      { category: 'vocabulary', label: 'Advanced Vocabulary', color: 'word-mark' },
-      { category: 'structure', label: 'Sophisticated Structure', color: 'structure-mark' },
-      { category: 'development', label: 'Rich Development', color: 'development-mark' },
-      { category: 'clarity', label: 'Complex Ideas', color: 'clarity-mark' },
-      { category: 'strengths', label: 'Exceptional Techniques', color: 'positive-mark' },
+      { category: 'ideas', label: 'Ideas & Content', color: 'ideas-mark' },
+      { category: 'organization', label: 'Organization', color: 'organization-mark' },
+      { category: 'voice', label: 'Voice & Focus', color: 'voice-mark' },
+      { category: 'wordChoice', label: 'Word Choice', color: 'word-choice-mark' },
+      { category: 'fluency', label: 'Sentence Fluency', color: 'fluency-mark' },
+      { category: 'conventions', label: 'Conventions', color: 'conventions-mark' },
     ]
 
     // Use real API annotations or fallback to empty array
@@ -66,6 +82,16 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
     // Get paragraph feedback from evaluation data
     const paragraphFeedback = evaluationData.paragraphFeedback || []
 
+    // Extract category-specific feedback from API response
+    const categoryFeedback: { [key: string]: string } = {}
+    if (evaluationData.feedback && Array.isArray(evaluationData.feedback)) {
+      evaluationData.feedback.forEach((fb: any) => {
+        if (fb.category && fb.content) {
+          categoryFeedback[fb.category] = fb.content
+        }
+      })
+    }
+
     return {
       score,
       categories,
@@ -75,6 +101,7 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
       annotationBlocks,
       paragraphFeedback,
       feedback: evaluationData.feedback || [],
+      categoryFeedback,
     }
   }, [evaluationData, essayText, annotationProcessor])
 
@@ -83,32 +110,32 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
     <div className="professional-report-container">
       {/* Report Content */}
       <div className="professional-report-content">
-        {/* Header */}
-        <div className="header">
-          {/* Main content block - left column only */}
-          <div className="main-content-block">
-            <div className="info-column">
+        {/* Header - Test Information */}
+        <div className="header-info">
+          <div className="test-info-block">
+            <div className="test-name-date">
               <div className="test-name">{evaluationData.rubric?.name || 'Essay Evaluation'}</div>
               <div className="test-date">
                 {studentInfo?.date || new Date().toLocaleDateString()}
               </div>
-              {prompt && (
-                <div className="prompt-section">
-                  <div className="prompt-label">Essay Prompt</div>
-                  <div className="prompt-text">{prompt}</div>
-                </div>
-              )}
             </div>
-          </div>
-
-          {/* Separate score block - completely independent */}
-          <div className="score-block">
-            <div className="score-display">
-              <div className="score-number">{reportContent.score}</div>
-              <div className="score-label">/ 5</div>
-            </div>
+            {prompt && (
+              <div className="prompt-section">
+                <div className="prompt-label">Essay Prompt</div>
+                <div className="prompt-text">{prompt}</div>
+              </div>
+            )}
           </div>
         </div>
+
+
+        
+        {/* Enhanced Performance Meter */}
+        <EnhancedPerformanceMeter 
+          score={reportContent.score}
+          level={iseeLevel}
+          className="mb-6"
+        />
 
         {/* Legend */}
         <div className="legend">
@@ -198,19 +225,42 @@ const ProfessionalReport: React.FC<ProfessionalReportProps> = ({
           })}
         </div>
 
-        {/* Score Summary */}
-        <div className="score-summary">
-          <h3>📊 Evaluation Summary</h3>
-          <div className="score-grid">
-            {reportContent.categories.map(category => (
-              <div key={category.key} className="score-item">
-                <span>{category.name}</span>
-                <span className="score-badge">{category.score}/5</span>
-              </div>
-            ))}
-          </div>
-          <div className="average-score">
-            Overall Score: {Number(reportContent.score).toFixed(1)}/5.0
+        {/* Category Feedback Summary */}
+        <div className="category-feedback-summary">
+          <h3>📝 Writing Assessment Feedback</h3>
+          <div className="category-feedback-grid">
+            {reportContent.categories.map(category => {
+              const levelCategoryDescription = getLevelCategoryDescription(iseeLevel, category.name)
+              const levelPerformanceExpectation = getLevelPerformanceExpectation(iseeLevel, category.score)
+              const customFeedback = (reportContent.categoryFeedback as { [key: string]: string })[category.key]
+              
+              const feedback = customFeedback || 
+                `${levelPerformanceExpectation} Focus area: ${levelCategoryDescription}.`
+              
+              return (
+                <div key={category.key} className="category-feedback-item">
+                  <div className="category-header">
+                    <h4>{category.name}</h4>
+                    <div className="category-level-info">
+                      <span className="level-focus-badge" style={{ 
+                        backgroundColor: `${ISEE_LEVELS[iseeLevel].color}20`,
+                        color: ISEE_LEVELS[iseeLevel].color,
+                        borderColor: `${ISEE_LEVELS[iseeLevel].color}40`
+                      }}>
+                        {ISEE_LEVELS[iseeLevel].grades}
+                      </span>
+                      <span className={`performance-badge ${getPerformanceLevelClass(category.score)}`}>
+                        {getPerformanceLevel(category.score)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="category-focus-description">
+                    <strong>Level Focus:</strong> {levelCategoryDescription}
+                  </div>
+                  <p className="category-feedback-text">{feedback}</p>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

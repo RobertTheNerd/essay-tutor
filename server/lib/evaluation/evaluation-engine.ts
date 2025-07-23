@@ -75,16 +75,12 @@ export class EvaluationEngine {
   private convertAnalysisToDetailedEvaluation(essay: StructuredEssay, analysis: any): any {
     // Use real AI analysis results
     const scores = {
-      grammar: analysis.rubricScores.grammarMechanics,
-      vocabulary: analysis.rubricScores.wordChoiceVocabulary,
-      structure: analysis.rubricScores.structureOrganization,
-      development: analysis.rubricScores.developmentSupport,
-      clarity: analysis.rubricScores.clarityFocus,
-      strengths: Math.round((analysis.rubricScores.grammarMechanics + 
-                            analysis.rubricScores.wordChoiceVocabulary + 
-                            analysis.rubricScores.structureOrganization + 
-                            analysis.rubricScores.developmentSupport + 
-                            analysis.rubricScores.clarityFocus) / 5)
+      ideas: analysis.rubricScores.ideasContent,
+      organization: analysis.rubricScores.organization,
+      voice: analysis.rubricScores.voiceFocus,
+      wordChoice: analysis.rubricScores.wordChoice,
+      fluency: analysis.rubricScores.sentenceFluency,
+      conventions: analysis.rubricScores.conventions
     }
 
     // Convert AI feedback to structured format
@@ -122,7 +118,7 @@ export class EvaluationEngine {
    * Generate detailed feedback from AI analysis
    */
   private generateDetailedFeedback(analysis: any): any {
-    const categories = ['grammar', 'vocabulary', 'structure', 'development', 'clarity', 'strengths']
+    const categories = ['ideas', 'organization', 'voice', 'wordChoice', 'fluency', 'conventions']
     const feedback: any = {}
     
     categories.forEach(category => {
@@ -130,7 +126,7 @@ export class EvaluationEngine {
       const categoryFeedback = this.extractCategoryFeedback(category, analysis)
       
       feedback[category] = {
-        score_justification: `AI-powered ${category} assessment: ${score}/5`,
+        score_justification: `AI-powered ${category} assessment: ${score}/4`,
         strengths: categoryFeedback.strengths,
         improvements: categoryFeedback.improvements,
         evidence: categoryFeedback.evidence
@@ -141,39 +137,33 @@ export class EvaluationEngine {
   }
 
   private getCategoryType(category: string): string {
-    return category === 'strengths' ? 'strength' : 'improvement'
+    // All categories can have both strengths and areas for improvement
+    return 'improvement'
   }
 
   private getSeverityFromCategory(category: string): string {
     const severityMap: { [key: string]: string } = {
-      grammar: 'moderate',
-      vocabulary: 'minor',
-      structure: 'major',
-      development: 'moderate', 
-      clarity: 'major',
-      strengths: 'positive'
+      ideas: 'moderate',
+      organization: 'major',
+      voice: 'minor',
+      wordChoice: 'minor',
+      fluency: 'moderate',
+      conventions: 'moderate'
     }
     return severityMap[category] || 'moderate'
   }
 
   private getScoreForCategory(category: string, analysis: any): number {
     const scoreMap: { [key: string]: string } = {
-      grammar: 'grammarMechanics',
-      vocabulary: 'wordChoiceVocabulary',
-      structure: 'structureOrganization',
-      development: 'developmentSupport',
-      clarity: 'clarityFocus'
+      ideas: 'ideasContent',
+      organization: 'organization',
+      voice: 'voiceFocus',
+      wordChoice: 'wordChoice',
+      fluency: 'sentenceFluency',
+      conventions: 'conventions'
     }
     
-    if (category === 'strengths') {
-      return Math.round((analysis.rubricScores.grammarMechanics + 
-                        analysis.rubricScores.wordChoiceVocabulary + 
-                        analysis.rubricScores.structureOrganization + 
-                        analysis.rubricScores.developmentSupport + 
-                        analysis.rubricScores.clarityFocus) / 5)
-    }
-    
-    return analysis.rubricScores[scoreMap[category]] || 3
+    return analysis.rubricScores[scoreMap[category]] || 2
   }
 
   private extractCategoryFeedback(category: string, analysis: any): any {
@@ -199,7 +189,7 @@ export class EvaluationEngine {
       
       scores.push({
         category: category.id,
-        score: Math.max(1, Math.min(5, score)), // Ensure score is 1-5
+        score: Math.max(1, Math.min(4, score)), // Ensure score is 1-4
         maxScore: this.rubric.scoringScale.max,
         feedback: categoryData?.score_justification ? [categoryData.score_justification] : [],
         strengths: categoryData?.strengths || [],

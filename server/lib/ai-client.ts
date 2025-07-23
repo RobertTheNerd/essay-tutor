@@ -77,11 +77,12 @@ export interface BatchImageProcessingResult {
 
 export interface EssayAnalysisResult {
   rubricScores: {
-    grammarMechanics: number;
-    wordChoiceVocabulary: number;
-    structureOrganization: number;
-    developmentSupport: number;
-    clarityFocus: number;
+    ideasContent: number;
+    organization: number;
+    voiceFocus: number;
+    wordChoice: number;
+    sentenceFluency: number;
+    conventions: number;
   };
   overallScore: number;
   feedback: string[];
@@ -642,13 +643,13 @@ ${text}
 
 Please provide a detailed evaluation with:
 
-1. SCORES (1-5 scale for each category):
-   - Grammar & Mechanics (sentence structure, punctuation, spelling)
-   - Word Choice & Vocabulary (advanced vocabulary, precise word choice)
-   - Structure & Organization (essay organization, transitions, paragraphs)
-   - Development & Support (ideas development, examples, evidence)
-   - Clarity & Focus (clear thesis, coherent ideas, logical flow)
-   - Strengths & Excellence (exceptional techniques, sophisticated elements)
+1. SCORES (1-4 scale for each category):
+   - Ideas & Content (topic development, supporting details, depth of analysis, creativity)
+   - Organization (structure, logical sequence, transitions, introduction and conclusion)
+   - Voice & Focus (writer's personality, tone, clarity of message, audience awareness)
+   - Word Choice (vocabulary precision, variety, grade-appropriate language, impact)
+   - Sentence Fluency (sentence variety, rhythm, flow, readability when read aloud)
+   - Conventions (grammar, spelling, punctuation, capitalization, mechanics)
 
 2. DETAILED FEEDBACK for each category with specific examples from the text
 
@@ -663,9 +664,10 @@ Please provide a detailed evaluation with:
 
 4. SPECIFIC ANNOTATIONS: Identify all text segments that need improvement, with:
    - Original text excerpt (exact words from the essay, 3-15 words)
-   - Category (grammar/vocabulary/structure/development/clarity/strengths, etc)
+   - Category (ideas/organization/voice/wordChoice/fluency/conventions)
    - Explanation of the issue or strength
-   - Suggested improvement (if applicable)\n   - Focus on areas for improvement
+   - Suggested improvement (if applicable)
+   - Focus on areas for improvement
 
 5. SUMMARY:
    - Top strengths
@@ -675,12 +677,12 @@ Please provide a detailed evaluation with:
 Format your response as valid JSON with this structure:
 {
   "scores": {
-    "grammar": 1-5,
-    "vocabulary": 1-5, 
-    "structure": 1-5,
-    "development": 1-5,
-    "clarity": 1-5,
-    "strengths": 1-5
+    "ideas": 1-4,
+    "organization": 1-4,
+    "voice": 1-4,
+    "wordChoice": 1-4,
+    "fluency": 1-4,
+    "conventions": 1-4
   },
   "overallScore": calculated_average,
   "feedback": ["detailed feedback for each category"],
@@ -696,7 +698,7 @@ Format your response as valid JSON with this structure:
   "annotations": [
     {
       "originalText": "exact text from essay",
-      "category": "grammar|vocabulary|structure|development|clarity|strengths",
+      "category": "ideas|organization|voice|wordChoice|fluency|conventions",
       "explanation": "specific issue explanation",
       "suggestedText": "suggested improvement"
     }
@@ -735,11 +737,12 @@ Be constructive, specific, and encouraging while maintaining high standards appr
 
       return {
         rubricScores: {
-          grammarMechanics: parsed.scores?.grammar || 3,
-          wordChoiceVocabulary: parsed.scores?.vocabulary || 3,
-          structureOrganization: parsed.scores?.structure || 3,
-          developmentSupport: parsed.scores?.development || 3,
-          clarityFocus: parsed.scores?.clarity || 3,
+          ideasContent: parsed.scores?.ideas || 2,
+          organization: parsed.scores?.organization || 2,
+          voiceFocus: parsed.scores?.voice || 2,
+          wordChoice: parsed.scores?.wordChoice || 2,
+          sentenceFluency: parsed.scores?.fluency || 2,
+          conventions: parsed.scores?.conventions || 2,
         },
         overallScore: parsed.overallScore || 3,
         feedback: parsed.feedback || ["AI evaluation completed"],
@@ -772,11 +775,12 @@ Be constructive, specific, and encouraging while maintaining high standards appr
 
     return {
       rubricScores: {
-        grammarMechanics: baseScore,
-        wordChoiceVocabulary: Math.max(1, baseScore - 1),
-        structureOrganization: paragraphCount > 1 ? baseScore : Math.max(1, baseScore - 1),
-        developmentSupport: wordCount > 100 ? baseScore : Math.max(1, baseScore - 1),
-        clarityFocus: baseScore,
+        ideasContent: wordCount > 100 ? baseScore : Math.max(1, baseScore - 1),
+        organization: paragraphCount > 1 ? baseScore : Math.max(1, baseScore - 1),
+        voiceFocus: baseScore,
+        wordChoice: Math.max(1, baseScore - 1),
+        sentenceFluency: baseScore,
+        conventions: baseScore,
       },
       overallScore: baseScore,
       feedback: [

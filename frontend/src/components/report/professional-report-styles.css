@@ -75,12 +75,228 @@
   font-weight: 400;
 }
 
-/* Header with separate blocks */
-.header {
+/* Header Information Section */
+.header-info {
+  background: var(--gradient-header);
+  color: white;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-lg);
   position: relative;
-  padding: 0.75rem;
-  background: none !important; /* Remove the purple gradient from entire header */
-  box-shadow: none !important; /* Remove shadow from header container */
+  overflow: hidden;
+}
+
+.header-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+.test-info-block {
+  position: relative;
+  z-index: 1;
+}
+
+.test-name-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.test-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-family: 'Source Serif Pro', serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.test-date {
+  font-size: 1rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.prompt-section {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.prompt-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.prompt-text {
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.4;
+  opacity: 0.95;
+}
+
+/* Performance Meter Section */
+.performance-meter-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+.meter-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.meter-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.performance-meter {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.meter-bar {
+  display: flex;
+  height: 16px;
+  background: #e5e7eb;
+  border-radius: 25px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.meter-segment {
+  flex: 1;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.meter-segment:first-child {
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+
+.meter-segment:last-child {
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+
+.meter-segment.empty {
+  background: #f3f4f6;
+}
+
+.meter-segment.filled {
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Color variations for different performance levels */
+.meter-segment.filled.performance-beginning {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.meter-segment.filled.performance-developing {
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+.meter-segment.filled.performance-proficient {
+  background: linear-gradient(90deg, #10b981, #047857);
+}
+
+.meter-segment.filled.performance-advanced {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+.meter-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.meter-label-start,
+.meter-label-end {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.meter-label-current {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e5e7eb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.performance-description {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-style: italic;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Responsive Design for Meter */
+@media (max-width: 768px) {
+  .performance-meter-section {
+    padding: 1.5rem 1rem;
+  }
+  
+  .meter-bar {
+    height: 20px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .meter-labels {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .meter-label-current {
+    order: -1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .performance-description {
+    font-size: 0.9rem;
+  }
+}
+
+/* Legacy header styles cleanup */
+.header {
+  display: none; /* Hide old header structure */
 }
 
 /* Main content block - left column with its own background */
@@ -147,56 +363,7 @@
   text-align: left;
 }
 
-/* Completely separate score block */
-.score-block {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 10;
-}
-
-.score-display {
-  display: flex;
-  align-items: baseline;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  box-shadow:
-    0 8px 32px rgba(102, 126, 234, 0.25),
-    0 2px 8px rgba(0, 0, 0, 0.1);
-  min-width: 120px;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.score-display::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #22d3ee 0%, #06b6d4 100%);
-}
-
-.score-number {
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: #ffffff;
-  line-height: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.score-label {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: #cbd5e1;
-  margin-left: 0.25rem;
-  margin-bottom: 0.25rem;
-}
+/* Old score-block styles removed - using performance progression instead */
 
 /* Mobile responsive design */
 @media (max-width: 768px) {
@@ -473,6 +640,234 @@
   transition: all 0.2s ease;
 }
 
+/* Performance Level Styling */
+.performance-level {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 100px;
+}
+
+.performance-beginning {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 2px solid #f59e0b;
+}
+
+.performance-developing {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+  border: 2px solid #3b82f6;
+}
+
+.performance-proficient {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+  border: 2px solid #10b981;
+}
+
+.performance-advanced {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #5b21b6;
+  border: 2px solid #8b5cf6;
+}
+
+.performance-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.performance-level-text {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Category Feedback Styling */
+.category-feedback-summary {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+.category-feedback-summary h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-light);
+  padding-bottom: 0.5rem;
+}
+
+.category-feedback-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.category-feedback-item {
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.category-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.category-feedback-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.category-level-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.level-focus-badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+  border: 1px solid;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.category-focus-description {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-style: italic;
+  padding: 0.5rem;
+  background: rgba(248, 250, 252, 0.8);
+  border-radius: 4px;
+  border-left: 3px solid #e2e8f0;
+}
+
+.category-focus-description strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.overall-performance {
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  border-radius: 8px;
+  border: 1px solid var(--border-medium);
+}
+
+/* Print Styles for Performance Levels */
+@media print {
+  .performance-level,
+  .performance-badge,
+  .performance-level-text {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .performance-beginning {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    border: 2px solid #f59e0b !important;
+  }
+
+  .performance-developing {
+    background: #dbeafe !important;
+    color: #1e40af !important;
+    border: 2px solid #3b82f6 !important;
+  }
+
+  .performance-proficient {
+    background: #d1fae5 !important;
+    color: #065f46 !important;
+    border: 2px solid #10b981 !important;
+  }
+
+  .performance-advanced {
+    background: #ede9fe !important;
+    color: #5b21b6 !important;
+    border: 2px solid #8b5cf6 !important;
+  }
+
+  .category-feedback-grid {
+    page-break-inside: avoid;
+  }
+
+  .category-feedback-item {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+
+  /* Print styles for performance meter */
+  .performance-meter-section {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+  
+  .meter-segment.filled,
+  .meter-segment.filled.performance-beginning,
+  .meter-segment.filled.performance-developing,
+  .meter-segment.filled.performance-proficient,
+  .meter-segment.filled.performance-advanced,
+  .meter-label-current {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* 6+1 Trait Category Marks */
+.ideas-mark {
+  background: linear-gradient(120deg, rgba(147, 51, 234, 0.25) 0%, rgba(147, 51, 234, 0.15) 100%);
+}
+
+.organization-mark {
+  background: linear-gradient(120deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.15) 100%);
+}
+
+.voice-mark {
+  background: linear-gradient(120deg, rgba(249, 115, 22, 0.25) 0%, rgba(249, 115, 22, 0.15) 100%);
+}
+
+.word-choice-mark {
+  background: linear-gradient(120deg, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.15) 100%);
+}
+
+.fluency-mark {
+  background: linear-gradient(120deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.15) 100%);
+}
+
+.conventions-mark {
+  background: linear-gradient(120deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.15) 100%);
+}
+
+/* Legacy classes for backward compatibility */
 .grammar-mark {
   background: linear-gradient(120deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.15) 100%);
 }
@@ -1105,6 +1500,342 @@
   * {
     print-color-adjust: exact !important;
     -webkit-print-color-adjust: exact !important;
+  }
+}
+
+/* ISEE Level Progression Styles */
+.isee-level-progression {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+.level-progression-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.level-progression-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'Source Serif Pro', serif;
+}
+
+.current-level-indicator {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
+}
+
+.level-progression-bar {
+  position: relative;
+  height: 60px;
+  margin-bottom: 1rem;
+}
+
+.gradient-background {
+  position: relative;
+  height: 8px;
+  background: linear-gradient(90deg, #22c55e, #3b82f6, #8b5cf6, #f59e0b);
+  border-radius: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.level-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.level-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.level-dot.active {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.8), 0 0 12px rgba(0,0,0,0.15);
+}
+
+.level-label {
+  position: absolute;
+  top: 24px;
+  width: 100px;
+  text-align: center;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.level-label.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.level-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.level-grades {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+
+.active-level-highlight {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 16px;
+  border-radius: 8px;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+.progression-description {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.progression-text {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Enhanced Performance Meter Styles */
+.enhanced-performance-meter {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+.enhanced-performance-meter .meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.level-context {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.level-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  box-shadow: var(--shadow-sm);
+}
+
+.performance-meter-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.meter-background {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.gradient-bar {
+  display: flex;
+  height: 20px;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.segment-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+.score-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.score-value {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.level-progression-mini {
+  margin-top: 1rem;
+  opacity: 0.8;
+}
+
+.progression-track {
+  position: relative;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.progression-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+}
+
+.progression-dot.active {
+  width: 12px;
+  height: 12px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+.progression-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ISEE Level Color Schemes */
+.isee-elementary {
+  --level-color: #22c55e;
+  --level-gradient: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.isee-middle {
+  --level-color: #3b82f6;
+  --level-gradient: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.isee-upper {
+  --level-color: #8b5cf6;
+  --level-gradient: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.isee-high {
+  --level-color: #f59e0b;
+  --level-gradient: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+/* Responsive Design for ISEE Components */
+@media (max-width: 768px) {
+  .isee-level-progression {
+    padding: 1rem;
+  }
+  
+  .level-progression-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .level-progression-bar {
+    height: 80px;
+  }
+  
+  .level-label {
+    width: 80px;
+    font-size: 0.65rem;
+  }
+  
+  .enhanced-performance-meter {
+    padding: 1.5rem 1rem;
+  }
+  
+  .enhanced-performance-meter .meter-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .gradient-bar {
+    height: 24px;
+  }
+  
+  .score-indicator {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .score-value {
+    font-size: 0.75rem;
+  }
+}
+
+/* Print styles for ISEE components */
+@media print {
+  .isee-level-progression,
+  .enhanced-performance-meter {
+    break-inside: avoid;
+    margin-bottom: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .level-badge,
+  .score-indicator,
+  .progression-dot {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .gradient-background,
+  .gradient-bar,
+  .active-level-highlight {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 

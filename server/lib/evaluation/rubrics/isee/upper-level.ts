@@ -12,14 +12,13 @@ export const iseeUpperLevelRubric: EvaluationRubric = {
 
   scoringScale: {
     min: 1,
-    max: 5,
+    max: 4,
     type: "integer",
     labels: {
-      1: "Needs Significant Improvement",
+      1: "Beginning",
       2: "Developing",
       3: "Proficient",
       4: "Advanced",
-      5: "Exceptional",
     },
   },
 
@@ -31,358 +30,306 @@ export const iseeUpperLevelRubric: EvaluationRubric = {
 
   categories: [
     {
-      id: "grammar",
-      name: "Grammar & Mechanics",
-      description: "Sentence structure, punctuation, spelling, capitalization",
-      color: "#ef4444", // Red
-      weight: 0.2,
-    },
-    {
-      id: "vocabulary",
-      name: "Word Choice & Vocabulary",
-      description: "Advanced vocabulary, precise word choice, varied language",
-      color: "#3b82f6", // Blue
-      weight: 0.2,
-    },
-    {
-      id: "structure",
-      name: "Structure & Organization",
-      description: "Essay organization, transitions, paragraph development",
-      color: "#22c55e", // Green
-      weight: 0.2,
-    },
-    {
-      id: "development",
-      name: "Development & Support",
-      description: "Ideas development, examples, evidence, depth of analysis",
+      id: "ideas",
+      name: "Ideas & Content",
+      description: "Topic development, supporting details, depth of analysis, creativity",
       color: "#9333ea", // Purple
       weight: 0.2,
     },
     {
-      id: "clarity",
-      name: "Clarity & Focus",
-      description: "Clear thesis, coherent ideas, logical flow",
-      color: "#f97316", // Orange
-      weight: 0.1,
+      id: "organization",
+      name: "Organization",
+      description: "Structure, logical sequence, transitions, introduction and conclusion",
+      color: "#22c55e", // Green
+      weight: 0.2,
     },
     {
-      id: "strengths",
-      name: "Strengths & Excellence",
-      description:
-        "Exceptional techniques, sophisticated elements, standout qualities",
+      id: "voice",
+      name: "Voice & Focus",
+      description: "Writer's personality, tone, clarity of message, audience awareness",
+      color: "#f97316", // Orange
+      weight: 0.15,
+    },
+    {
+      id: "wordChoice",
+      name: "Word Choice",
+      description: "Vocabulary precision, variety, grade-appropriate language, impact",
+      color: "#3b82f6", // Blue
+      weight: 0.15,
+    },
+    {
+      id: "fluency",
+      name: "Sentence Fluency",
+      description: "Sentence variety, rhythm, flow, readability when read aloud",
       color: "#10b981", // Teal
-      weight: 0.1,
+      weight: 0.15,
+    },
+    {
+      id: "conventions",
+      name: "Conventions",
+      description: "Grammar, spelling, punctuation, capitalization, mechanics",
+      color: "#ef4444", // Red
+      weight: 0.15,
     },
   ],
 };
 
 // Scoring criteria for each category
 export const ISEEUpperLevelCriteria = {
-  grammar: {
-    5: {
-      description: "Flawless grammar and mechanics throughout",
-      indicators: [
-        "Perfect sentence structure with varied complexity",
-        "Flawless punctuation and capitalization",
-        "No spelling errors",
-        "Sophisticated use of grammar constructs",
-      ],
-    },
+  ideas: {
     4: {
-      description:
-        "Strong grammar with minor errors that don't impede understanding",
+      description: "Clear, focused, and engaging topic with rich development",
       indicators: [
-        "Generally correct sentence structure",
-        "Mostly accurate punctuation",
-        "Few minor spelling errors",
-        "Good control of complex sentences",
+        "Compelling main idea that captures reader's interest",
+        "Rich, relevant details that support and enhance the topic",
+        "Creative and original thinking evident",
+        "Depth of understanding and insight demonstrated",
+        "Strong connection between ideas and supporting evidence",
       ],
     },
     3: {
-      description: "Adequate grammar with some errors",
+      description: "Clear topic with adequate development and support",
       indicators: [
-        "Basic sentence structure mostly correct",
-        "Some punctuation errors",
-        "Occasional spelling mistakes",
-        "Limited variety in sentence types",
+        "Clear main idea that is easy to identify",
+        "Sufficient details that support the topic",
+        "Some original thinking present",
+        "Good understanding of the topic evident",
+        "Ideas are generally well-supported",
       ],
     },
     2: {
-      description: "Frequent errors that may impede understanding",
+      description: "Topic is emerging but development is limited",
       indicators: [
-        "Frequent sentence structure errors",
-        "Consistent punctuation problems",
-        "Multiple spelling errors",
-        "Run-on sentences or fragments",
+        "Main idea is present but may lack clarity",
+        "Limited details or examples provided",
+        "Basic understanding of topic shown",
+        "Some support for ideas but insufficient",
+        "Ideas may be predictable or general",
       ],
     },
     1: {
-      description: "Serious errors that significantly impede understanding",
+      description: "Unclear topic with minimal development",
       indicators: [
-        "Major sentence structure problems",
-        "Extensive punctuation errors",
-        "Numerous spelling mistakes",
-        "Difficulty following due to mechanical errors",
+        "Main idea is unclear or missing",
+        "Very few details or examples",
+        "Limited understanding of topic",
+        "Little or no support for ideas",
+        "Ideas are underdeveloped or off-topic",
       ],
     },
   },
 
-  vocabulary: {
-    5: {
-      description: "Exceptional vocabulary with sophisticated word choice",
-      indicators: [
-        "Advanced vocabulary appropriate to grade level",
-        "Precise and varied word choice",
-        "Effective use of literary devices",
-        "Demonstrates extensive vocabulary knowledge",
-      ],
-    },
+  organization: {
     4: {
-      description: "Strong vocabulary with good word choice variety",
+      description: "Clear, logical structure that enhances the message",
       indicators: [
-        "Good vocabulary for grade level",
-        "Generally precise word choice",
-        "Some variety in language use",
-        "Appropriate academic vocabulary",
+        "Compelling introduction that draws reader in",
+        "Logical sequence of ideas throughout",
+        "Smooth, effective transitions between ideas",
+        "Strong conclusion that provides closure",
+        "Structure enhances and supports the content",
       ],
     },
     3: {
-      description: "Adequate vocabulary with some variety",
+      description: "Well-organized with clear beginning, middle, and end",
       indicators: [
-        "Basic vocabulary appropriate to task",
-        "Occasional precise word choice",
-        "Limited but acceptable variety",
-        "Generally clear expression",
+        "Clear introduction that establishes topic",
+        "Ideas are arranged in logical order",
+        "Adequate transitions between paragraphs",
+        "Satisfactory conclusion",
+        "Structure supports the content",
       ],
     },
     2: {
-      description: "Limited vocabulary with repetitive word choice",
+      description: "Some organizational structure evident",
       indicators: [
-        "Basic vocabulary below grade level",
-        "Repetitive word choice",
-        "Imprecise language",
-        "Limited expression of ideas",
-      ],
-    },
-    1: {
-      description: "Very limited vocabulary impeding communication",
-      indicators: [
-        "Very basic vocabulary",
-        "Excessive repetition",
-        "Unclear expression",
-        "Difficulty conveying meaning",
-      ],
-    },
-  },
-
-  structure: {
-    5: {
-      description: "Sophisticated organization with seamless flow",
-      indicators: [
-        "Clear, sophisticated thesis statement",
-        "Logical progression of ideas",
-        "Effective transitions throughout",
-        "Strong introduction and conclusion",
-        "Well-developed body paragraphs",
-      ],
-    },
-    4: {
-      description: "Well-organized with clear structure",
-      indicators: [
-        "Clear thesis statement",
-        "Good organization of ideas",
-        "Effective transitions between paragraphs",
-        "Solid introduction and conclusion",
-        "Developed body paragraphs",
-      ],
-    },
-    3: {
-      description: "Adequate organization with basic structure",
-      indicators: [
-        "Identifiable thesis statement",
-        "Generally logical organization",
-        "Some transitions present",
-        "Basic introduction and conclusion",
-        "Adequate paragraph development",
-      ],
-    },
-    2: {
-      description: "Weak organization with unclear structure",
-      indicators: [
-        "Unclear or missing thesis",
-        "Poor organization of ideas",
-        "Few or ineffective transitions",
+        "Identifiable beginning, middle, and end",
+        "Some attempt at logical order",
+        "Limited or ineffective transitions",
         "Weak introduction or conclusion",
-        "Underdeveloped paragraphs",
+        "Structure may not always support content",
       ],
     },
     1: {
-      description: "Poor organization impeding understanding",
+      description: "Little or no organizational structure",
       indicators: [
-        "No clear thesis statement",
-        "Confusing organization",
-        "Missing transitions",
-        "Inadequate introduction/conclusion",
-        "Very poor paragraph structure",
+        "No clear introduction or conclusion",
+        "Ideas presented randomly or confusingly",
+        "No transitions between ideas",
+        "Difficult to follow the writer's thinking",
+        "Structure interferes with understanding",
       ],
     },
   },
 
-  development: {
-    5: {
-      description: "Rich development with sophisticated analysis",
-      indicators: [
-        "Ideas developed with depth and insight",
-        "Compelling examples and evidence",
-        "Sophisticated analysis and reflection",
-        "Creative and original thinking",
-        "Strong support for all claims",
-      ],
-    },
+  voice: {
     4: {
-      description: "Good development with solid support",
+      description: "Strong, engaging voice that connects with audience",
       indicators: [
-        "Ideas well-developed with detail",
-        "Relevant examples and evidence",
-        "Good analysis and explanation",
-        "Clear support for main points",
-        "Thoughtful development",
+        "Writer's personality shines through clearly",
+        "Tone is perfectly matched to audience and purpose",
+        "Writing is engaging and holds reader's attention",
+        "Clear sense of confidence and authority",
+        "Message is focused and compelling",
       ],
     },
     3: {
-      description: "Adequate development with some support",
+      description: "Clear voice appropriate for audience and purpose",
       indicators: [
-        "Ideas developed with basic detail",
-        "Some examples provided",
-        "Basic analysis present",
-        "Adequate support for claims",
-        "Generally clear development",
+        "Writer's personality is evident",
+        "Tone is appropriate for the task",
+        "Writing engages the reader",
+        "Shows confidence in the topic",
+        "Message is clear and focused",
       ],
     },
     2: {
-      description: "Limited development with weak support",
+      description: "Voice is emerging but may be inconsistent",
       indicators: [
-        "Ideas superficially developed",
-        "Few or weak examples",
-        "Limited analysis",
-        "Insufficient support for claims",
-        "Underdeveloped content",
+        "Some sense of writer's personality",
+        "Tone may be uneven or inappropriate at times",
+        "Writing occasionally engages reader",
+        "Limited confidence evident",
+        "Message may lack focus or clarity",
       ],
     },
     1: {
-      description: "Very limited development",
+      description: "Little evidence of writer's voice or personality",
       indicators: [
-        "Ideas barely developed",
-        "No supporting examples",
-        "No analysis or reflection",
-        "Unsupported claims",
-        "Very thin content",
+        "Writing is flat or lifeless",
+        "Tone is inappropriate for audience",
+        "Fails to engage the reader",
+        "No sense of writer behind the words",
+        "Message is unclear or unfocused",
       ],
     },
   },
 
-  clarity: {
-    5: {
-      description: "Exceptional clarity with complex ideas expressed clearly",
-      indicators: [
-        "Crystal clear communication throughout",
-        "Complex ideas made accessible",
-        "Perfect coherence and flow",
-        "Reader never confused",
-        "Sophisticated yet clear expression",
-      ],
-    },
+  wordChoice: {
     4: {
-      description: "Clear communication with good focus",
+      description: "Precise, vivid, and sophisticated word selection",
       indicators: [
-        "Generally clear communication",
-        "Good focus on topic",
-        "Coherent flow of ideas",
-        "Easy to follow",
-        "Clear expression of thoughts",
+        "Words are specific, accurate, and powerful",
+        "Rich vocabulary that enhances meaning",
+        "Creative and memorable word combinations",
+        "Language is natural and flows smoothly",
+        "Advanced vocabulary used appropriately",
       ],
     },
     3: {
-      description: "Adequate clarity with basic focus",
+      description: "Clear, effective vocabulary with good variety",
       indicators: [
-        "Mostly clear communication",
-        "Adequate focus on topic",
-        "Generally coherent",
-        "Occasionally unclear",
-        "Basic clarity maintained",
+        "Words are generally precise and clear",
+        "Good variety in word choice",
+        "Vocabulary is appropriate for grade level",
+        "Language conveys meaning effectively",
+        "Some sophisticated vocabulary present",
       ],
     },
     2: {
-      description: "Limited clarity with unclear focus",
+      description: "Basic vocabulary with some variety attempted",
       indicators: [
-        "Often unclear communication",
-        "Poor focus on topic",
-        "Incoherent in places",
-        "Reader often confused",
-        "Unclear expression",
+        "Words are generally accurate but basic",
+        "Limited variety in word choice",
+        "Some attempts at more sophisticated vocabulary",
+        "Meaning is usually clear",
+        "Occasional repetitive language",
       ],
     },
     1: {
-      description: "Very poor clarity impeding understanding",
+      description: "Limited vocabulary that may impede meaning",
       indicators: [
-        "Very unclear communication",
-        "No clear focus",
-        "Incoherent overall",
-        "Very difficult to follow",
-        "Meaning often unclear",
+        "Words are basic and often imprecise",
+        "Repetitive word choice",
+        "Vocabulary below grade level expectations",
+        "Language may confuse meaning",
+        "Limited range of expression",
       ],
     },
   },
 
-  strengths: {
-    5: {
-      description: "Multiple exceptional techniques demonstrate mastery",
-      indicators: [
-        "Sophisticated literary devices",
-        "Exceptional creativity and originality",
-        "Advanced analytical thinking",
-        "Impressive depth of insight",
-        "College-level sophistication",
-      ],
-    },
+  fluency: {
     4: {
-      description: "Several strong techniques show advanced skill",
+      description: "Smooth, natural flow with varied sentence structure",
       indicators: [
-        "Good use of literary devices",
-        "Creative and original elements",
-        "Strong analytical thinking",
-        "Good insight and reflection",
-        "Above grade-level performance",
+        "Sentences flow naturally when read aloud",
+        "Excellent variety in sentence length and structure",
+        "Strong rhythm and cadence throughout",
+        "Sentences enhance the overall message",
+        "Easy and enjoyable to read",
       ],
     },
     3: {
-      description: "Some positive techniques evident",
+      description: "Good flow with some sentence variety",
       indicators: [
-        "Basic literary devices attempted",
-        "Some creative elements",
-        "Adequate analytical thinking",
-        "Some personal insight",
-        "Grade-appropriate performance",
+        "Sentences generally flow well",
+        "Some variety in sentence structure",
+        "Pleasant rhythm when read aloud",
+        "Mostly easy to read",
+        "Few awkward constructions",
       ],
     },
     2: {
-      description: "Few strengths, mostly basic performance",
+      description: "Adequate flow but limited sentence variety",
       indicators: [
-        "Limited creative elements",
-        "Basic thinking demonstrated",
-        "Little personal insight",
-        "Below grade-level performance",
-        "Few standout qualities",
+        "Sentences are understandable but may be choppy",
+        "Limited variety in sentence structure",
+        "Some awkward or repetitive constructions",
+        "Adequate but not smooth when read aloud",
+        "May require re-reading in places",
       ],
     },
     1: {
-      description: "Very few strengths, significant improvement needed",
+      description: "Poor flow with difficult-to-read sentences",
       indicators: [
-        "No notable creative elements",
-        "Very basic thinking",
-        "No personal insight",
-        "Well below grade level",
-        "No standout qualities",
+        "Sentences are choppy, rambling, or confusing",
+        "Little variety in sentence structure",
+        "Difficult to read aloud smoothly",
+        "Many awkward constructions",
+        "Frequent need to re-read for understanding",
+      ],
+    },
+  },
+
+  conventions: {
+    4: {
+      description: "Excellent control of writing conventions",
+      indicators: [
+        "Few or no errors in grammar, spelling, or punctuation",
+        "Sophisticated use of capitalization and paragraphing",
+        "Strong command of complex sentence structures",
+        "Conventions enhance readability",
+        "Editing skills are evident",
+      ],
+    },
+    3: {
+      description: "Good control of conventions with minor errors",
+      indicators: [
+        "Generally correct grammar, spelling, and punctuation",
+        "Proper capitalization and paragraphing",
+        "Good control of sentence structure",
+        "Errors don't interfere with meaning",
+        "Some evidence of editing",
+      ],
+    },
+    2: {
+      description: "Adequate control with noticeable errors",
+      indicators: [
+        "Some errors in grammar, spelling, or punctuation",
+        "Generally correct capitalization and paragraphing",
+        "Basic sentence structure usually correct",
+        "Errors may occasionally interfere with meaning",
+        "Limited evidence of editing",
+      ],
+    },
+    1: {
+      description: "Limited control of conventions interferes with meaning",
+      indicators: [
+        "Frequent errors in grammar, spelling, and punctuation",
+        "Problems with capitalization and paragraphing",
+        "Sentence structure errors are common",
+        "Errors significantly interfere with meaning",
+        "Little or no evidence of editing",
       ],
     },
   },

@@ -67,50 +67,50 @@ export interface RenderConfig {
 
 // Category color mappings for annotations
 export const ANNOTATION_COLORS = {
-  grammar: {
-    background: 'grammar-mark',
-    marker: 'marker-grammar',
-    block: 'grammar-block',
-    color: '#ef4444'
-  },
-  vocabulary: {
-    background: 'word-mark',
-    marker: 'marker-word', 
-    block: 'word-block',
-    color: '#3b82f6'
-  },
-  structure: {
-    background: 'structure-mark',
-    marker: 'marker-structure',
-    block: 'structure-block',
-    color: '#22c55e'
-  },
-  development: {
-    background: 'development-mark',
-    marker: 'marker-development',
-    block: 'development-block',
+  ideas: {
+    background: 'ideas-mark',
+    marker: 'marker-ideas',
+    block: 'ideas-block',
     color: '#9333ea'
   },
-  clarity: {
-    background: 'clarity-mark',
-    marker: 'marker-clarity',
-    block: 'clarity-block',
+  organization: {
+    background: 'organization-mark',
+    marker: 'marker-organization',
+    block: 'organization-block',
+    color: '#22c55e'
+  },
+  voice: {
+    background: 'voice-mark',
+    marker: 'marker-voice',
+    block: 'voice-block',
     color: '#f97316'
   },
-  strengths: {
-    background: 'positive-mark',
-    marker: 'marker-positive',
-    block: 'positive-block',
+  wordChoice: {
+    background: 'word-choice-mark',
+    marker: 'marker-word-choice',
+    block: 'word-choice-block',
+    color: '#3b82f6'
+  },
+  fluency: {
+    background: 'fluency-mark',
+    marker: 'marker-fluency',
+    block: 'fluency-block',
     color: '#10b981'
+  },
+  conventions: {
+    background: 'conventions-mark',
+    marker: 'marker-conventions',
+    block: 'conventions-block',
+    color: '#ef4444'
   }
 };
 
 // Legend items for the report
 export const LEGEND_ITEMS = [
-  { category: 'grammar', label: 'Grammar', color: 'grammar-mark' },
-  { category: 'vocabulary', label: 'Advanced Vocabulary', color: 'word-mark' },
-  { category: 'structure', label: 'Sophisticated Structure', color: 'structure-mark' },
-  { category: 'development', label: 'Rich Development', color: 'development-mark' },
-  { category: 'clarity', label: 'Complex Ideas', color: 'clarity-mark' },
-  { category: 'strengths', label: 'Exceptional Techniques', color: 'positive-mark' }
+  { category: 'ideas', label: 'Ideas & Content', color: 'ideas-mark' },
+  { category: 'organization', label: 'Organization', color: 'organization-mark' },
+  { category: 'voice', label: 'Voice & Focus', color: 'voice-mark' },
+  { category: 'wordChoice', label: 'Word Choice', color: 'word-choice-mark' },
+  { category: 'fluency', label: 'Sentence Fluency', color: 'fluency-mark' },
+  { category: 'conventions', label: 'Conventions', color: 'conventions-mark' }
 ];
