@@ -1,49 +1,112 @@
 import OpenAI from "openai";
 import { EnhancedTopicResult } from "./types";
 
-// Lazy initialization of OpenAI client - initialized on first use to ensure env vars are loaded
-let openai: OpenAI | null = null;
+/**
+ * AI Client with support for multiple Azure OpenAI deployments
+ * 
+ * Environment Variables:
+ * - AZURE_OPENAI_TEXT_DEPLOYMENT_NAME: Deployment name for text models (GPT-4, GPT-3.5-turbo, etc.)
+ * - AZURE_OPENAI_VISION_DEPLOYMENT_NAME: Deployment name for vision models (GPT-4 Vision, etc.)
+ * - AZURE_OPENAI_DEPLOYMENT_NAME: Fallback deployment name if specific ones aren't set
+ * - AZURE_OPENAI_TEXT_MODEL: Model name for text operations (e.g., "gpt-4o-mini")
+ * - AZURE_OPENAI_VISION_MODEL: Model name for vision operations (e.g., "gpt-4o-mini")
+ * - AZURE_OPENAI_ENDPOINT: Azure OpenAI endpoint URL
+ * - AZURE_OPENAI_API_VERSION: API version (defaults to "2025-04-14")
+ * - OPENAI_API_KEY: API key for authentication
+ */
+// Cache for different OpenAI clients (one per deployment)
+const openaiClients: { [deploymentName: string]: OpenAI | null } = {};
 
-function getOpenAIClient(): OpenAI | null {
-  if (openai === null) {
-    // Initialize OpenAI client with Azure configuration if available
-    if (process.env.OPENAI_API_KEY) {
-      console.log('Initializing OpenAI client with Azure config...');
+/**
+ * Get OpenAI client for a specific deployment
+ */
+function getOpenAIClientForDeployment(deploymentName: string): OpenAI | null {
+  if (!deploymentName) {
+    console.warn('No deployment name provided');
+    return null;
+  }
+
+  if (!(deploymentName in openaiClients)) {
+    // Initialize OpenAI client with Azure configuration for this deployment
+    if (process.env.OPENAI_API_KEY && process.env.AZURE_OPENAI_ENDPOINT) {
+      console.log(`Initializing OpenAI client for deployment: ${deploymentName}`);
       try {
-        openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-        baseURL: process.env.AZURE_OPENAI_ENDPOINT
-          ? `${process.env.AZURE_OPENAI_ENDPOINT.replace(
-              /\/$/,
-              ""
-            )}/openai/deployments/${process.env.AZURE_OPENAI_DEPLOYMENT_NAME}`
-          : undefined,
-        defaultQuery: process.env.AZURE_OPENAI_ENDPOINT
-          ? {
-              "api-version":
-                process.env.AZURE_OPENAI_API_VERSION || "2025-04-14",
-            }
-          : undefined,
-        defaultHeaders: process.env.AZURE_OPENAI_ENDPOINT
-          ? {
-              "api-key": process.env.OPENAI_API_KEY,
-            }
-          : undefined,
+        openaiClients[deploymentName] = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+          baseURL: `${process.env.AZURE_OPENAI_ENDPOINT.replace(
+            /\/$/,
+            ""
+          )}/openai/deployments/${deploymentName}`,
+          defaultQuery: {
+            "api-version": process.env.AZURE_OPENAI_API_VERSION || "2025-04-14",
+          },
+          defaultHeaders: {
+            "api-key": process.env.OPENAI_API_KEY,
+          },
         });
-        console.log('OpenAI client initialized successfully');
+        console.log(`OpenAI client initialized successfully for deployment: ${deploymentName}`);
       } catch (error) {
-        console.error('Failed to initialize OpenAI client:', error);
-        openai = null;
+        console.error(`Failed to initialize OpenAI client for deployment ${deploymentName}:`, error);
+        openaiClients[deploymentName] = null;
+      }
+    } else if (process.env.OPENAI_API_KEY && !process.env.AZURE_OPENAI_ENDPOINT) {
+      // Standard OpenAI (non-Azure) configuration
+      console.log('Initializing standard OpenAI client');
+      try {
+        openaiClients[deploymentName] = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+        });
+        console.log('Standard OpenAI client initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize standard OpenAI client:', error);
+        openaiClients[deploymentName] = null;
       }
     } else {
       console.log('No OPENAI_API_KEY found, OpenAI client not initialized');
+      openaiClients[deploymentName] = null;
     }
   }
-  return openai;
+  
+  return openaiClients[deploymentName];
+}
+
+/**
+ * Legacy function for backward compatibility
+ */
+function getOpenAIClient(): OpenAI | null {
+  // Use text deployment as default for backward compatibility
+  const textDeployment = process.env.AZURE_OPENAI_TEXT_DEPLOYMENT_NAME || 
+                         process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 
+                         'default';
+  return getOpenAIClientForDeployment(textDeployment);
+}
+
+/**
+ * Get client for text models
+ */
+function getTextClient(): OpenAI | null {
+  const deploymentName = process.env.AZURE_OPENAI_TEXT_DEPLOYMENT_NAME || 
+                         process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 
+                         'text-deployment';
+  return getOpenAIClientForDeployment(deploymentName);
+}
+
+/**
+ * Get client for vision models
+ */
+function getVisionClient(): OpenAI | null {
+  const deploymentName = process.env.AZURE_OPENAI_VISION_DEPLOYMENT_NAME || 
+                         process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 
+                         'vision-deployment';
+  return getOpenAIClientForDeployment(deploymentName);
 }
 
 function getTextModel(): string {
   return process.env.AZURE_OPENAI_TEXT_MODEL || "gpt-4o-mini";
+}
+
+function getVisionModel(): string {
+  return process.env.AZURE_OPENAI_VISION_MODEL || "gpt-4o-mini";
 }
 
 export interface DocumentProcessingResult {
@@ -105,20 +168,37 @@ export interface EssayAnalysisResult {
 }
 
 export class AIClient {
-  private client: any
+  private textClient: any
+  private visionClient: any
   private textModel: string
+  private visionModel: string
 
   constructor() {
-    // Don't initialize client in constructor - wait until first use
-    this.client = null
+    // Don't initialize clients in constructor - wait until first use
+    this.textClient = null
+    this.visionClient = null
     this.textModel = getTextModel()
+    this.visionModel = getVisionModel()
   }
 
-  private getClient() {
-    if (this.client === null) {
-      this.client = getOpenAIClient()
+  private getTextClient() {
+    if (this.textClient === null) {
+      this.textClient = getTextClient()
     }
-    return this.client
+    return this.textClient
+  }
+
+  private getVisionClient() {
+    if (this.visionClient === null) {
+      this.visionClient = getVisionClient()
+    }
+    return this.visionClient
+  }
+
+  // Legacy method for backward compatibility
+  private getClient() {
+    // Default to text client for backward compatibility
+    return this.getTextClient()
   }
 
   /**
@@ -128,7 +208,7 @@ export class AIClient {
     imageFiles: { buffer: Buffer; filename: string; mimeType: string }[]
   ): Promise<BatchImageProcessingResult> {
     const startTime = Date.now();
-    const client = getOpenAIClient();
+    const client = this.getVisionClient();
 
     if (!client) {
       return {
@@ -169,7 +249,7 @@ export class AIClient {
 
       // Single AI request to process all images, extract text, and determine order
       const response = await client.chat.completions.create({
-        model: process.env.AZURE_OPENAI_VISION_MODEL || "gpt-4o-mini",
+        model: this.visionModel,
         messages: [
           {
             role: "system",
@@ -364,12 +444,12 @@ For summarized topics, create a brief description like "Essay about a teacher's 
         extractedText = fileBuffer.toString("utf-8");
         aiProcessed = false;
       } else if (mimeType.startsWith("image/")) {
-        const client = getOpenAIClient();
+        const client = this.getVisionClient();
         if (client) {
           // Use GPT-4 Vision for OCR
           const base64Image = fileBuffer.toString("base64");
           const response = await client.chat.completions.create({
-            model: process.env.AZURE_OPENAI_VISION_MODEL || "gpt-4o-mini",
+            model: this.visionModel,
             messages: [
               {
                 role: "user",
@@ -446,7 +526,7 @@ For summarized topics, create a brief description like "Essay about a teacher's 
    * Enhanced topic detection with ISEE categorization
    */
   async detectTopicEnhanced(text: string): Promise<EnhancedTopicResult> {
-    const client = getOpenAIClient();
+    const client = this.getTextClient();
     if (!client) {
       return {
         detectedTopic: "Topic detection not available - AI API key required",
@@ -464,7 +544,7 @@ For summarized topics, create a brief description like "Essay about a teacher's 
       const fullText = text.substring(0, 2000); // Increased context window
 
       const response = await client.chat.completions.create({
-        model: process.env.AZURE_OPENAI_TEXT_MODEL || "gpt-4o-mini",
+        model: this.textModel,
         messages: [
           {
             role: "system",
