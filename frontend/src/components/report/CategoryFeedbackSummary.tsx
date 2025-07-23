@@ -4,7 +4,6 @@ import {
   getPerformanceLevelClass,
   getLevelCategoryDescription,
   getLevelPerformanceExpectation,
-  ISEE_LEVELS,
   type ISEELevel,
 } from '../../types/evaluation'
 

@@ -494,60 +494,6 @@ export class AnnotationProcessor {
     return `${headerName} (${annotation.marker})`
   }
 
-  /**
-   * Generate contextual label based on annotation category and severity
-   */
-  private generateAnnotationLabel(category: string, severity: string): string {
-    const labels: { [key: string]: { [key: string]: string } } = {
-      'strengths': {
-        'positive': 'Advanced technique:',
-        'major': 'Exceptional technique:',
-        'moderate': 'Strong technique:',
-        'minor': 'Good technique:'
-      },
-      'structure': {
-        'positive': 'Sophisticated organization:',
-        'major': 'Strong organization:',
-        'moderate': 'Organization improvement:',
-        'minor': 'Structure note:'
-      },
-      'development': {
-        'positive': 'Rich development:',
-        'major': 'Strong development:',
-        'moderate': 'Development opportunity:',
-        'minor': 'Development note:'
-      },
-      'vocabulary': {
-        'positive': 'Advanced vocabulary:',
-        'major': 'Strong word choice:',
-        'moderate': 'Word choice improvement:',
-        'minor': 'Word choice note:'
-      },
-      'clarity': {
-        'positive': 'Clear expression:',
-        'major': 'Strong clarity:',
-        'moderate': 'Clarity improvement:',
-        'minor': 'Clarity note:'
-      },
-      'grammar': {
-        'positive': 'Strong mechanics:',
-        'major': 'Mechanics correction:',
-        'moderate': 'Grammar improvement:',
-        'minor': 'Grammar note:'
-      },
-      'fluency': {
-        'positive': 'Smooth fluency:',
-        'major': 'Strong fluency:',
-        'moderate': 'Fluency improvement:',
-        'minor': 'Fluency note:'
-      }
-    }
-
-    const broadCategory = this.mapToBroadCategory(category)
-    const categoryLabels = labels[broadCategory] || labels['grammar']
-    return categoryLabels[severity] || categoryLabels['moderate'] || 'Improvement opportunity:'
-  }
-
   private generateBlockContent(annotation: ProcessedAnnotation): string {
     let content = ''
 

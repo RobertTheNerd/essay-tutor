@@ -4,7 +4,6 @@ import {
   getISEELevelFromRubric,
   type EvaluationData,
 } from '../../types/evaluation'
-import ISEELevelProgression from './ISEELevelProgression'
 import EnhancedPerformanceMeter from './EnhancedPerformanceMeter'
 import CategoryFeedbackSummary from './CategoryFeedbackSummary'
 import './professional-report-styles.css'

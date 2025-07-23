@@ -321,36 +321,36 @@ const TestProfessionalReport: React.FC = () => {
           paragraphNumber: 1,
           title: "Basic Introduction",
           content: "This paragraph introduces the topic and states that Forsaken is enjoyable due to its variety and special ways to play. However, it is very brief and lacks a clear thesis or preview of the main points. The sentence structure is simple and could be more engaging.",
-          type: "needs-improvement",
-          priority: "high"
+          type: "needs-improvement" as const,
+          priority: "high" as const
         },
         {
           paragraphNumber: 2,
           title: "Explanation of Game Mechanics",
           content: "This paragraph attempts to explain the basic gameplay of Forsaken, including the survivor and killer roles. While it provides some details, the explanation is confusing and contains grammatical errors. The paragraph lacks clear topic sentences and transitions, making it hard to follow.",
-          type: "needs-improvement",
-          priority: "high"
+          type: "needs-improvement" as const,
+          priority: "high" as const
         },
         {
           paragraphNumber: 3,
           title: "Comparison of Techniques",
           content: "The paragraph tries to distinguish Forsaken from other games by discussing the variety of techniques. It includes an example but is unclear and somewhat disorganized. The explanation of techniques and their uniqueness needs more development and clarity.",
-          type: "needs-improvement",
-          priority: "high"
+          type: "needs-improvement" as const,
+          priority: "high" as const
         },
         {
           paragraphNumber: 4,
           title: "Discussion of Map Variety",
           content: "This paragraph highlights the lack of map voting in Forsaken and how it requires players to adapt. The idea is interesting but not fully developed or clearly connected to the essay's main argument. The writing contains awkward phrasing and grammatical errors.",
-          type: "needs-improvement",
-          priority: "medium"
+          type: "needs-improvement" as const,
+          priority: "medium" as const
         },
         {
           paragraphNumber: 5,
           title: "Brief Conclusion",
           content: "The conclusion restates the main reasons Forsaken is a great game but is very brief and lacks a strong closing statement. It does not effectively summarize or leave a lasting impression.",
-          type: "needs-improvement",
-          priority: "medium"
+          type: "needs-improvement" as const,
+          priority: "medium" as const
         }
       ],
       summary: {

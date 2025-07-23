@@ -20,9 +20,6 @@ const EnhancedPerformanceMeter: React.FC<EnhancedPerformanceMeterProps> = ({
   const currentLevel = Math.round(score)
   const description = getPerformanceDescription(score)
   
-  // Calculate position for the score indicator (0-100%)
-  const scorePosition = ((score - 1) / 3) * 100
-  
   // Performance level definitions with modern gradients
   const performanceLevels = [
     {
