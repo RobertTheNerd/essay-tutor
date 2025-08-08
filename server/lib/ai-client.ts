@@ -293,8 +293,7 @@ Important Notes:
               ...imageContent
             ]
           }
-        ],
-        temperature: 0.1
+        ]
       });
 
       const content = response.choices[0]?.message?.content || "";
@@ -541,8 +540,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
             role: "user",
             content: `Extract the writing prompt from this text (the prompt is usually at the beginning):\n\n${fullText}`,
           },
-        ],
-        temperature: 0.2,
+        ]
       });
 
       const content = response.choices[0]?.message?.content || "";
@@ -641,8 +639,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
             role: "user",
             content: prompt
           }
-        ],
-        temperature: 0.4
+        ]
       });
 
       const aiResponse = response.choices[0]?.message?.content;
