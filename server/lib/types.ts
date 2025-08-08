@@ -116,6 +116,10 @@ export interface MultiPageDocument {
     processingTime: number
     confidence: number
     aiProcessed: boolean
+    // Optional topic metadata when available from upstream processing
+    detectedTopic?: string
+    topicSource?: 'extracted' | 'summarized'
+    enhancedTopic?: EnhancedTopicResult
   }
 }
 

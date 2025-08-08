@@ -121,6 +121,8 @@ export interface BatchImageProcessingResult {
   processingTime: number;
   totalPages: number;
   aiProcessed: boolean;
+  // Surface the source of the topic from the vision result
+  topicSource?: 'extracted' | 'summarized';
 }
 
 export interface EssayAnalysisResult {
@@ -325,19 +327,23 @@ Important Notes:
         const fullText = sortedPages.map(page => page.extractedText).join('\n\n');
 
         // Extract topic and source from AI response
-        let detectedTopic = aiResult.detectedTopic || "";
-        let topicSource = aiResult.topicSource || "summarized";
+        const detectedTopic: string = aiResult.detectedTopic || "";
+        const topicSource: 'extracted' | 'summarized' =
+          aiResult.topicSource === 'extracted' ? 'extracted' : 'summarized';
 
-        // Get enhanced topic analysis
-        const enhancedTopic = await this.detectTopicEnhanced(fullText);
-        enhancedTopic.topicSource = topicSource;
-
-        // Use enhanced topic if AI didn't provide a good topic
-        if (!detectedTopic || detectedTopic.length < 10) {
-          detectedTopic = enhancedTopic.detectedTopic;
-          topicSource = "summarized"; // Default to summarized if we fall back
-          enhancedTopic.topicSource = "summarized";
-        }
+        // Build a minimal enhanced topic based on vision output
+        const enhancedTopic: EnhancedTopicResult = {
+          detectedTopic: detectedTopic || 'Topic not found',
+          promptType: 'other',
+          iseeCategory: 'expository',
+          confidence: typeof aiResult.confidence === 'number'
+            ? Math.max(0, Math.min(1, aiResult.confidence))
+            : (detectedTopic ? 0.8 : 0.5),
+          keywords: [],
+          suggestedStructure: [],
+          relatedTopics: [],
+          topicSource,
+        };
 
         return {
           fullText,
@@ -346,7 +352,8 @@ Important Notes:
           orderedPages,
           processingTime: Date.now() - startTime,
           totalPages: imageFiles.length,
-          aiProcessed: true
+          aiProcessed: true,
+          topicSource
         };
 
       } catch (parseError) {
@@ -384,7 +391,8 @@ Important Notes:
         })),
         processingTime: Date.now() - startTime,
         totalPages: imageFiles.length,
-        aiProcessed: false
+        aiProcessed: false,
+        topicSource: 'summarized'
       };
     }
   }
@@ -447,9 +455,6 @@ Important Notes:
         aiProcessed = false;
       }
 
-      // Basic topic detection
-      const topic = await this.detectTopic(extractedText);
-
       const processingTime = Date.now() - startTime;
       const wordCount = extractedText
         .split(/\s+/)
@@ -458,7 +463,7 @@ Important Notes:
 
       return {
         extractedText,
-        detectedTopic: topic,
+        detectedTopic: '',
         confidence: aiProcessed ? 0.85 : 0.0,
         processingTime,
         aiProcessed,
@@ -478,142 +483,7 @@ Important Notes:
     }
   }
 
-  /**
-   * Detect the topic/prompt from essay content (legacy method)
-   */
-  async detectTopic(text: string): Promise<string> {
-    const enhanced = await this.detectTopicEnhanced(text);
-    return enhanced.detectedTopic;
-  }
-
-  /**
-   * Enhanced topic detection with ISEE categorization
-   */
-  async detectTopicEnhanced(text: string): Promise<EnhancedTopicResult> {
-    const client = this.getTextClient();
-    if (!client) {
-      return {
-        detectedTopic: "Topic detection not available - AI API key required",
-        promptType: "other",
-        iseeCategory: "expository",
-        confidence: 0,
-        keywords: [],
-        suggestedStructure: [],
-        relatedTopics: [],
-        topicSource: "extracted"
-      };
-    }
-
-    try {
-      const fullText = text.substring(0, 8000); // Increased context window
-
-      const response = await client.chat.completions.create({
-        model: this.textModel,
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert ISEE essay evaluator. Extract the writing prompt/topic from the given text.
-
-The writing prompt is typically found at the beginning of the text and tells the student what they should write about. It's usually phrased as a question or instruction.
-
-ISEE Essay Categories:
-- Narrative: Personal experiences, stories, "describe a time when..."
-- Expository: Explain concepts, "describe how...", "what is...", informational
-- Persuasive: Argue a position, "do you agree...", "convince...", opinion-based
-- Creative: Imaginative scenarios, "if you could...", "imagine...", fictional
-- Analytical: Compare/contrast, analyze causes/effects, "why do you think..."
-
-Prompt Types:
-- describe: Ask to describe something (person, place, experience)
-- explain: Ask to explain how/why something works or happens
-- persuade: Ask for opinion or to convince about a position
-- narrative: Ask to tell a story or personal experience
-- compare: Ask to compare/contrast two or more things
-- other: Doesn't fit standard categories
-
-Respond with ONLY a valid JSON object with these exact fields:
-{
-  "detectedTopic": "The writing prompt OR topic summary",
-  "promptType": "describe|explain|persuade|narrative|compare|other",
-  "iseeCategory": "narrative|expository|persuasive|creative|analytical",
-  "confidence": 0.95,
-  "keywords": ["key", "terms", "from", "prompt"],
-  "suggestedStructure": ["Introduction with thesis", "Body paragraph 1", "Body paragraph 2", "Conclusion"],
-  "relatedTopics": ["related", "topic", "suggestions"],
-  "topicSource": "extracted or summarized"
-}
-
-If you find an explicit writing prompt/question in the text (like "What is your favorite..." or "Describe a time when..."), use topicSource: "extracted" and include the exact prompt.
-
-If no explicit prompt is found, use topicSource: "summarized" and create a concise topic summary based on what the essay is about.`,
-          },
-          {
-            role: "user",
-            content: `Extract the writing prompt from this text (the prompt is usually at the beginning):\n\n${fullText}`,
-          },
-        ]
-      });
-
-      this.logAIResponse('detectTopicEnhanced', response);
-      const content = response.choices[0]?.message?.content || "";
-
-      try {
-        // Parse JSON response
-        const result = JSON.parse(content) as EnhancedTopicResult;
-
-        // Validate required fields
-        if (
-          !result.detectedTopic ||
-          !result.promptType ||
-          !result.iseeCategory
-        ) {
-          throw new Error("Missing required fields");
-        }
-
-        // Ensure arrays are present
-        result.keywords = result.keywords || [];
-        result.suggestedStructure = result.suggestedStructure || [];
-        result.relatedTopics = result.relatedTopics || [];
-
-        // Validate confidence is between 0 and 1
-        result.confidence = Math.max(0, Math.min(1, result.confidence || 0.5));
-
-        // Ensure topicSource is valid
-        result.topicSource = result.topicSource === "extracted" ? "extracted" : "summarized";
-
-        return result;
-      } catch (parseError) {
-        console.warn(
-          "Failed to parse enhanced topic response, falling back to basic detection:",
-          parseError
-        );
-
-        // Fallback to basic topic detection
-        return {
-          detectedTopic: content || "Unable to detect topic",
-          promptType: "other",
-          iseeCategory: "expository",
-          confidence: 0.3,
-          keywords: [],
-          suggestedStructure: ["Introduction", "Body paragraphs", "Conclusion"],
-          relatedTopics: [],
-          topicSource: "summarized"
-        };
-      }
-    } catch (error) {
-      console.error("Enhanced topic detection error:", error);
-      return {
-        detectedTopic: "Topic detection failed",
-        promptType: "other",
-        iseeCategory: "expository",
-        confidence: 0,
-        keywords: [],
-        suggestedStructure: [],
-        relatedTopics: [],
-        topicSource: "summarized"
-      };
-    }
-  }
+  // detectTopicEnhanced removed from pipeline; no longer implemented here.
 
   /**
    * Analyze essay using ISEE rubric (Phase 3 implementation)

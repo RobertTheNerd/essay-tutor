@@ -67,7 +67,10 @@ export async function convertImagesToDocument(
       totalPages: batchResult.totalPages,
       processingTime: Date.now() - startTime,
       confidence: batchResult.orderedPages.reduce((sum, p) => sum + p.confidence, 0) / batchResult.orderedPages.length,
-      aiProcessed: batchResult.aiProcessed
+      aiProcessed: batchResult.aiProcessed,
+      detectedTopic: batchResult.detectedTopic,
+      topicSource: batchResult.topicSource,
+      enhancedTopic: batchResult.enhancedTopic
     }
   }
 }
@@ -81,8 +84,17 @@ export async function extractStructuredEssay(document: MultiPageDocument): Promi
   // Combine all pages into full text
   const fullText = document.pages.map(page => page.content).join('\n\n')
   
-  // Enhanced topic detection
-  const enhancedTopic = await aiClient.detectTopicEnhanced(fullText)
+  // Use topic inferred during image processing when available; otherwise create a basic fallback
+  const enhancedTopic: EnhancedTopicResult = document.metadata.enhancedTopic ?? {
+    detectedTopic: document.metadata.detectedTopic || 'Topic not found',
+    promptType: 'other',
+    iseeCategory: 'expository',
+    confidence: 0.5,
+    keywords: [],
+    suggestedStructure: [],
+    relatedTopics: [],
+    topicSource: document.metadata.topicSource || 'summarized'
+  }
   
   // Extract writing prompt vs student essay
   const { writingPrompt, studentEssayText } = await extractPromptAndEssay(fullText, enhancedTopic)
