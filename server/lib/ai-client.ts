@@ -294,7 +294,6 @@ Important Notes:
             ]
           }
         ],
-        max_tokens: 4000,
         temperature: 0.1
       });
 
@@ -342,52 +341,13 @@ Important Notes:
         };
 
       } catch (parseError) {
-        console.warn("Failed to parse batch processing response, falling back to individual processing:", parseError);
-
-        // Fallback: process images individually
-        const fallbackResults = [];
-        let combinedText = "";
-
-        for (let i = 0; i < imageFiles.length; i++) {
-          const file = imageFiles[i];
-          try {
-            const result = await this.extractTextFromDocument(
-              file.buffer,
-              file.mimeType,
-              file.filename
-            );
-
-            fallbackResults.push({
-              originalIndex: i,
-              correctOrder: i + 1,
-              filename: file.filename,
-              extractedText: result.extractedText,
-              confidence: result.confidence
-            });
-
-            combinedText += result.extractedText + "\n\n";
-          } catch (error) {
-            fallbackResults.push({
-              originalIndex: i,
-              correctOrder: i + 1,
-              filename: file.filename,
-              extractedText: `Error processing ${file.filename}`,
-              confidence: 0
-            });
-          }
-        }
-
-        const enhancedTopic = await this.detectTopicEnhanced(combinedText);
-
-        return {
-          fullText: combinedText,
-          detectedTopic: enhancedTopic.detectedTopic,
-          enhancedTopic,
-          orderedPages: fallbackResults,
-          processingTime: Date.now() - startTime,
-          totalPages: imageFiles.length,
-          aiProcessed: true
-        };
+        console.error(
+          "Failed to parse batch processing response:",
+          parseError,
+          { contentPreview: (content || "").slice(0, 200) }
+        );
+        // Propagate to outer handler to return a uniform failure response
+        throw new Error("Invalid AI JSON response");
       }
 
     } catch (error) {
