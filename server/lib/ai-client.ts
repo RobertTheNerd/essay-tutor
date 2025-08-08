@@ -20,7 +20,7 @@ const openaiClients: { [deploymentName: string]: OpenAI | null } = {};
 /**
  * Get OpenAI client for a specific deployment
  */
-function getOpenAIClientForDeployment(deploymentName: string): OpenAI | null {
+function getOpenAIClientForDeployment(deploymentName: string | undefined): OpenAI | null {
   if (!deploymentName) {
     console.warn('No deployment name provided');
     return null;
@@ -71,23 +71,10 @@ function getOpenAIClientForDeployment(deploymentName: string): OpenAI | null {
 }
 
 /**
- * Legacy function for backward compatibility
- */
-function getOpenAIClient(): OpenAI | null {
-  // Use text deployment as default for backward compatibility
-  const textDeployment = process.env.AZURE_OPENAI_TEXT_DEPLOYMENT_NAME || 
-                         process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 
-                         'default';
-  return getOpenAIClientForDeployment(textDeployment);
-}
-
-/**
  * Get client for text models
  */
 function getTextClient(): OpenAI | null {
-  const deploymentName = process.env.AZURE_OPENAI_TEXT_DEPLOYMENT_NAME || 
-                         process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 
-                         'text-deployment';
+  const deploymentName = process.env.AZURE_OPENAI_TEXT_DEPLOYMENT_NAME;
   return getOpenAIClientForDeployment(deploymentName);
 }
 
@@ -95,18 +82,16 @@ function getTextClient(): OpenAI | null {
  * Get client for vision models
  */
 function getVisionClient(): OpenAI | null {
-  const deploymentName = process.env.AZURE_OPENAI_VISION_DEPLOYMENT_NAME || 
-                         process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 
-                         'vision-deployment';
+  const deploymentName = process.env.AZURE_OPENAI_VISION_DEPLOYMENT_NAME;
   return getOpenAIClientForDeployment(deploymentName);
 }
 
 function getTextModel(): string {
-  return process.env.AZURE_OPENAI_TEXT_MODEL || "gpt-4o-mini";
+  return process.env.AZURE_OPENAI_TEXT_MODEL!;
 }
 
 function getVisionModel(): string {
-  return process.env.AZURE_OPENAI_VISION_MODEL || "gpt-4o-mini";
+  return process.env.AZURE_OPENAI_VISION_MODEL!;
 }
 
 export interface DocumentProcessingResult {
@@ -199,6 +184,30 @@ export class AIClient {
   private getClient() {
     // Default to text client for backward compatibility
     return this.getTextClient()
+  }
+
+  /**
+   * Centralized logger for AI responses
+   */
+  private logAIResponse(contextLabel: string, response: any) {
+    try {
+      const firstChoice = response?.choices?.[0]?.message;
+      const content = firstChoice?.content ?? '';
+      console.log(`[AI Response][${contextLabel}]`, {
+        id: response?.id,
+        model: response?.model,
+        created: response?.created,
+        usage: response?.usage,
+        role: firstChoice?.role ?? 'assistant',
+        contentLength: typeof content === 'string' ? content.length : 0,
+      });
+      if (typeof content === 'string') {
+        console.log(`[AI Raw Content][${contextLabel}]`);
+        console.log(content);
+      }
+    } catch (logError) {
+      console.log(`[AI Response][${contextLabel}] log failed`, logError);
+    }
   }
 
   /**
@@ -296,6 +305,7 @@ Important Notes:
         ]
       });
 
+      this.logAIResponse('processBatchImages', response);
       const content = response.choices[0]?.message?.content || "";
 
       try {
@@ -423,6 +433,7 @@ Important Notes:
             ],
           });
 
+          this.logAIResponse('extractTextFromDocument', response);
           extractedText = response.choices[0]?.message?.content || "";
           aiProcessed = true;
         } else {
@@ -494,7 +505,7 @@ Important Notes:
     }
 
     try {
-      const fullText = text.substring(0, 2000); // Increased context window
+      const fullText = text.substring(0, 8000); // Increased context window
 
       const response = await client.chat.completions.create({
         model: this.textModel,
@@ -543,6 +554,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
         ]
       });
 
+      this.logAIResponse('detectTopicEnhanced', response);
       const content = response.choices[0]?.message?.content || "";
 
       try {
@@ -642,6 +654,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
         ]
       });
 
+      this.logAIResponse('analyzeEssay', response);
       const aiResponse = response.choices[0]?.message?.content;
       if (!aiResponse) {
         throw new Error('No response from AI');
