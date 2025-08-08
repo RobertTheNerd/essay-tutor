@@ -422,7 +422,6 @@ Important Notes:
                 ],
               },
             ],
-            max_tokens: 2000,
           });
 
           extractedText = response.choices[0]?.message?.content || "";
@@ -543,7 +542,6 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
             content: `Extract the writing prompt from this text (the prompt is usually at the beginning):\n\n${fullText}`,
           },
         ],
-        max_tokens: 300,
         temperature: 0.2,
       });
 
@@ -644,8 +642,7 @@ If no explicit prompt is found, use topicSource: "summarized" and create a conci
             content: prompt
           }
         ],
-        temperature: 0.4,
-        max_tokens: 3000
+        temperature: 0.4
       });
 
       const aiResponse = response.choices[0]?.message?.content;
