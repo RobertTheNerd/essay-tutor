@@ -3,7 +3,7 @@
 
 import formidable from 'formidable'
 import { promises as fs } from 'fs'
-import { convertTextToDocument, convertImagesToDocument, extractStructuredEssay } from './document-processor'
+import { convertTextToDocument, processImagesToStructuredEssay } from './document-processor'
 import type { PlatformRequest, PlatformResponse, UnifiedProcessingResponse } from './types'
 
 export interface ProcessRequest {
@@ -26,74 +26,55 @@ export async function handleUnifiedProcessing(
   const startTime = Date.now()
 
   try {
-    let document
-    let inputType: 'text' | 'files'
 
-    // Determine input type and process accordingly
-    if (req.body?.text) {
-      // Text input
-      inputType = 'text'
-      const { text } = req.body as { text: string }
-      
-      if (!text || typeof text !== 'string' || text.trim().length === 0) {
-        return res.status(400).json({ error: 'Text content is required and cannot be empty' })
-      }
-      
-      document = await convertTextToDocument(text)
-      
-    } else {
-      // File input
-      inputType = 'files'
-      const uploadedFiles = await parseUploadedFiles(req, rawReq)
-      
-      if (uploadedFiles.length === 0) {
-        return res.status(400).json({ error: 'No files uploaded' })
-      }
-      
-      // Validate file types
-      const supportedTypes = ['image/jpeg', 'image/png']
-      for (const file of uploadedFiles) {
-        const mimeType = file.mimetype || file.type
-        if (!supportedTypes.includes(mimeType || '')) {
-          return res.status(400).json({ 
-            error: `Unsupported file type: ${file.originalFilename || file.name}. Please upload JPG or PNG images only.` 
-          })
-        }
-      }
-      
-      // Convert files to image processing format
-      const imageFiles = []
-      for (let i = 0; i < uploadedFiles.length; i++) {
-        const file = uploadedFiles[i]
-        const filePath = file.filepath || file.path
-        const fileName = file.originalFilename || file.name
-        const mimeType = file.mimetype || file.type
-        
-        const fileContent = await fs.readFile(filePath)
-        
-        imageFiles.push({
-          buffer: fileContent,
-          filename: fileName || `page-${i + 1}`,
-          mimeType: mimeType || 'image/jpeg'
-        })
-        
-        // Clean up temporary file (FERPA compliance)
-        await fs.unlink(filePath)
-      }
-      
-      document = await convertImagesToDocument(imageFiles)
+    // File input
+    const inputType = 'files'
+    const uploadedFiles = await parseUploadedFiles(req, rawReq)
+
+    if (uploadedFiles.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' })
     }
 
-    // Extract structured essay from document
-    const essay = await extractStructuredEssay(document)
+    // Validate file types
+    const supportedTypes = ['image/jpeg', 'image/png']
+    for (const file of uploadedFiles) {
+      const mimeType = file.mimetype || file.type
+      if (!supportedTypes.includes(mimeType || '')) {
+        return res.status(400).json({
+          error: `Unsupported file type: ${file.originalFilename || file.name}. Please upload JPG or PNG images only.`
+        })
+      }
+    }
+
+    // Convert files to image processing format
+    const imageFiles = []
+    for (let i = 0; i < uploadedFiles.length; i++) {
+      const file = uploadedFiles[i]
+      const filePath = file.filepath || file.path
+      const fileName = file.originalFilename || file.name
+      const mimeType = file.mimetype || file.type
+
+      const fileContent = await fs.readFile(filePath)
+
+      imageFiles.push({
+        buffer: fileContent,
+        filename: fileName || `page-${i + 1}`,
+        mimeType: mimeType || 'image/jpeg'
+      })
+
+      // Clean up temporary file (FERPA compliance)
+      await fs.unlink(filePath)
+    }
+
+    const { document: processedDocument, essay } = await processImagesToStructuredEssay(imageFiles)
     
     const totalProcessingTime = Date.now() - startTime
 
     const response: UnifiedProcessingResponse = {
       success: true,
-      document,
+      document: processedDocument,
       essay,
-      message: generateSuccessMessage(inputType, document, essay),
+      message: generateSuccessMessage(inputType, processedDocument, essay),
       timestamp: new Date().toISOString(),
       processingTime: totalProcessingTime
     }

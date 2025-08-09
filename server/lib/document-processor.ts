@@ -78,32 +78,59 @@ export async function convertImagesToDocument(
 /**
  * Extract structured essay from MultiPageDocument
  */
-export async function extractStructuredEssay(document: MultiPageDocument): Promise<StructuredEssay> {
+export async function processImagesToStructuredEssay(
+  imageFiles: { buffer: Buffer; filename: string; mimeType: string }[]
+): Promise<{ document: MultiPageDocument; essay: StructuredEssay }> {
   const startTime = Date.now()
-  
-  // Combine all pages into full text
-  const fullText = document.pages.map(page => page.content).join('\n\n')
-  
-  // Use topic inferred during image processing when available; otherwise create a basic fallback
-  const enhancedTopic: EnhancedTopicResult = document.metadata.enhancedTopic ?? {
-    detectedTopic: document.metadata.detectedTopic || 'Topic not found',
-    promptType: 'other',
-    iseeCategory: 'expository',
-    confidence: 0.5,
-    keywords: [],
-    suggestedStructure: [],
-    relatedTopics: [],
-    topicSource: document.metadata.topicSource || 'summarized'
+
+  const batchResult = await aiClient.processBatchImages(imageFiles)
+
+  const pages: DocumentPage[] = batchResult.orderedPages.map(page => ({
+    pageNumber: page.correctOrder,
+    content: page.extractedText,
+    confidence: page.confidence,
+    metadata: {
+      originalFilename: page.filename,
+      originalIndex: page.originalIndex
+    }
+  }))
+
+  const document: MultiPageDocument = {
+    pages: pages.sort((a, b) => a.pageNumber - b.pageNumber),
+    metadata: {
+      source: 'images',
+      totalPages: batchResult.totalPages,
+      processingTime: Date.now() - startTime,
+      confidence: batchResult.orderedPages.reduce((sum, p) => sum + p.confidence, 0) / batchResult.orderedPages.length,
+      aiProcessed: batchResult.aiProcessed,
+      detectedTopic: batchResult.detectedTopic,
+      topicSource: batchResult.topicSource,
+      enhancedTopic: batchResult.enhancedTopic
+    }
   }
-  
-  // Extract writing prompt vs student essay
-  const { writingPrompt, studentEssayText } = await extractPromptAndEssay(fullText, enhancedTopic)
-  
-  // Generate advanced statistics and structure analysis
+
+  const fullText = document.pages.map(page => page.content).join('\n\n')
+  const enhancedTopic: EnhancedTopicResult = document.metadata.enhancedTopic!
+  const studentEssayText = batchResult.studentEssayText && batchResult.studentEssayText.trim().length > 0
+    ? batchResult.studentEssayText
+    : fullText
+
+  const writingPromptText = batchResult.writingPromptText && batchResult.writingPromptText.trim().length > 0
+    ? batchResult.writingPromptText
+    : enhancedTopic.detectedTopic
+
+  const writingPrompt: WritingPrompt = {
+    text: writingPromptText,
+    source: (document.metadata.topicSource || 'summarized') as 'extracted' | 'summarized',
+    confidence: enhancedTopic.confidence,
+    iseeCategory: enhancedTopic.iseeCategory,
+    promptType: enhancedTopic.promptType
+  }
+
   const statistics = getAdvancedTextStatistics(studentEssayText)
   const structure = analyzeEssayStructure(studentEssayText)
 
-  return {
+  const essay: StructuredEssay = {
     writingPrompt,
     studentEssay: {
       fullText: studentEssayText,
@@ -117,76 +144,14 @@ export async function extractStructuredEssay(document: MultiPageDocument): Promi
       timestamp: new Date().toISOString()
     }
   }
+
+  return { document, essay }
 }
 
 /**
  * Extract writing prompt from essay text (internal helper)
  */
-async function extractPromptAndEssay(
-  fullText: string, 
-  enhancedTopic: EnhancedTopicResult
-): Promise<{ writingPrompt: WritingPrompt; studentEssayText: string }> {
-  
-  let writingPrompt: WritingPrompt
-  let studentEssayText: string
-
-  if (enhancedTopic.topicSource === 'extracted') {
-    // Try to find the actual prompt in the text
-    const lines = fullText.split('\n').map(line => line.trim()).filter(line => line.length > 0)
-    
-    // Look for prompt patterns in first few lines
-    const promptPatterns = [
-      /^(what|describe|explain|do you|why|how|if you|imagine|compare)/i,
-      /\?$/,
-      /^[A-Z][^.]*[?]/
-    ]
-    
-    let promptLine = ''
-    let essayStartIndex = 0
-    
-    for (let i = 0; i < Math.min(3, lines.length); i++) {
-      const line = lines[i]
-      if (promptPatterns.some(pattern => pattern.test(line))) {
-        promptLine = line
-        essayStartIndex = i + 1
-        break
-      }
-    }
-    
-    if (promptLine) {
-      writingPrompt = {
-        text: promptLine,
-        source: 'extracted',
-        confidence: enhancedTopic.confidence,
-        iseeCategory: enhancedTopic.iseeCategory,
-        promptType: enhancedTopic.promptType
-      }
-      studentEssayText = lines.slice(essayStartIndex).join('\n\n')
-    } else {
-      // Fallback: treat detected topic as prompt, full text as essay
-      writingPrompt = {
-        text: enhancedTopic.detectedTopic,
-        source: 'extracted',
-        confidence: enhancedTopic.confidence * 0.7, // Lower confidence since we couldn't find explicit prompt
-        iseeCategory: enhancedTopic.iseeCategory,
-        promptType: enhancedTopic.promptType
-      }
-      studentEssayText = fullText
-    }
-  } else {
-    // Summarized topic
-    writingPrompt = {
-      text: enhancedTopic.detectedTopic,
-      source: 'summarized',
-      confidence: enhancedTopic.confidence,
-      iseeCategory: enhancedTopic.iseeCategory,
-      promptType: enhancedTopic.promptType
-    }
-    studentEssayText = fullText
-  }
-
-  return { writingPrompt, studentEssayText }
-}
+// Removed regex/heuristic prompt extraction; handled in AI step
 
 // Import existing helper functions
 function getAdvancedTextStatistics(text: string): AdvancedTextStatistics {

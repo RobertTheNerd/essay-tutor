@@ -123,6 +123,9 @@ export interface BatchImageProcessingResult {
   aiProcessed: boolean;
   // Surface the source of the topic from the vision result
   topicSource?: 'extracted' | 'summarized';
+  // New fields from vision to avoid downstream regex/heuristics
+  writingPromptText?: string;
+  studentEssayText?: string;
 }
 
 export interface EssayAnalysisResult {
@@ -276,16 +279,19 @@ export class AIClient {
 	7.	Return ONLY valid JSON in this format:
 
 {
-“detectedTopic”: “The exact writing prompt or a short topic summary”,
-“topicSource”: “extracted or summarized”,
-“pages”: [
-{
-“originalIndex”: 0,
-“correctOrder”: 1,
-“extractedText”: “Full text from this page”,
-“confidence”: 0.95
-}
-]
+  "detectedTopic": "The exact writing prompt or a short topic summary",
+  "topicSource": "extracted or summarized",
+  "confidence": 0.85,
+  "writingPromptText": "Exact prompt if extracted, or short topic summary if summarized",
+  "studentEssayText": "Only the student's essay text with preserved paragraph breaks; exclude the prompt and page instructions",
+  "pages": [
+    {
+      "originalIndex": 0,
+      "correctOrder": 1,
+      "extractedText": "Full text from this page",
+      "confidence": 0.95
+    }
+  ]
 }
 
 Important Notes:
@@ -353,7 +359,9 @@ Important Notes:
           processingTime: Date.now() - startTime,
           totalPages: imageFiles.length,
           aiProcessed: true,
-          topicSource
+          topicSource,
+          writingPromptText: typeof aiResult.writingPromptText === 'string' ? aiResult.writingPromptText : undefined,
+          studentEssayText: typeof aiResult.studentEssayText === 'string' ? aiResult.studentEssayText : undefined,
         };
 
       } catch (parseError) {
