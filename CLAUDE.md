@@ -82,8 +82,7 @@ cd frontend && npm run lint && npm run format
 
 All endpoints work identically on both platforms:
 - `GET /api/hello` - Health check and AI configuration status
-- `POST /api/process` - Unified processing endpoint for text and files
-  - Text input: JSON with `text` field for direct essay processing
+- `POST /api/images-to-essay` - Image upload endpoint that returns a structured essay
   - File input: FormData with `files` for multi-page image upload
   - Features: AI OCR, topic detection, text analysis, ISEE categorization
   - Response includes `essay.writingPrompt.source` for intelligent routing:
@@ -137,7 +136,7 @@ AZURE_OPENAI_TEXT_MODEL=gpt-4o-mini
    - User can review, reorder, or remove images before processing
 
 2. **Stage 2: Batch Processing**
-   - Single `/api/process` call handles all uploaded images
+   - Single `/api/images-to-essay` call handles all uploaded images
    - AI-powered OCR extraction with automatic page ordering
    - Text analysis, topic detection, and prompt extraction
    - Returns structured essay data with confidence indicators
@@ -232,7 +231,7 @@ This policy ensures a clean, maintainable codebase and prevents cluttering the f
 - **Unified Processing Pipeline**: Complete `MultiPageDocument` → `StructuredEssay` workflow
 - **CommonJS Conversion**: Full conversion from ES modules to CommonJS for Vercel compatibility
 - **Zero Code Duplication**: Eliminated ~400 lines of duplicate code between platforms
-- **Clean API Design**: Single `/api/process` endpoint handling both text and file inputs
+- **Clean API Design**: Dedicated `/api/images-to-essay` endpoint for image uploads
 - **Foundation for Evaluation**: Prepared architecture for hierarchical evaluation engine
 
 ### Technical Improvements

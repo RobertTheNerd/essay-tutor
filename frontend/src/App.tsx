@@ -112,7 +112,7 @@ function App() {
         formData.append('files', file)
       })
 
-      const response = await fetch('/api/process', {
+      const response = await fetch('/api/images-to-essay', {
         method: 'POST',
         body: formData,
       })

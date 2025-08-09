@@ -8,7 +8,7 @@ import path from "path"
 
 // Import handlers (will be available after compilation)
 import { handleHello } from "./simple-handlers"
-import { handleUnifiedProcessing } from "./unified-handlers"
+import { handleImagesToEssay } from "./unified-handlers"
 import { handleEvaluation } from "./evaluation/evaluation-handler"
 import { adaptExpressRequest, ResponseAdapter } from "./types"
 
@@ -53,14 +53,14 @@ export function createApp(options: AppOptions = {}) {
     await handleHello(platformReq, platformRes)
   })
 
-  // Unified processing endpoint (handles both text and files)
-  app.post("/api/process", upload.array("files", 10), async (req, res) => {
+  // Images-to-essay endpoint (image uploads only)
+  app.post("/api/images-to-essay", upload.array("files", 10), async (req, res) => {
     try {
       const platformReq = adaptExpressRequest(req)
       const platformRes = new ResponseAdapter(res, "express")
-      await handleUnifiedProcessing(platformReq, platformRes)
+      await handleImagesToEssay(platformReq, platformRes)
     } catch (error) {
-      console.error("Unified processing error:", error)
+      console.error("Images-to-essay processing error:", error)
       res.status(500).json({
         error: "Processing failed",
         details: error instanceof Error ? error.message : "Unknown error",

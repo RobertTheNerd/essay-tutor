@@ -18,7 +18,7 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Essay Tutor Express Server running on port ${PORT}`);
   console.log(`📁 API endpoints:`);
   console.log(`   GET  http://localhost:${PORT}/api/hello`);
-  console.log(`   POST http://localhost:${PORT}/api/process (unified - text & files)`);
+  console.log(`   POST http://localhost:${PORT}/api/images-to-essay (images → structured essay)`);
   console.log(`   POST http://localhost:${PORT}/api/evaluate (essay evaluation)`);
   console.log(`   GET  http://localhost:${PORT}/health`);
   console.log(`🌐 Frontend: http://localhost:${PORT}`);

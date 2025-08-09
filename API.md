@@ -37,72 +37,9 @@ Health check and configuration validation.
 }
 ```
 
-### POST /api/process
+### POST /api/images-to-essay
 
-Unified processing endpoint for both text and file inputs.
-
-#### Text Input
-
-**Content-Type:** `application/json`
-
-**Request Body:**
-```json
-{
-  "text": "Essay content to be processed..."
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "result": {
-    "writingPrompt": {
-      "text": "Detected or summarized prompt",
-      "source": "extracted|summarized",
-      "confidence": 0.95,
-      "iseeCategory": "Creative Expression",
-      "promptType": "personal_narrative"
-    },
-    "studentEssay": {
-      "fullText": "Student essay content...",
-      "structure": {
-        "hasIntroduction": true,
-        "hasBodyParagraphs": true,
-        "hasConclusion": true,
-        "paragraphCount": 4,
-        "estimatedWordCount": 287
-      },
-      "statistics": {
-        "normalizedText": "Clean essay text...",
-        "paragraphs": 4,
-        "sentences": 18,
-        "words": 287,
-        "characters": 1456,
-        "charactersNoSpaces": 1169,
-        "averageWordsPerSentence": 15.9,
-        "averageSentencesPerParagraph": 4.5,
-        "averageCharactersPerWord": 5.1,
-        "longSentences": 3,
-        "shortSentences": 2,
-        "complexWords": 45,
-        "complexityScore": 15.7
-      },
-      "enhancedTopic": {
-        "detectedTopic": "My perfect day",
-        "confidence": 0.92,
-        "topicSource": "extracted",
-        "iseeCategory": "Creative Expression",
-        "promptType": "personal_narrative"
-      }
-    },
-    "metadata": {
-      "processingTime": 1250,
-      "timestamp": "2025-06-30T12:00:00.000Z"
-    }
-  }
-}
-```
+Uploads essay images (JPG/PNG) and returns a structured essay.
 
 #### File Input
 
@@ -115,29 +52,25 @@ Unified processing endpoint for both text and file inputs.
 ```json
 {
   "success": true,
-  "files": [
-    {
-      "name": "essay_page1.jpg",
-      "type": "image/jpeg",
-      "size": 2048576,
-      "processed": true,
-      "pageNumber": 1
+  "document": {
+    "metadata": {
+      "totalPages": 2,
+      "processingTime": 2150,
+      "confidence": 0.88,
+      "aiProcessed": true
     }
-  ],
-  "processing": {
-    "extractedText": "Combined text from all pages...",
-    "detectedTopic": "Essay topic",
-    "wordCount": 287,
-    "characterCount": 1456,
-    "processingTime": 2150,
-    "confidence": 0.88,
-    "totalPages": 2,
-    "pageOrder": [1, 2],
-    "aiProcessed": true
   },
-  "result": {
-    // Same structure as text input response
-  }
+  "essay": {
+    "writingPrompt": {
+      "text": "Detected or summarized prompt",
+      "source": "extracted|summarized",
+      "confidence": 0.95
+    },
+    "studentEssay": {
+      "fullText": "Student essay content..."
+    }
+  },
+  "message": "Successfully processed 2 pages with automatic ordering! Detected Creative Expression essay with extracted topic.
 }
 ```
 
@@ -358,21 +291,12 @@ AZURE_OPENAI_TEXT_MODEL=gpt-4o-mini
 ### JavaScript/TypeScript
 
 ```typescript
-// Basic processing
-const response = await fetch('/api/process', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ text: 'Essay content...' })
-});
-
-const result = await response.json();
-
 // File upload
 const formData = new FormData();
 formData.append('files', file1);
 formData.append('files', file2);
 
-const response = await fetch('/api/process', {
+const response = await fetch('/api/images-to-essay', {
   method: 'POST',
   body: formData
 });
@@ -381,13 +305,8 @@ const response = await fetch('/api/process', {
 ### cURL Examples
 
 ```bash
-# Text processing
-curl -X POST http://localhost:3001/api/process \
-  -H "Content-Type: application/json" \
-  -d '{"text":"Sample essay content for processing."}'
-
 # File upload
-curl -X POST http://localhost:3001/api/process \
+curl -X POST http://localhost:3001/api/images-to-essay \
   -F "files=@essay_page1.jpg" \
   -F "files=@essay_page2.jpg"
 
@@ -398,7 +317,7 @@ curl http://localhost:3001/api/hello?name=TestUser
 ## Changelog
 
 ### Version 2.0.0 (Phase 2.5 - Current)
-- ✅ Unified `/api/process` endpoint
+- ✅ `/api/images-to-essay` endpoint for image uploads
 - ✅ CommonJS compatibility for Vercel
 - ✅ Enhanced topic detection with source attribution
 - ✅ Advanced text statistics and structure analysis

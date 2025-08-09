@@ -1,20 +1,19 @@
-// Unified handlers using the new MultiPageDocument → StructuredEssay pipeline
-// Clean API design without legacy constraints
+// Images-to-essay handler using the MultiPageDocument → StructuredEssay pipeline
+// Clean API design focused on image uploads only
 
-import formidable from 'formidable'
+import formidable from 'formidable' 
 import { promises as fs } from 'fs'
-import { convertTextToDocument, processImagesToStructuredEssay } from './document-processor'
-import type { PlatformRequest, PlatformResponse, UnifiedProcessingResponse } from './types'
+import { processImagesToStructuredEssay } from './document-processor'
+import type { PlatformRequest, PlatformResponse, ImagesToEssayResponse } from './types'
 
-export interface ProcessRequest {
-  text?: string
+export interface ImagesToEssayRequest {
   files?: any[]
 }
 
 /**
- * Unified processing endpoint for both text and file inputs
+ * Images-to-essay processing endpoint (image uploads only)
  */
-export async function handleUnifiedProcessing(
+export async function handleImagesToEssay(
   req: PlatformRequest,
   res: PlatformResponse,
   rawReq?: any // For Vercel formidable parsing
@@ -27,8 +26,6 @@ export async function handleUnifiedProcessing(
 
   try {
 
-    // File input
-    const inputType = 'files'
     const uploadedFiles = await parseUploadedFiles(req, rawReq)
 
     if (uploadedFiles.length === 0) {
@@ -70,11 +67,11 @@ export async function handleUnifiedProcessing(
     
     const totalProcessingTime = Date.now() - startTime
 
-    const response: UnifiedProcessingResponse = {
+    const response: ImagesToEssayResponse = {
       success: true,
       document: processedDocument,
       essay,
-      message: generateSuccessMessage(inputType, processedDocument, essay),
+      message: generateSuccessMessage(processedDocument, essay),
       timestamp: new Date().toISOString(),
       processingTime: totalProcessingTime
     }
@@ -82,7 +79,7 @@ export async function handleUnifiedProcessing(
     return res.status(200).json(response)
 
   } catch (error) {
-    console.error('Unified processing error:', error)
+    console.error('Images-to-essay processing error:', error)
     return res.status(500).json({ 
       error: 'Processing failed',
       details: error instanceof Error ? error.message : 'Unknown error',
@@ -123,29 +120,15 @@ async function parseUploadedFiles(req: PlatformRequest, rawReq?: any): Promise<a
 /**
  * Generate appropriate success message
  */
-function generateSuccessMessage(
-  inputType: 'text' | 'files',
-  document: any,
-  essay: any
-): string {
+function generateSuccessMessage(document: any, essay: any): string {
   const promptSource = essay.writingPrompt.source
   const iseeCategory = essay.writingPrompt.iseeCategory
   const aiProcessed = document.metadata.aiProcessed
+  const pageCount = document.metadata.totalPages
+  const pageText = pageCount === 1 ? 'page' : 'pages'
 
-  if (inputType === 'text') {
-    if (aiProcessed) {
-      return `Text analysis complete! Detected ${iseeCategory} essay with ${promptSource} topic.`
-    } else {
-      return 'Text processed successfully. Set OPENAI_API_KEY for AI analysis.'
-    }
-  } else {
-    const pageCount = document.metadata.totalPages
-    const pageText = pageCount === 1 ? 'page' : 'pages'
-    
-    if (aiProcessed) {
-      return `Successfully processed ${pageCount} ${pageText} with automatic ordering! Detected ${iseeCategory} essay with ${promptSource} topic.`
-    } else {
-      return `${pageCount} ${pageText} uploaded successfully. Set OPENAI_API_KEY for AI processing.`
-    }
+  if (aiProcessed) {
+    return `Successfully processed ${pageCount} ${pageText} with automatic ordering! Detected ${iseeCategory} essay with ${promptSource} topic.`
   }
+  return `${pageCount} ${pageText} uploaded successfully. Set OPENAI_API_KEY for AI processing.`
 }

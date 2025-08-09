@@ -146,8 +146,8 @@ export interface StructuredEssay {
   }
 }
 
-// Unified API Response Structure
-export interface UnifiedProcessingResponse {
+// Images-to-essay API Response Structure
+export interface ImagesToEssayResponse {
   success: boolean
   document: MultiPageDocument
   essay: StructuredEssay

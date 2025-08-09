@@ -22,7 +22,7 @@ This document outlines the architecture and implementation plan for a separate P
 │   (React)       │───▶│   (Vercel)       │───▶│   (Railway/     │
 │                 │    │                  │    │    Render)      │
 │                 │    │   /api/evaluate  │    │                 │
-│                 │    │   /api/process   │    │   /generate-pdf │
+│                 │    │   /api/images-to-essay   │    │   /generate-pdf │
 │                 │    │   /api/pdf-proxy │───▶│   /health       │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```

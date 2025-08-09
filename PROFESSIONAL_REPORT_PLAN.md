@@ -159,7 +159,7 @@ export class ReportService {
 ```
 1. User Input (text or images)
    ↓
-2. POST /api/process (optional - for images)
+2. POST /api/images-to-essay (optional - for images)
    ↓
 3. POST /api/evaluate
    ↓ 
@@ -172,7 +172,7 @@ export class ReportService {
 ```
 1. User Input (text or images)
    ↓
-2. POST /api/process (optional - for images)
+2. POST /api/images-to-essay (optional - for images)
    ↓
 3. POST /api/evaluate
    ↓

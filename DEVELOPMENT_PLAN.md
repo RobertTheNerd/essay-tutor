@@ -390,19 +390,19 @@ Web application for automated ISEE essay evaluation with AI-powered document pro
 ## Phase 2.5: Unified Architecture Refactor (Completed)
 **Status:** ✅ **COMPLETED** (Completed: 2025-06-30)  
 **Duration:** 0.5 weeks  
-**Key Deliverables:** Clean unified processing pipeline and CommonJS architecture
+**Key Deliverables:** Clean images-to-essay processing pipeline and CommonJS architecture
 
 ### Architecture Achievements
 - ✅ Unified `MultiPageDocument` → `StructuredEssay` processing pipeline
 - ✅ CommonJS conversion for Vercel compatibility (eliminated ES module conflicts)
 - ✅ Zero code duplication between platforms (~400 lines eliminated)
-- ✅ Single `/api/process` endpoint handling both text and file inputs
+- ✅ Images-to-essay `/api/images-to-essay` endpoint handling image uploads
 - ✅ Clear separation of writing prompt vs student essay content
 - ✅ Foundation prepared for hierarchical evaluation engine
 
 ### Technical Implementation
 1. ✅ **CommonJS Conversion**: Changed from ES modules to CommonJS for Vercel compatibility
-2. ✅ **Unified API Endpoint**: Single `/api/process` handles both text and file processing
+2. ✅ **Images-to-essay Endpoint**: `/api/images-to-essay` handles image processing to structured essay
 3. ✅ **Shared App Factory**: `/server/lib/app-factory.ts` eliminates platform duplication
 4. ✅ **Clean Imports**: Removed file extensions from imports after CommonJS conversion
 5. ✅ **Document Processing Pipeline**: Complete `convertTextToDocument` and `convertImagesToDocument` functions

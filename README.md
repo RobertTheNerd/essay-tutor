@@ -319,9 +319,8 @@ AZURE_OPENAI_DEPLOYMENT_NAME=your_deployment
 
 **Available on both Vercel and Express servers:**
 
-### POST /api/process
-**Unified processing endpoint for text and files**
-- **Text Input**: JSON with `text` field for direct essay processing
+### POST /api/images-to-essay
+**Images-to-essay processing endpoint**
 - **File Input**: FormData with `files` for multi-page image upload
 - **Features**:
   - AI OCR text extraction with page ordering detection
@@ -361,10 +360,10 @@ cd frontend && npm run dev
 # Health check
 curl http://localhost:3001/api/hello
 
-# Text processing
-curl -X POST http://localhost:3001/api/process-text \
-  -H "Content-Type: application/json" \
-  -d '{"text":"Sample essay text for testing topic detection and statistics."}'
+# Images-to-essay
+curl -X POST http://localhost:3001/api/images-to-essay \
+  -F "files=@essay_page1.jpg" \
+  -F "files=@essay_page2.jpg"
 ```
 
 ### Production Testing
